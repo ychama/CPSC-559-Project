@@ -10,8 +10,8 @@ const endpointBase = "http://localhost:5001/api/svg/";
   },
 };*/
 
-export const getUser = async (userName) => {
-  return axios.get(endpointBase + "getSVG/" + userName).then((response) => {
+export const getSVG = async (svgName) => {
+  return axios.get(endpointBase + "getSVG/" + svgName).then((response) => {
     return response.data;
   });
 };

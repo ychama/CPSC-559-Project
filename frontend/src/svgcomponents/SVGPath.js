@@ -1,5 +1,5 @@
 import React from "react";
-const SVG = (props, onClick, fill) => {
+const SVGPath = (props, onClick, fill) => {
   return (
     <path
       strokeWidth={props.svgStrokeWidth}
@@ -13,4 +13,4 @@ const SVG = (props, onClick, fill) => {
   );
 };
 
-export default SVG;
+export default SVGPath;
