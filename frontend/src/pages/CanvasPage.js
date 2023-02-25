@@ -10,7 +10,7 @@ import {
   ColorPicker,
 } from "@mantine/core";
 import Sidebar from "../components/Sidebar";
-import Flower from "../svg-images/flower.js";
+import SVG from "../svgcomponents/SVG.js";
 
 const CanvasPage = () => {
   const [fillColors, setFillColors] = useState(Array(22).fill("#FFFFFF"));
@@ -23,11 +23,11 @@ const CanvasPage = () => {
   };
 
   return (
-    <AppShell navbar={<Sidebar activePage='WORK' />}>
+    <AppShell navbar={<Sidebar activePage="WORK" />}>
       <Center>
-        <Flower fillColors={fillColors} onFill={onFillColor} />
+        <SVG fillColors={fillColors} onFill={onFillColor} />
         <ColorPicker
-          format='hex'
+          format="hex"
           value={currentColor}
           onChange={setCurrentColor}
         />
