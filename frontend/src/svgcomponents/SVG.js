@@ -1,6 +1,7 @@
 import { React, useState, useEffect } from "react";
 import { getSVG, updateSVG } from "../backendhelpers/svgHelpers.js";
 import { Center, ColorPicker, Container, Stack, Text } from "@mantine/core";
+import { useInterval } from "../helpers/interval.js";
 
 const SVG = () => {
   const [SVGPaths, setSVGPaths] = useState([]);
@@ -24,6 +25,16 @@ const SVG = () => {
       setGroupTransform(SVGData.groupTransform);
     });
   }, []);
+
+  // Using interval to poll database in 1 second intervals for game updates
+  useInterval(() => {
+    getSVG("flower1").then((result) => {
+      const SVGData = result.existingSVG;
+      setSVGPathName(SVGData.SVGName);
+      setSVGPaths(SVGData.svgPaths);
+      setGroupTransform(SVGData.groupTransform);
+    });
+  }, 500);
 
   return (
     // this is the breakdown for the flower image
