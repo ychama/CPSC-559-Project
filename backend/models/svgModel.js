@@ -5,7 +5,7 @@ const svgPath = mongoose.Schema({
   svgStrokeMiterLimit: String,
   svgD: String,
   svgTransform: String,
-  svgStyle: String,
+  svgFill: String,
 });
 
 const svgSchema = mongoose.Schema({
@@ -14,6 +14,7 @@ const svgSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  groupTransform: String,
   svgPaths: [svgPath],
 });
 
