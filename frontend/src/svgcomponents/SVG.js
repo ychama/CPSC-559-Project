@@ -1,6 +1,13 @@
 import { React, useState, useEffect } from "react";
 import { getSVG, updateSVG } from "../backendhelpers/svgHelpers.js";
-import { Center, ColorPicker, Container, Stack, Text } from "@mantine/core";
+import {
+  Center,
+  ColorPicker,
+  Container,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 import { useInterval } from "../helpers/interval.js";
 
 const SVG = () => {
@@ -41,38 +48,41 @@ const SVG = () => {
     // keep the sizing
     <>
       <Stack direction='column' spacing='md'>
-        <Container>
-          <svg
-            width='500.70076'
-            height='570.7067066666666'
-            xmlns='http://www.w3.org/2000/svg'
+        <Center>
+          <Title order={1} color='br-turq'>
+            Coloring Book #1: Flower
+          </Title>
+        </Center>
+        <svg
+          width='500.70076'
+          height='550.7067066666666'
+          xmlns='http://www.w3.org/2000/svg'
+        >
+          <title>Flower Template</title>
+          <g
+            id='layer1'
+            inkscapelabel='Calque 1'
+            inkscapegroupmode='layer'
+            transform={groupTransform}
           >
-            <title>Flower Template</title>
-            <g
-              id='layer1'
-              inkscapelabel='Calque 1'
-              inkscapegroupmode='layer'
-              transform={groupTransform}
-            >
-              <g id='g3020'>
-                {SVGPaths.map((path, index) => {
-                  return (
-                    <path
-                      key={index}
-                      strokeWidth={path.svgStrokeWidth}
-                      strokeMiterlimit={path.svgStrokeMiterLimit}
-                      d={path.svgD}
-                      stroke='#000000'
-                      transform={path.svgTransform}
-                      onClick={() => updateColor(index)}
-                      fill={path.svgFill ? path.svgFill : "#FFFFFF"}
-                    />
-                  );
-                })}
-              </g>
+            <g id='g3020'>
+              {SVGPaths.map((path, index) => {
+                return (
+                  <path
+                    key={index}
+                    strokeWidth={path.svgStrokeWidth}
+                    strokeMiterlimit={path.svgStrokeMiterLimit}
+                    d={path.svgD}
+                    stroke='#000000'
+                    transform={path.svgTransform}
+                    onClick={() => updateColor(index)}
+                    fill={path.svgFill ? path.svgFill : "#FFFFFF"}
+                  />
+                );
+              })}
             </g>
-          </svg>
-        </Container>
+          </g>
+        </svg>
         <Center>
           <ColorPicker
             format='hex'
