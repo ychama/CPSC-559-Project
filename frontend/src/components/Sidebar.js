@@ -61,6 +61,7 @@ const Sidebar = (props) => {
       <Burger
         className='burger'
         color={theme.colors["br-black"][7]}
+        opened={drawerOpened}
         onClick={() => setDrawerOpened((open) => !open)}
       />
       <Drawer
@@ -161,11 +162,11 @@ const Sidebar = (props) => {
                     <Box sx={{ flex: 1 }}>
                       <Text size='sm' weight={500}>
                         {/* {"@" + user.username} */}
-                        {"Thomas"}
+                        {"@John"}
                       </Text>
                       <Text color='white' size='xs'>
                         {/* {user.firstName + " " + user.lastName} */}
-                        {"Thomas Thomas"}
+                        {"John Smith"}
                       </Text>
                     </Box>
 
