@@ -10,11 +10,10 @@ const svgPath = mongoose.Schema({
 
 const svgSchema = mongoose.Schema({
   svgName: {
-    // Image Name
     type: String,
     required: true,
   },
-  groupTransform: String,
+  svgGroupTransform: String,
   svgPaths: [svgPath],
 });
 
