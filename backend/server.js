@@ -43,36 +43,36 @@ app.get(
   })
 );
 
-const wss = new WebSocket.Server({ noServer: true });
+// const wss = new WebSocket.Server({ noServer: true });
 
-wss.on("connection", (ws) => {
-  console.log("A new client has connected!");
+// wss.on("connection", (ws) => {
+//   console.log("A new client has connected!");
 
-  ws.on("message", (message) => {
-    console.log(`Received message: ${message}`);
-    const jsonMsg = JSON.parse(message);
-    // Updating depends on how we send the JSON, we will find the workspace and update the paths
-    workspaceModel.findOneAndUpdate({}, {}, {}, (err, workspace) => {
-      if (err) {
-        console.log("Something went wrong updating the workspace.");
-      } else {
-        console.log("The workspace was successfully updated.");
-        // Send to clients if the backend is successfully updated, we can change this if need be
-        wss.clients.forEach((client) => {
-          // Will need to make sure clients can process other client updates (on open sockets)
-          if (client !== ws && client.readyState === WebSocket.OPEN) {
-            client.send(message);
-          }
-        });
-      }
-    });
-  });
-});
+//   ws.on("message", (message) => {
+//     console.log(`Received message: ${message}`);
+//     const jsonMsg = JSON.parse(message);
+//     // Updating depends on how we send the JSON, we will find the workspace and update the paths
+//     workspaceModel.findOneAndUpdate({}, {}, {}, (err, workspace) => {
+//       if (err) {
+//         console.log("Something went wrong updating the workspace.");
+//       } else {
+//         console.log("The workspace was successfully updated.");
+//         // Send to clients if the backend is successfully updated, we can change this if need be
+//         wss.clients.forEach((client) => {
+//           // Will need to make sure clients can process other client updates (on open sockets)
+//           if (client !== ws && client.readyState === WebSocket.OPEN) {
+//             client.send(message);
+//           }
+//         });
+//       }
+//     });
+//   });
+// });
 
-server.on("upgrade", (request, socket, head) => {
-  wss.handleUpgrade(request, socket, head, (socket) => {
-    wss.emit("connection", socket, request);
-  });
-});
+// server.on("upgrade", (request, socket, head) => {
+//   wss.handleUpgrade(request, socket, head, (socket) => {
+//     wss.emit("connection", socket, request);
+//   });
+// });
 
 app.listen(port, () => console.log("Server started on port " + port));
