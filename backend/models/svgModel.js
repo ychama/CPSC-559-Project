@@ -6,6 +6,8 @@ const svgPath = mongoose.Schema({
   svgD: String,
   svgTransform: String,
   svgFill: String,
+  svgStrokeLinecap: String,
+  svgStrokeLineJoin: String,
 });
 
 const svgSchema = mongoose.Schema({
