@@ -9,7 +9,6 @@ import http from "http";
 import workspaceModel from "./models/workspaceModel.js";
 import WebSocket from "ws";
 import asyncHandler from "express-async-handler";
-dotenv.config({ path: ".env" });
 
 connectMongoDB();
 
