@@ -18,12 +18,13 @@ import {
 import { useForm } from "@mantine/form";
 import logo from "../images/logo.png";
 import "../styles/LoginPage.css";
+import { isValidUsername } from "../helpers/validation";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const theme = useMantineTheme();
 
-  useEffect(() => {}, []);
+  useEffect(() => { }, []);
 
   const loginForm = useForm({
     initialValues: {
@@ -32,7 +33,7 @@ const LoginPage = () => {
     },
 
     validate: {
-      username: (value) => (value === "" ? "Invalid username" : null),
+      username: (value) => (!isValidUsername(value) ? "Invalid username. Only digits and lowercase letters are allowed" : null),
       password: (value) => (value === "" ? "Invalid password" : null),
     },
   });
@@ -73,7 +74,7 @@ const LoginPage = () => {
             <TextInput
               withAsterisk
               label='Username'
-              placeholder='JohnSmith'
+              placeholder='johnsmith'
               {...loginForm.getInputProps("username")}
             />
             <Space h='lg' />
@@ -87,9 +88,12 @@ const LoginPage = () => {
             <Space h='xl' />
             <Stack spacing='xl'>
               <Button type='submit'>LOGIN</Button>
-              {/* <Button onClick={() => setModalOpen(true)}>SIGN UP</Button> */}
             </Stack>
           </form>
+          <Space h='sm' />
+          <Stack spacing='xl'>
+            <Button onClick={() => navigate("/signup")}>SIGN UP</Button>
+          </Stack>
         </Box>
       </MediaQuery>
     </>

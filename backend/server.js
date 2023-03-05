@@ -19,8 +19,8 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use("/api/workspaces", userRoute);
-app.use("/api/users", workspaceRoute);
+app.use("/api/workspaces", workspaceRoute);
+app.use("/api/users", userRoute);
 app.use("/api/svg", svgRoute);
 
 app.get(
