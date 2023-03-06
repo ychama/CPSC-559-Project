@@ -1,14 +1,11 @@
 import express from "express";
-import dotenv from "dotenv";
 import connectMongoDB from "./config/db.js";
+import cors from "cors";
+import asyncHandler from "express-async-handler";
+
 import userRoute from "./routes/userRoute.js";
 import workspaceRoute from "./routes/workspaceRoute.js";
-import svgRoute from "./routes/svgRoute.js";
-import cors from "cors";
-import http from "http";
-import workspaceModel from "./models/workspaceModel.js";
-import WebSocket from "ws";
-import asyncHandler from "express-async-handler";
+import templateRoute from "./routes/templateRoute.js";
 
 connectMongoDB();
 
@@ -21,7 +18,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use("/api/workspaces", workspaceRoute);
 app.use("/api/users", userRoute);
-app.use("/api/svg", svgRoute);
+app.use("/api/templates", templateRoute);
 
 app.get(
   "/api/getUserCookie",

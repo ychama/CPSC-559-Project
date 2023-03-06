@@ -8,10 +8,11 @@ const createWorkspace = asyncHandler(async (req, res) => {
     while (await Workspace.findOne({ workspaceCode: workspaceCode }))
       workspaceCode = uuidv4();
     const newWorkspace = await Workspace.create({
+      workspaceCode: workspaceCode,
       workspaceName: req.body.workspaceName,
       workspaceOwner: req.body.workspaceOwner,
-      workspaceColoringBook: req.body.workspaceColoringBook,
-      workspaceCode: workspaceCode,
+      paths: req.body.paths,
+      groupTransform: req.body.groupTransform,
     });
     res.status(200).json(newWorkspace);
   } catch (error) {
@@ -57,19 +58,51 @@ const getWorkspace = asyncHandler(async (req, res) => {
   }
 });
 
+// const updateSVG = asyncHandler(async (req, res) => {
+//   try {
+//     if (!req.body.templateName) {
+//       res.status(400);
+//       throw new Error("svgName not included in request body.");
+//     }
+//     if (!req.body.svgPaths) {
+//       res.status(400);
+//       throw new Error("svgPaths not included in request body.");
+//     }
+//     const query = { svgName: req.body.svgName };
+//     const update = { svgPaths: req.body.svgPaths };
+
+//     SVG.findOneAndUpdate(query, update, { new: true }, (err, doc) => {
+//       if (err) {
+//         res.status(400);
+//         throw new Error("Error updating SVG.");
+//       }
+//       res.status(200).json({ doc });
+//     });
+//   } catch (error) {
+//     const errMessage = error.message;
+//     res.status(400).json(errMessage);
+//   }
+// });
+
+// not tested
 const updateWorkspace = asyncHandler(async (req, res) => {
   try {
-    if (!req.body.workspaceCode) {
+    if (!req.params.workspaceCode) {
       res.status(400);
       throw new Error("Workspace code not included in request body.");
     }
-    const query = { workspaceCode: req.body.workspaceCode };
-    const update = { workspaceColoringBook: { svgPaths: req.body.svgPaths } };
+    if (!req.body.paths) {
+      res.status(400);
+      throw new Error("paths not included in request body.");
+    }
+
+    const query = { workspaceCode: req.params.workspaceCode };
+    const update = { paths: req.body.paths };
 
     Workspace.findOneAndUpdate(query, update, { new: true }, (err, doc) => {
       if (err) {
         res.status(400);
-        throw new Error("Error updating Coloring Book.");
+        throw new Error("Error updating Workspace Paths");
       }
       res.status(200).json({ doc });
     });
@@ -79,15 +112,16 @@ const updateWorkspace = asyncHandler(async (req, res) => {
   }
 });
 
+// not tested
 const deleteWorkspace = asyncHandler(async (req, res) => {
   try {
     const existingWorkspace = await User.findOne({
-      workspaceCode: req.body.workspaceCode,
+      workspaceCode: req.params.workspaceCode,
     });
     if (!existingWorkspace) {
       res.status(400);
       throw new Error(
-        "Workspace with code " + req.body.workspaceCode + " not found."
+        "Workspace with code " + req.params.workspaceCode + " not found."
       );
     }
     if (existingWorkspace.workspaceOwner != req.params.userName) {
