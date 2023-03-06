@@ -32,7 +32,6 @@ const createUser = asyncHandler(async (req, res) => {
         userPassword: hashedPassword,
         userFirstName: req.body.userFirstName,
         userLastName: req.body.userLastName,
-        userWorkspaces: [],
       });
 
       const token = await jwt.sign({ userName: newUser.userName }, SECRET);
@@ -55,15 +54,15 @@ const createUser = asyncHandler(async (req, res) => {
 const deleteUser = asyncHandler(async (req, res) => {
   try {
     const existingUser = await User.findOne({
-      userName: req.body.userName,
+      userName: req.params.userName,
     });
     if (!existingUser) {
       res.status(400);
-      throw new Error("User " + req.body.userName + " not found.");
+      throw new Error("User " + req.params.userName + " not found.");
     }
     await existingUser.remove();
     res.status(200).json({
-      message: "Removed user account with username: " + req.body.userName,
+      message: "Removed user account with username: " + req.params.userName,
     });
   } catch (error) {
     const errMessage = error.message;
@@ -114,10 +113,10 @@ const getUser = asyncHandler(async (req, res) => {
 
 const updateUser = asyncHandler(async (req, res) => {
   try {
-    const user = await User.findOne({ userName: req.body.userName });
+    const user = await User.findOne({ userName: req.params.userName });
     if (!user) {
       res.status(400);
-      throw new Error("User " + req.body.userName + " not found.");
+      throw new Error("User " + req.params.userName + " not found.");
     }
     const updatedUser = await User.findByIdAndUpdate(user._id, req.body, {
       new: true,
@@ -151,23 +150,23 @@ const getUserInfo = asyncHandler(async (req, res) => {
   }
 });
 
-const getUserWorkspaces = asyncHandler(async (req, res) => {
-  try {
-    const existingUser = await User.findOne({
-      userName: req.params.userName,
-    });
-    if (!existingUser) {
-      res.status(400);
-      throw new Error('User "' + req.params.userName + '" not found.');
-    }
-    res.status(200).json({
-      userWorkspaces: existingUser.userWorkspaces,
-    });
-  } catch (error) {
-    const errMessage = error.message;
-    res.status(400).json(errMessage);
-  }
-});
+// const getUserWorkspaces = asyncHandler(async (req, res) => {
+//   try {
+//     const existingUser = await User.findOne({
+//       userName: req.params.userName,
+//     });
+//     if (!existingUser) {
+//       res.status(400);
+//       throw new Error('User "' + req.params.userName + '" not found.');
+//     }
+//     res.status(200).json({
+//       userWorkspaces: existingUser.userWorkspaces,
+//     });
+//   } catch (error) {
+//     const errMessage = error.message;
+//     res.status(400).json(errMessage);
+//   }
+// });
 
 export {
   createUser,
@@ -175,5 +174,4 @@ export {
   getUser,
   updateUser,
   getUserInfo,
-  getUserWorkspaces,
 };

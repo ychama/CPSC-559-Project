@@ -59,12 +59,12 @@ const getWorkspace = asyncHandler(async (req, res) => {
 
 const updateWorkspace = asyncHandler(async (req, res) => {
   try {
-    if (!req.body.workspaceCode) {
+    if (!req.params.workspaceCode) {
       res.status(400);
       throw new Error("Workspace code not included in request body.");
     }
-    const query = { workspaceCode: req.body.workspaceCode };
-    const update = { workspaceColoringBook: { svgPaths: req.body.svgPaths } };
+    const query = { workspaceCode: req.params.workspaceCode };
+    const update = { workspaceColoringBook: { svgPaths: req.body.paths } };
 
     Workspace.findOneAndUpdate(query, update, { new: true }, (err, doc) => {
       if (err) {
@@ -82,12 +82,12 @@ const updateWorkspace = asyncHandler(async (req, res) => {
 const deleteWorkspace = asyncHandler(async (req, res) => {
   try {
     const existingWorkspace = await User.findOne({
-      workspaceCode: req.body.workspaceCode,
+      workspaceCode: req.params.workspaceCode,
     });
     if (!existingWorkspace) {
       res.status(400);
       throw new Error(
-        "Workspace with code " + req.body.workspaceCode + " not found."
+        "Workspace with code " + req.params.workspaceCode + " not found."
       );
     }
     if (existingWorkspace.workspaceOwner != req.params.userName) {
