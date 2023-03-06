@@ -20,6 +20,19 @@ const createWorkspace = asyncHandler(async (req, res) => {
   }
 });
 
+const getAllWorkspaces = asyncHandler(async (req, res) => {
+  try {
+    const existingWorkspaces = await Workspace.find({});
+    // if (!existingWorkspaces) {
+    //   res.status(400).json("No Workspaces were found.");
+    // }
+    res.status(200).json({ existingWorkspaces });
+  } catch (error) {
+    const errMessage = error.message;
+    res.status(400).json(errMessage);
+  }
+});
+
 const getWorkspace = asyncHandler(async (req, res) => {
   try {
     if (!req.params.workspaceCode) {
@@ -97,4 +110,10 @@ const deleteWorkspace = asyncHandler(async (req, res) => {
   }
 });
 
-export { getWorkspace, updateWorkspace, deleteWorkspace, createWorkspace };
+export {
+  getWorkspace,
+  getAllWorkspaces,
+  updateWorkspace,
+  deleteWorkspace,
+  createWorkspace,
+};

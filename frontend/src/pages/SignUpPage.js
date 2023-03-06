@@ -17,20 +17,23 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import logo from "../images/logo.png";
-import "../styles/LoginPage.css";
-import { isValidUsername } from "../helpers/validation";
-import { signIn } from "../backendhelpers/userHelpers.js";
+import { isValidEmail, isValidUsername } from "../helpers/validation";
+import { signUp } from "../backendhelpers/userHelpers.js";
 
-const LoginPage = () => {
+const SignUpPage = () => {
   const navigate = useNavigate();
   const theme = useMantineTheme();
 
   useEffect(() => {}, []);
 
-  const loginForm = useForm({
+  const signUpForm = useForm({
     initialValues: {
       username: "",
+      email: "",
+      firstName: "",
+      lastName: "",
       password: "",
+      confirmPassword: "",
     },
 
     validate: {
@@ -38,14 +41,20 @@ const LoginPage = () => {
         !isValidUsername(value)
           ? "Invalid username. Only digits and lowercase letters are allowed"
           : null,
+      email: (value) => (!isValidEmail(value) ? "Invalid email format" : null),
+      firstName: (value) => (value === "" ? "Invalid first name" : null),
+      lastName: (value) => (value === "" ? "Invalid last name" : null),
       password: (value) => (value === "" ? "Invalid password" : null),
     },
   });
 
-  const handleSignIn = async (values) => {
+  const handleSignUp = async (values) => {
     try {
-      let token = await signIn({
+      let token = await signUp({
         userName: values.username,
+        userEmail: values.email,
+        userFirstName: values.firstName,
+        userLastName: values.lastName,
         userPassword: values.password,
       });
       localStorage.setItem("token", token);
@@ -82,34 +91,57 @@ const LoginPage = () => {
         styles={{ paddingLeft: "30px", paddingRight: "30px", height: "100vh" }}
       >
         <Box sx={{ maxWidth: 400 }} mx='auto'>
-          <form onSubmit={loginForm.onSubmit((values) => handleSignIn(values))}>
+          <form
+            onSubmit={signUpForm.onSubmit((values) => handleSignUp(values))}
+          >
             <TextInput
               withAsterisk
               label='Username'
               placeholder='johnsmith'
-              {...loginForm.getInputProps("username")}
+              {...signUpForm.getInputProps("username")}
+            />
+            <Space h='lg' />
+            <TextInput
+              withAsterisk
+              label='Email'
+              placeholder='JohnSmith@gmail.com'
+              {...signUpForm.getInputProps("email")}
+            />
+            <Space h='lg' />
+            <TextInput
+              withAsterisk
+              label='First Name'
+              placeholder='John'
+              {...signUpForm.getInputProps("firstName")}
+            />
+            <Space h='lg' />
+            <TextInput
+              withAsterisk
+              label='Last Name'
+              placeholder='Smith'
+              {...signUpForm.getInputProps("lastName")}
             />
             <Space h='lg' />
             <PasswordInput
               withAsterisk
               label='Password'
               placeholder='Password'
-              {...loginForm.getInputProps("password")}
+              {...signUpForm.getInputProps("password")}
             />
             <Space h='xl' />
             <Space h='xl' />
             <Stack spacing='xl'>
-              <Button type='submit'>LOGIN</Button>
+              <Button type='submit'>Create New User</Button>
+            </Stack>
+            <Space h='sm' />
+            <Stack spacing='xl'>
+              <Button onClick={() => navigate("/")}>Back</Button>
             </Stack>
           </form>
-          <Space h='sm' />
-          <Stack spacing='xl'>
-            <Button onClick={() => navigate("/signup")}>SIGN UP</Button>
-          </Stack>
         </Box>
       </MediaQuery>
     </>
   );
 };
 
-export default LoginPage;
+export default SignUpPage;
