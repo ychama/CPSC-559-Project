@@ -24,7 +24,7 @@ const SignUpPage = () => {
   const navigate = useNavigate();
   const theme = useMantineTheme();
 
-  useEffect(() => { }, []);
+  useEffect(() => {}, []);
 
   const signUpForm = useForm({
     initialValues: {
@@ -33,16 +33,18 @@ const SignUpPage = () => {
       firstName: "",
       lastName: "",
       password: "",
-      confirmPassword: ""
+      confirmPassword: "",
     },
 
     validate: {
-      username: (value) => (!isValidUsername(value) ? "Invalid username. Only digits and lowercase letters are allowed" : null),
+      username: (value) =>
+        !isValidUsername(value)
+          ? "Invalid username. Only digits and lowercase letters are allowed"
+          : null,
       email: (value) => (!isValidEmail(value) ? "Invalid email format" : null),
       firstName: (value) => (value === "" ? "Invalid first name" : null),
       lastName: (value) => (value === "" ? "Invalid last name" : null),
       password: (value) => (value === "" ? "Invalid password" : null),
-      // confirmPassword: (value) => (value === password ? "Passwords do not match" : null), how do I do this?
     },
   });
 
@@ -53,12 +55,12 @@ const SignUpPage = () => {
         userEmail: values.email,
         userFirstName: values.firstName,
         userLastName: values.lastName,
-        userPassword: values.password
-      })
-      console.log(token);
-      navigate("/");
+        userPassword: values.password,
+      });
+      localStorage.setItem("token", token);
+      navigate("/home");
     } catch (err) {
-      console.log(err.response.data.error)
+      console.log(err);
     }
   };
 
@@ -89,7 +91,9 @@ const SignUpPage = () => {
         styles={{ paddingLeft: "30px", paddingRight: "30px", height: "100vh" }}
       >
         <Box sx={{ maxWidth: 400 }} mx='auto'>
-          <form onSubmit={signUpForm.onSubmit((values) => handleSignUp(values))}>
+          <form
+            onSubmit={signUpForm.onSubmit((values) => handleSignUp(values))}
+          >
             <TextInput
               withAsterisk
               label='Username'
@@ -123,13 +127,6 @@ const SignUpPage = () => {
               label='Password'
               placeholder='Password'
               {...signUpForm.getInputProps("password")}
-            />
-            <Space h='lg' />
-            <PasswordInput
-              withAsterisk
-              label='Confirm Password'
-              placeholder='Password'
-              {...signUpForm.getInputProps("confirmPassword")}
             />
             <Space h='xl' />
             <Space h='xl' />
