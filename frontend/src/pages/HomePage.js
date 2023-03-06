@@ -14,6 +14,7 @@ import {
 } from "@mantine/core";
 import { getWorkspace } from "../backendhelpers/workspaceHelper";
 import Sidebar from "../components/Sidebar";
+import plus from "../images/plus.png";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -37,38 +38,6 @@ const HomePage = () => {
       canvasID: 124151,
       participants: 4,
       capacity: 5,
-      thumbNail:
-        "https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80",
-    },
-    {
-      name: "Yassin's Canvas",
-      canvasID: 5362352,
-      participants: 5,
-      capacity: 5,
-      thumbNail:
-        "https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80",
-    },
-    {
-      name: "Alejo's Canvas",
-      canvasID: 346233,
-      participants: 10,
-      capacity: 2,
-      thumbNail:
-        "https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80",
-    },
-    {
-      name: "Yazan's Canvas",
-      canvasID: 53923,
-      participants: 6,
-      capacity: 7,
-      thumbNail:
-        "https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80",
-    },
-    {
-      name: "Rohit's Canvas",
-      canvasID: 90432,
-      participants: 1,
-      capacity: 100,
       thumbNail:
         "https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80",
     },

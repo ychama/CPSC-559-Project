@@ -4,7 +4,7 @@ import { Stack, AppShell, Text } from "@mantine/core";
 import Sidebar from "../components/Sidebar";
 
 const GalleryPage = () => {
-  return <AppShell navbar={<Sidebar activePage='GALLERY' />}></AppShell>;
+  return <AppShell navbar={<Sidebar activePage='CREATE' />}></AppShell>;
 };
 
 export default GalleryPage;

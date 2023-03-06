@@ -118,14 +118,14 @@ const Sidebar = (props) => {
                   variant='subtle'
                   leftIcon={<IconPhotoSearch size={50} />}
                   size='xl'
-                  color={activePage === "GALLERY" ? "br-black" : "br-white"}
+                  color={activePage === "CREATE" ? "br-black" : "br-white"}
                   onClick={() => {
-                    navigate("/gallery");
+                    navigate("/create");
                   }}
                   fullWidth
                   className='button'
                 >
-                  GALLERY
+                  CREATE
                 </Button>
               </>
             ) : null}

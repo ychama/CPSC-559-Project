@@ -7,7 +7,7 @@ import SignUpPage from "./pages/SignUpPage";
 import HomePage from "./pages/HomePage";
 import CanvasPage from "./pages/CanvasPage";
 import { useColorScheme } from "@mantine/hooks";
-import GalleryPage from "./pages/GalleryPage";
+import CreatePage from "./pages/CreatePage";
 
 function App() {
   const preferredColorScheme = useColorScheme();
@@ -110,7 +110,7 @@ function App() {
             <Route path='signup' element={<SignUpPage />} />
             <Route path='home' element={<HomePage />} />
             <Route path='work' element={<CanvasPage />} />
-            <Route path='gallery' element={<GalleryPage />} />
+            <Route path='create' element={<CreatePage />} />
           </Routes>
         </BrowserRouter>
       </MantineProvider>

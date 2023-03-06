@@ -6,6 +6,7 @@ import {
   Container,
   Stack,
   Text,
+  TextInput,
   Title,
 } from "@mantine/core";
 import { useInterval } from "../helpers/interval.js";
@@ -48,25 +49,25 @@ const SVG = () => {
     // this is the breakdown for the flower image
     // keep the sizing
     <>
-      <Stack direction="column" spacing="md">
+      <Stack direction='column' spacing='md'>
         <Center>
-          <Title order={1} color="br-turq">
+          <Title order={1} color='br-turq'>
             {SVGTitleName}
           </Title>
         </Center>
         <svg
-          width="500.70076"
-          height="550.7067066666666"
-          xmlns="http://www.w3.org/2000/svg"
+          width='500.70076'
+          height='550.7067066666666'
+          xmlns='http://www.w3.org/2000/svg'
         >
           <title>Flower Template</title>
           <g
-            id="layer1"
-            inkscapelabel="Calque 1"
-            inkscapegroupmode="layer"
+            id='layer1'
+            inkscapelabel='Calque 1'
+            inkscapegroupmode='layer'
             transform={groupTransform}
           >
-            <g id="g3020">
+            <g id='g3020'>
               {SVGPaths.map((path, index) => {
                 return (
                   <path
@@ -74,7 +75,7 @@ const SVG = () => {
                     strokeWidth={path.svgStrokeWidth}
                     strokeMiterlimit={path.svgStrokeMiterLimit}
                     d={path.svgD}
-                    stroke="#000000"
+                    stroke='#000000'
                     transform={path.svgTransform}
                     onClick={() => updateColor(index)}
                     fill={path.svgFill ? path.svgFill : "#FFFFFF"}
@@ -86,13 +87,18 @@ const SVG = () => {
         </svg>
         <Center>
           <ColorPicker
-            format="hex"
+            format='hex'
             value={currentColor}
             onChange={setCurrentColor}
           />
         </Center>
-        <Center mt="md">
-          <Text color="br-black">Current Color: {currentColor}</Text>
+        <Center mt='sm'>
+          <TextInput
+            placeholder='#FFFFFF'
+            value={currentColor}
+            label='Current color'
+            onChange={(e) => setCurrentColor(e.target.value)}
+          ></TextInput>
         </Center>
       </Stack>
     </>
