@@ -19,12 +19,13 @@ import { useForm } from "@mantine/form";
 import logo from "../images/logo.png";
 import "../styles/LoginPage.css";
 import { isValidUsername } from "../helpers/validation";
+import { signIn } from "../backendhelpers/userHelpers.js";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const theme = useMantineTheme();
 
-  useEffect(() => { }, []);
+  useEffect(() => {}, []);
 
   const loginForm = useForm({
     initialValues: {
@@ -33,14 +34,25 @@ const LoginPage = () => {
     },
 
     validate: {
-      username: (value) => (!isValidUsername(value) ? "Invalid username. Only digits and lowercase letters are allowed" : null),
+      username: (value) =>
+        !isValidUsername(value)
+          ? "Invalid username. Only digits and lowercase letters are allowed"
+          : null,
       password: (value) => (value === "" ? "Invalid password" : null),
     },
   });
 
-  const handleSignIn = (values) => {
-    console.log(values);
-    navigate("/home");
+  const handleSignIn = async (values) => {
+    try {
+      let token = await signIn({
+        userName: values.username,
+        userPassword: values.password,
+      });
+      localStorage.setItem("token", token);
+      navigate("/home");
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
