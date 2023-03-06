@@ -14,7 +14,6 @@ import {
 } from "@mantine/core";
 import { getWorkspace } from "../backendhelpers/workspaceHelper";
 import Sidebar from "../components/Sidebar";
-import plus from "../images/plus.png";
 
 const HomePage = () => {
   const navigate = useNavigate();
