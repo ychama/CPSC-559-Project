@@ -9,12 +9,6 @@ const userSchema = mongoose.Schema({
   userPassword: { type: String, required: true },
   userFirstName: { type: String, required: true },
   userLastName: { type: String, required: true },
-  userWorkspaces: [
-    {
-      workspaceName: { type: String, required: true },
-      worskpaceCode: { type: String, required: true },
-    },
-  ],
 });
 
 export default mongoose.model("User", userSchema);

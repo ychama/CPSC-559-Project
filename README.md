@@ -17,8 +17,8 @@ sunflower SVG
 
 {
    "_id": ObjectID(),
-   "svgName":"flower1",
-   "svgPaths":[
+   "templateName":"flower1",
+   "paths":[
       {
          "svgStrokeWidth":"0.39355",
          "svgStrokeMiterLimit":"2",
