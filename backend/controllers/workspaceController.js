@@ -7,7 +7,7 @@ const createWorkspace = asyncHandler(async (req, res) => {
     let workspaceCode = uuidv4();
     while (await Workspace.findOne({ workspaceCode: workspaceCode }))
       workspaceCode = uuidv4();
-    const newWorkspace = await User.create({
+    const newWorkspace = await Workspace.create({
       workspaceName: req.body.workspaceName,
       workspaceOwner: req.body.workspaceOwner,
       workspaceColoringBook: req.body.workspaceColoringBook,
@@ -46,8 +46,8 @@ const getWorkspace = asyncHandler(async (req, res) => {
       res.status(400);
       throw new Error(
         "No Workspaces with the code " +
-          req.params.workspaceCode +
-          " were found."
+        req.params.workspaceCode +
+        " were found."
       );
     }
     res.status(200).json({ existingWorkspace });
@@ -94,9 +94,9 @@ const deleteWorkspace = asyncHandler(async (req, res) => {
       res.status(400);
       throw new Error(
         "User " +
-          req.params.userName +
-          " is not the owner of the Workspace: " +
-          existingWorkspace.workspaceName
+        req.params.userName +
+        " is not the owner of the Workspace: " +
+        existingWorkspace.workspaceName
       );
     }
     const workspaceName = existingWorkspace.workspaceName;
