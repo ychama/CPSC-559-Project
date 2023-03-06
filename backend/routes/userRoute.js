@@ -13,9 +13,9 @@ const userRoute = express.Router();
 
 userRoute.post("/signup", createUser);
 userRoute.post("/login", getUser);
-userRoute.put("/updateaccount", loggedIn, updateUser);
-userRoute.get("/getuser/:userName", loggedIn, getUserInfo);
-userRoute.get("/getuserworkspaces", loggedIn, getUserWorkspaces);
-userRoute.delete("/deleteaccount", loggedIn, deleteUser);
+userRoute.put("/updateaccount", updateUser);
+userRoute.get("/getuser/:userName", getUserInfo);
+userRoute.get("/getuserworkspaces", getUserWorkspaces);
+userRoute.delete("/deleteaccount", deleteUser);
 
 export default userRoute;

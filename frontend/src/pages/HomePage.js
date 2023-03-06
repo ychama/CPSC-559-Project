@@ -19,6 +19,8 @@ const HomePage = () => {
   const navigate = useNavigate();
   const theme = useMantineTheme();
 
+  const [workspaces, setWorkspaces] = useState([]);
+
   useEffect(() => {
     if (!localStorage.getItem("token")) {
       navigate("/");
@@ -40,14 +42,46 @@ const HomePage = () => {
       thumbNail:
         "https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80",
     },
+    {
+      name: "Yassin's Canvas",
+      canvasID: 5362352,
+      participants: 5,
+      capacity: 5,
+      thumbNail:
+        "https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80",
+    },
+    {
+      name: "Alejo's Canvas",
+      canvasID: 346233,
+      participants: 10,
+      capacity: 2,
+      thumbNail:
+        "https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80",
+    },
+    {
+      name: "Yazan's Canvas",
+      canvasID: 53923,
+      participants: 6,
+      capacity: 7,
+      thumbNail:
+        "https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80",
+    },
+    {
+      name: "Rohit's Canvas",
+      canvasID: 90432,
+      participants: 1,
+      capacity: 100,
+      thumbNail:
+        "https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80",
+    },
   ];
 
   const getWorkspaces = async () => {
     try {
-      let workspaces = await getWorkspace({
+      let res = await getWorkspace({
         token: localStorage.getItem("token"),
       });
-      console.log(workspaces);
+      setWorkspaces(res.existingWorkspaces);
     } catch (err) {
       console.log(err);
     }
@@ -56,19 +90,18 @@ const HomePage = () => {
   return (
     <AppShell navbar={<Sidebar activePage='HOME' />}>
       <SimpleGrid cols={3} m='lg'>
-        {cardData.map((canvas) => (
-          <Card shadow='sm' p='lg' radius='md' withBorder>
+        {workspaces.map((workspace, index) => (
+          <Card key={index} shadow='sm' p='lg' radius='md' withBorder>
             <Card.Section>
-              <Image
-                src={canvas.thumbNail}
-                height={160}
-                alt='Image of {canvas.name}'
-              />
+              <Image src={""} height={160} alt='Stock Image' />
             </Card.Section>
             <Text mt='sm' weight={500}>
-              {canvas.name}
+              {workspace.workspaceName}
             </Text>
-            {canvas.participants < canvas.capacity && (
+            <Text mb='sm' size='sm' color='dimmed'>
+              Owner: {workspace.workspaceOwner}
+            </Text>
+            {/* {canvas.participants < canvas.capacity && (
               <Text mb='sm' size='sm' color='dimmed'>
                 {canvas.participants}/{canvas.capacity} artists joined
               </Text>
@@ -77,13 +110,13 @@ const HomePage = () => {
               <Badge mb='xs' radius='sm' color='orange' variant='filled'>
                 Canvas Full
               </Badge>
-            )}
+            )} */}
             <Button
               shadow='sm'
               fullWidth
-              disabled={canvas.participants >= canvas.capacity}
+              disabled={false}
               onClick={() => {
-                handleJoinCanvas(canvas.canvasID);
+                handleJoinCanvas(124151);
               }}
             >
               Join
