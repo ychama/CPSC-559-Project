@@ -3,7 +3,7 @@ import { getTemplate, getAllTemplates } from "../controllers/templateController.
 
 const templateRoute = express.Router();
 
-templateRoute.get("/:svgName", getTemplate);
+templateRoute.get("/:templateName", getTemplate);
 templateRoute.get("/", getAllTemplates);
 
 export default templateRoute;

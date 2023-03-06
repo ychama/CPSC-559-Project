@@ -6,7 +6,6 @@ import {
   getUser,
   updateUser,
   getUserInfo,
-  getUserWorkspaces,
 } from "../controllers/userController.js";
 
 const userRoute = express.Router();

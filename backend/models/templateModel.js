@@ -11,12 +11,9 @@ export const svgPath = mongoose.Schema({
 });
 
 const templateSchema = mongoose.Schema({
-  templateName: {
-    type: String,
-    required: true,
-  },
-  groupTransform: String,
-  paths: [svgPath],
+  templateName: { type: String, required: true },
+  groupTransform: { type: String, required: true },
+  paths: [svgPath]
 });
 
 export default mongoose.model("Template", templateSchema);

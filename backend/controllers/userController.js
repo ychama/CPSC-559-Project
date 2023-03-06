@@ -51,6 +51,7 @@ const createUser = asyncHandler(async (req, res) => {
   }
 });
 
+// not tested
 const deleteUser = asyncHandler(async (req, res) => {
   try {
     const existingUser = await User.findOne({
@@ -111,6 +112,7 @@ const getUser = asyncHandler(async (req, res) => {
   }
 });
 
+// not tested
 const updateUser = asyncHandler(async (req, res) => {
   try {
     const user = await User.findOne({ userName: req.params.userName });
