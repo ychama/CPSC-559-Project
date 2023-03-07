@@ -1,20 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Flex,
   AppShell,
   Text,
   Card,
   Image,
-  Badge,
   Button,
-  Center,
   useMantineTheme,
   SimpleGrid,
 } from "@mantine/core";
-import { getWorkspace } from "../backendhelpers/workspaceHelper";
+import { getAllWorkspaces } from "../backendhelpers/workspaceHelper";
 import Sidebar from "../components/Sidebar";
-import plus from "../images/plus.png";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -30,15 +26,14 @@ const HomePage = () => {
     }
   }, []);
 
-  const handleJoinCanvas = (id) => {
-    navigate("/work", { state: { canvasID: id } });
+  const handleJoinCanvas = (code) => {
+    localStorage.setItem("workspaceCode", code);
+    navigate("/canvas");
   };
 
   const getWorkspaces = async () => {
     try {
-      let res = await getWorkspace({
-        token: localStorage.getItem("token"),
-      });
+      let res = await getAllWorkspaces();
       setWorkspaces(res.existingWorkspaces);
     } catch (err) {
       console.log(err);
@@ -78,7 +73,7 @@ const HomePage = () => {
               fullWidth
               disabled={false}
               onClick={() => {
-                handleJoinCanvas(124151);
+                handleJoinCanvas(workspace.workspaceCode);
               }}
             >
               Join
