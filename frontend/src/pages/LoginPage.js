@@ -25,7 +25,11 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const theme = useMantineTheme();
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      navigate("/home");
+    }
+  }, []);
 
   const loginForm = useForm({
     initialValues: {
