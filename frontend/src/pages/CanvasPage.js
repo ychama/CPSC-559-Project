@@ -28,7 +28,7 @@ This will be transmitted to all clients connected to the wss
 
 const CanvasPage = () => {
   return (
-    <AppShell navbar={<Sidebar activePage="WORK" />}>
+    <AppShell navbar={<Sidebar activePage='HOME' />}>
       <Center>
         <SVG />
       </Center>
