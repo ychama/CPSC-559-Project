@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Stack, AppShell, Text } from "@mantine/core";
+import React from "react";
+import { AppShell, Center } from "@mantine/core";
 import Sidebar from "../components/Sidebar";
 
 const GalleryPage = () => {

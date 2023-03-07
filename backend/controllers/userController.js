@@ -81,7 +81,11 @@ const getUser = asyncHandler(async (req, res) => {
     const user = await User.findOne({
       userName: req.body.userName,
     });
-    if (user) {
+    if (!user) {
+      res
+        .status(402)
+        .json({ error: "User " + req.body.userName + " not found." });
+    } else {
       const comparison = await bcrypt.compare(
         req.body.userPassword,
         user.userPassword
@@ -99,12 +103,9 @@ const getUser = asyncHandler(async (req, res) => {
         res.status(200).json(token);
       } else {
         res
-          .status(400)
+          .status(405)
           .json({ error: "Password does not match existing password." });
       }
-    } else {
-      res.status(400);
-      throw new Error("User " + req.body.userName + " not found.");
     }
   } catch (error) {
     const errMessage = error.message;
@@ -170,10 +171,4 @@ const getUserInfo = asyncHandler(async (req, res) => {
 //   }
 // });
 
-export {
-  createUser,
-  deleteUser,
-  getUser,
-  updateUser,
-  getUserInfo,
-};
+export { createUser, deleteUser, getUser, updateUser, getUserInfo };

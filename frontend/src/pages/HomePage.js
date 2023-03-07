@@ -1,18 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Flex,
   AppShell,
   Text,
   Card,
   Image,
-  Badge,
   Button,
-  Center,
   useMantineTheme,
   SimpleGrid,
 } from "@mantine/core";
-import { getWorkspace } from "../backendhelpers/workspaceHelper";
+import { getAllWorkspaces } from "../backendhelpers/workspaceHelper";
 import Sidebar from "../components/Sidebar";
 
 const HomePage = () => {
@@ -23,21 +20,20 @@ const HomePage = () => {
 
   useEffect(() => {
     if (!localStorage.getItem("token")) {
-      navigate("/login");
+      navigate("/");
     } else {
       getWorkspaces();
     }
   }, []);
 
-  const handleJoinCanvas = (id) => {
-    navigate("/work", { state: { canvasID: id } });
+  const handleJoinCanvas = (code) => {
+    localStorage.setItem("workspaceCode", code);
+    navigate("/canvas");
   };
 
   const getWorkspaces = async () => {
     try {
-      let res = await getWorkspace({
-        token: localStorage.getItem("token"),
-      });
+      let res = await getAllWorkspaces();
       setWorkspaces(res.existingWorkspaces);
     } catch (err) {
       console.log(err);
@@ -51,7 +47,7 @@ const HomePage = () => {
           <Card key={index} shadow='sm' p='lg' radius='md' withBorder>
             <Card.Section>
               <Image
-                src="https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80"
+                src='https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80'
                 height={160}
                 alt='Stock Image'
               />
@@ -77,7 +73,7 @@ const HomePage = () => {
               fullWidth
               disabled={false}
               onClick={() => {
-                handleJoinCanvas(124151);
+                handleJoinCanvas(workspace.workspaceCode);
               }}
             >
               Join

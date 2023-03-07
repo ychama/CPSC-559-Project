@@ -40,13 +40,13 @@ const Sidebar = (props) => {
    * Logs user out of application
    */
   const logout = () => {
-    fetch("/user/logout/", {
-      method: "POST",
-    }).then((response) => {
-      localStorage.removeItem("user");
-      localStorage.removeItem("authenticated");
-      navigate("/");
-    });
+    // fetch("/user/logout/", {
+    //   method: "POST",
+    // }).then((response) => {
+    //   navigate("/");
+    // });
+    localStorage.removeItem("token");
+    navigate("/");
   };
 
   /**
@@ -100,14 +100,14 @@ const Sidebar = (props) => {
                   variant='subtle'
                   leftIcon={<IconBrush size={50} />}
                   size='xl'
-                  color={activePage === "WORK" ? "br-black" : "br-white"}
+                  color={activePage === "GALLERY" ? "br-black" : "br-white"}
                   onClick={() => {
-                    navigate("/work");
+                    navigate("/gallery");
                   }}
                   fullWidth
                   className='button'
                 >
-                  WORK
+                  GALLERY
                 </Button>
               </>
             ) : null}
@@ -118,14 +118,14 @@ const Sidebar = (props) => {
                   variant='subtle'
                   leftIcon={<IconPhotoSearch size={50} />}
                   size='xl'
-                  color={activePage === "GALLERY" ? "br-black" : "br-white"}
+                  color={activePage === "CREATE" ? "br-black" : "br-white"}
                   onClick={() => {
-                    navigate("/gallery");
+                    navigate("/create");
                   }}
                   fullWidth
                   className='button'
                 >
-                  GALLERY
+                  CREATE
                 </Button>
               </>
             ) : null}

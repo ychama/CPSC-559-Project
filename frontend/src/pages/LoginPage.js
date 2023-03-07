@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   AspectRatio,
@@ -25,7 +25,11 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const theme = useMantineTheme();
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      navigate("/home");
+    }
+  }, []);
 
   const loginForm = useForm({
     initialValues: {
@@ -51,7 +55,12 @@ const LoginPage = () => {
       localStorage.setItem("token", token);
       navigate("/home");
     } catch (err) {
-      console.log(err);
+      if (err.response.status === 402) {
+        loginForm.setErrors({ username: "Invalid username" });
+      }
+      if (err.response.status === 405) {
+        loginForm.setErrors({ password: "Invalid password" });
+      }
     }
   };
 

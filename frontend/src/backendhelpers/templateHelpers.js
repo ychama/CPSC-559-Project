@@ -10,14 +10,14 @@ const endpointBase = process.env.BACKEND_URL || "http://localhost:5000/api";
   },
 };*/
 
-export const getSVG = async (id) => {
-  return axios.get(endpointBase + "/svg/getSVG/" + id).then((response) => {
+export const getAllTemplates = async () => {
+  return axios.get(endpointBase + "/templates/").then((response) => {
     return response.data;
   });
 };
 
-export const updateSVG = async (reqBody) => {
-  return axios.put(endpointBase + "/svg/", reqBody).then((response) => {
+export const getTemplate = async (id) => {
+  return axios.get(endpointBase + "/templates/" + id).then((response) => {
     return response.data;
   });
 };
