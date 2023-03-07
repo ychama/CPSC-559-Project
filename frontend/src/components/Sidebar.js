@@ -40,12 +40,13 @@ const Sidebar = (props) => {
    * Logs user out of application
    */
   const logout = () => {
-    fetch("/user/logout/", {
-      method: "POST",
-    }).then((response) => {
-      localStorage.removeItem("token");
-      navigate("/");
-    });
+    // fetch("/user/logout/", {
+    //   method: "POST",
+    // }).then((response) => {
+    //   navigate("/");
+    // });
+    localStorage.removeItem("token");
+    navigate("/");
   };
 
   /**
