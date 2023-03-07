@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Stack, AppShell, Text } from "@mantine/core";
 import Sidebar from "../components/Sidebar";
+import { getAllTemplates } from "../backendhelpers/templateHelpers.js";
 
 const templates = [
   {
@@ -69,8 +70,14 @@ const templates = [
   },
 ];
 
-const GalleryPage = () => {
+const CreatePage = () => {
+  useEffect(() => {
+    getAllTemplates().then((res) => {
+      console.log(res);
+    });
+  }, []);
+
   return <AppShell navbar={<Sidebar activePage='CREATE' />}></AppShell>;
 };
 
-export default GalleryPage;
+export default CreatePage;
