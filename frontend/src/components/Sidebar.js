@@ -43,8 +43,7 @@ const Sidebar = (props) => {
     fetch("/user/logout/", {
       method: "POST",
     }).then((response) => {
-      localStorage.removeItem("user");
-      localStorage.removeItem("authenticated");
+      localStorage.removeItem("token");
       navigate("/");
     });
   };

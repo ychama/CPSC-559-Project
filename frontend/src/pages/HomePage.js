@@ -21,7 +21,7 @@ const HomePage = () => {
 
   useEffect(() => {
     if (!localStorage.getItem("token")) {
-      navigate("/login");
+      navigate("/");
     } else {
       getWorkspaces();
     }
