@@ -2,13 +2,21 @@ import axios from "axios";
 
 const endpointBase = process.env.BACKEND_URL || "http://localhost:5000/api";
 
-export const getWorkspace = async (token) => {
-  const headers = {
-    Authorization: "bearer " + token,
-  };
+export const getAllWorkspaces = async () => {
+  return axios.get(endpointBase + "/workspaces/").then((response) => {
+    return response.data;
+  });
+};
 
+export const getWorkspace = async (code) => {
+  return axios.get(endpointBase + "/workspaces/" + code).then((response) => {
+    return response.data;
+  });
+};
+
+export const updateWorkspace = async (code, reqBody) => {
   return axios
-    .get(endpointBase + "/workspaces/getAllWorkspaces/", { headers: headers })
+    .put(endpointBase + "/workspaces/" + code, reqBody)
     .then((response) => {
       return response.data;
     });
