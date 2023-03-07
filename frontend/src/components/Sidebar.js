@@ -99,14 +99,14 @@ const Sidebar = (props) => {
                   variant='subtle'
                   leftIcon={<IconBrush size={50} />}
                   size='xl'
-                  color={activePage === "WORK" ? "br-black" : "br-white"}
+                  color={activePage === "GALLERY" ? "br-black" : "br-white"}
                   onClick={() => {
-                    navigate("/work");
+                    navigate("/gallery");
                   }}
                   fullWidth
                   className='button'
                 >
-                  WORK
+                  GALLERY
                 </Button>
               </>
             ) : null}
