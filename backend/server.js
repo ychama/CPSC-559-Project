@@ -7,6 +7,13 @@ import userRoute from "./routes/userRoute.js";
 import workspaceRoute from "./routes/workspaceRoute.js";
 import templateRoute from "./routes/templateRoute.js";
 
+import listenForServers from "./communication/listener.js";
+import writeToServer from "./communication/writer.js";
+
+// Test Code
+console.log("My sack is Wet");
+listenForServers();
+
 connectMongoDB();
 
 const port = process.env.PORT || 5000;
@@ -70,5 +77,7 @@ app.get(
 //     wss.emit("connection", socket, request);
 //   });
 // });
+
+writeToServer();
 
 app.listen(port, () => console.log("Server started on port " + port));

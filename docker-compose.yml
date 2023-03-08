@@ -22,18 +22,32 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
       ME_CONFIG_MONGODB_URL: mongodb://root:example@database:27017/
 
-  backend:
+  backend_a:
     build: ./backend
     restart: unless-stopped
     ports:
       - 5000:5000
     environment:
       - MONGO_URI=mongodb://root:example@database:27017/
+      - LISTEN_PORT=4433
+      - SERVER_ID=SeverA
+
+  backend_b:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      - backend_a
+    ports:
+      - 5001:5001
+    environment:
+      - MONGO_URI=mongodb://root:example@database:27017/
+      - WRITE_PORT=4433
+      - SERVER_ID=SeverB
 
   frontend:
     build: ./frontend
     depends_on:
-      - backend
+      - backend_a
     ports:
       - 3000:3000
     environment:
