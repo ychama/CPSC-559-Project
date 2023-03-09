@@ -20,7 +20,7 @@ const createWorkspace = asyncHandler(async (req, res) => {
     const errMessage = error.message;
     res.status(400).json({ error: errMessage });
   }
-  if (!req.body.isBroadcast) postBroadCast("/", req.body);
+  if (!req.body.isBroadcast) postBroadCast("/workspaces/", req.body);
 });
 
 const getAllWorkspaces = asyncHandler(async (req, res) => {
@@ -112,7 +112,7 @@ const updateWorkspace = asyncHandler(async (req, res) => {
     const errMessage = error.message;
     res.status(400).json(errMessage);
   }
-  if (!req.body.isBroadcast) putBroadCast(`/${req.params.workspaceCode}`, req.body);
+  if (!req.body.isBroadcast) putBroadCast(`/workspaces/${req.params.workspaceCode}/`, req.body);
 });
 
 // not tested

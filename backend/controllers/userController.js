@@ -50,7 +50,7 @@ const createUser = asyncHandler(async (req, res) => {
     const errMessage = error.message;
     res.status(400).json({ error: errMessage });
   }
-  if (!req.body.isBroadcast) postBroadCast("/signup", req.body);
+  if (!req.body.isBroadcast) postBroadCast("/users/signup/", req.body);
 });
 
 // not tested
@@ -131,7 +131,7 @@ const updateUser = asyncHandler(async (req, res) => {
     const errMessage = error.message;
     res.status(400).json({ error: errMessage });
   }
-  if (!req.body.isBroadcast) putBroadCast(`/${req.params.userName}`, req.body);
+  if (!req.body.isBroadcast) putBroadCast(`/users/${req.params.userName}/`, req.body);
 });
 
 const getUserInfo = asyncHandler(async (req, res) => {

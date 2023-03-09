@@ -16,9 +16,9 @@ export const postBroadCast = async (endpoint, reqBody) => {
     server_list.forEach(element => {
         if (server_id === element) return;
         reqBody.isBroadcast = true;
-        url = endpointBase.replaceAll("{}", element);
+        let url = endpointBase.replace(/{}/g, element) + endpoint;
         axios
-            .post(endpointBase + endpoint, reqBody, { timeout: 1000 })
+            .post(url, reqBody, { timeout: 1000 })
             .then((res) => {
                 console.log(res);
             })
