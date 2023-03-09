@@ -98,24 +98,6 @@ const Sidebar = (props) => {
                 <Space h='xl' />
                 <Button
                   variant='subtle'
-                  leftIcon={<IconBrush size={50} />}
-                  size='xl'
-                  color={activePage === "GALLERY" ? "br-black" : "br-white"}
-                  onClick={() => {
-                    navigate("/gallery");
-                  }}
-                  fullWidth
-                  className='button'
-                >
-                  GALLERY
-                </Button>
-              </>
-            ) : null}
-            {!user.isAdmin ? (
-              <>
-                <Space h='xl' />
-                <Button
-                  variant='subtle'
                   leftIcon={<IconPhotoSearch size={50} />}
                   size='xl'
                   color={activePage === "CREATE" ? "br-black" : "br-white"}
@@ -126,6 +108,24 @@ const Sidebar = (props) => {
                   className='button'
                 >
                   CREATE
+                </Button>
+              </>
+            ) : null}
+            {!user.isAdmin ? (
+              <>
+                <Space h='xl' />
+                <Button
+                  variant='subtle'
+                  leftIcon={<IconBrush size={50} />}
+                  size='xl'
+                  color={activePage === "GALLERY" ? "br-black" : "br-white"}
+                  onClick={() => {
+                    navigate("/gallery");
+                  }}
+                  fullWidth
+                  className='button'
+                >
+                  GALLERY
                 </Button>
               </>
             ) : null}
