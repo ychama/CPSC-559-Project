@@ -11,6 +11,9 @@ import {
 } from "@mantine/core";
 import { getAllWorkspaces } from "../backendhelpers/workspaceHelper";
 import Sidebar from "../components/Sidebar";
+import flower from "../images/flower.png";
+import pumpkin from "../images/pumpkin.png";
+import brasil from "../images/brasil.png";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -40,6 +43,14 @@ const HomePage = () => {
     }
   };
 
+  const findImage = (templateName) => {
+    if (templateName === "pumpkin") {
+      return pumpkin;
+    } else if (templateName === "flower" || templateName === "flower1") {
+      return flower;
+    } else return brasil;
+  };
+
   return (
     <AppShell navbar={<Sidebar activePage='HOME' />}>
       <SimpleGrid cols={3} m='lg'>
@@ -47,9 +58,11 @@ const HomePage = () => {
           <Card key={index} shadow='sm' p='lg' radius='md' withBorder>
             <Card.Section>
               <Image
-                src='https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80'
+                mt='lg'
+                src={findImage(workspace.workspaceName)}
                 height={160}
                 alt='Stock Image'
+                fit='contain'
               />
             </Card.Section>
             <Text mt='sm' weight={500}>
