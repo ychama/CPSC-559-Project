@@ -6,6 +6,7 @@ import asyncHandler from "express-async-handler";
 import userRoute from "./routes/userRoute.js";
 import workspaceRoute from "./routes/workspaceRoute.js";
 import templateRoute from "./routes/templateRoute.js";
+import startClientWebSocket from "./communication/clientSocket.js";
 
 connectMongoDB();
 
@@ -38,6 +39,8 @@ app.get(
     res.send("Cookies have been deleted.");
   })
 );
+
+startClientWebSocket();
 
 // const wss = new WebSocket.Server({ noServer: true });
 

@@ -28,6 +28,7 @@ services:
     ports:
       - 5000:5000
     environment:
+      - SERVER_ID:1
       - MONGO_URI=mongodb://root:example@database:27017/
 
   frontend:
