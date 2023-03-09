@@ -7,10 +7,17 @@ const serverId = process.env.SERVER_ID;
 
 const writeToServer = async () => {
     
+
+
     if("WRITE_PORT" in process.env){
 
+        const address = 'ws://backend_a:' + process.env.WRITE_PORT;
+
         // Create WebSocket connection.
-        const socket = new WebSocket('ws://localhost:' + process.env.WRITE_PORT);
+        const socket = new WebSocket(address);
+        
+        console.log('The address sending to is ' + address);
+        
 
         // Connection opened
         socket.addEventListener('open', function (event) {

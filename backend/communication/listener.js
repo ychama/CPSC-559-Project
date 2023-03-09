@@ -1,7 +1,9 @@
 import { createRequire } from 'module';
+import { WebSocketServer } from 'ws';
 
 const require = createRequire(import.meta.url);
 const WebSocket = require('ws');
+const http = require('http');
 
 const serverId = process.env.SERVER_ID;
 
@@ -9,8 +11,17 @@ const listenForServers = async () => {
 
     if("LISTEN_PORT" in process.env) {
 
+        const server = http.createServer();
+
+        server.listen(serverId, "0.0.0.0", function(){
+
+        });
+
         // Set up server
-        const wss = new WebSocket.Server({ port: process.env.LISTEN_PORT });
+        const wss = new WebSocket.Server({ 
+            port: process.env.LISTEN_PORT, 
+            httpServer: server 
+        });
 
         console.log('Starting websocket server on port ' + process.env.LISTEN_PORT);
 
