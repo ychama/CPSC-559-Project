@@ -1,7 +1,9 @@
 import React from "react";
-import { AppShell, Center } from "@mantine/core";
+import { ActionIcon, AppShell, Center } from "@mantine/core";
 import Sidebar from "../components/Sidebar";
 import SVG from "../svgcomponents/SVG.js";
+import { IconArrowLeft } from "@tabler/icons";
+import { useNavigate } from "react-router-dom";
 
 /*
 
@@ -27,8 +29,22 @@ This will be transmitted to all clients connected to the wss
 */
 
 const CanvasPage = () => {
+  const navigate = useNavigate();
+
   return (
-    <AppShell navbar={<Sidebar activePage='HOME' />}>
+    <AppShell
+      navbar={
+        <ActionIcon
+          variant='transparent'
+          sz='xl'
+          onClick={() => navigate("/home")}
+          mt='sm'
+          ml='sm'
+        >
+          <IconArrowLeft size={34} />
+        </ActionIcon>
+      }
+    >
       <Center>
         <SVG />
       </Center>
