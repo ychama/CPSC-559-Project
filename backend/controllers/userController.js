@@ -3,6 +3,7 @@ import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
+import { postBroadCast, putBroadCast } from "../middleware/httpBroadcast.js";
 
 dotenv.config();
 
@@ -49,6 +50,7 @@ const createUser = asyncHandler(async (req, res) => {
     const errMessage = error.message;
     res.status(400).json({ error: errMessage });
   }
+  if (!req.body.isBroadcast) postBroadCast("/signup", req.body);
 });
 
 // not tested
@@ -129,6 +131,7 @@ const updateUser = asyncHandler(async (req, res) => {
     const errMessage = error.message;
     res.status(400).json({ error: errMessage });
   }
+  if (!req.body.isBroadcast) putBroadCast(`/${req.params.userName}`, req.body);
 });
 
 const getUserInfo = asyncHandler(async (req, res) => {

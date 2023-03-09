@@ -1,6 +1,7 @@
 import asyncHandler from "express-async-handler";
 import Workspace from "../models/workspaceModel.js";
 import { v4 as uuidv4 } from "uuid";
+import { postBroadCast, putBroadCast } from "../middleware/httpBroadcast.js";
 
 const createWorkspace = asyncHandler(async (req, res) => {
   try {
@@ -19,6 +20,7 @@ const createWorkspace = asyncHandler(async (req, res) => {
     const errMessage = error.message;
     res.status(400).json({ error: errMessage });
   }
+  if (!req.body.isBroadcast) postBroadCast("/", req.body);
 });
 
 const getAllWorkspaces = asyncHandler(async (req, res) => {
@@ -110,6 +112,7 @@ const updateWorkspace = asyncHandler(async (req, res) => {
     const errMessage = error.message;
     res.status(400).json(errMessage);
   }
+  if (!req.body.isBroadcast) putBroadCast(`/${req.params.workspaceCode}`, req.body);
 });
 
 // not tested
