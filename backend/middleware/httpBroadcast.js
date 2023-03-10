@@ -32,9 +32,9 @@ export const putBroadCast = async (endpoint, reqBody) => {
     server_list.forEach(element => {
         if (server_id === element) return;
         reqBody.isBroadcast = true;
-        url = endpointBase.replaceAll("{}", element);
+        let url = endpointBase.replace(/{}/g, element) + endpoint;
         axios
-            .put(endpointBase + endpoint, reqBody, { timeout: 1000 })
+            .put(url, reqBody, { timeout: 1000 })
             .then((res) => {
                 console.log(res);
             })

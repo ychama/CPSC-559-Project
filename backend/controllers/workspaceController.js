@@ -8,6 +8,10 @@ const createWorkspace = asyncHandler(async (req, res) => {
     let workspaceCode = uuidv4();
     while (await Workspace.findOne({ workspaceCode: workspaceCode }))
       workspaceCode = uuidv4();
+    if (req.body.workspaceCode) {
+      workspaceCode = req.body.workspaceCode;
+    }
+
     const newWorkspace = await Workspace.create({
       workspaceCode: workspaceCode,
       workspaceName: req.body.workspaceName,
@@ -16,11 +20,14 @@ const createWorkspace = asyncHandler(async (req, res) => {
       groupTransform: req.body.groupTransform,
     });
     res.status(200).json(newWorkspace);
+    req.body.workspaceCode = workspaceCode;
   } catch (error) {
     const errMessage = error.message;
     res.status(400).json({ error: errMessage });
   }
-  if (!req.body.isBroadcast) postBroadCast("/workspaces/", req.body);
+  if (!req.body.isBroadcast) {
+    postBroadCast("/workspaces/", req.body);
+  }
 });
 
 const getAllWorkspaces = asyncHandler(async (req, res) => {
