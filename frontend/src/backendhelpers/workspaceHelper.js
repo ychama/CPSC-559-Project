@@ -21,3 +21,9 @@ export const updateWorkspace = async (code, reqBody) => {
       return response.data;
     });
 };
+
+export const createWorkspace = async (reqBody) => {
+  return axios.post(endpointBase + "/workspaces/", reqBody).then((response) => {
+    return response.data;
+  });
+};
