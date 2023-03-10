@@ -1,12 +1,17 @@
 import asyncHandler from "express-async-handler";
 import Workspace from "../models/workspaceModel.js";
 import { v4 as uuidv4 } from "uuid";
+import { postBroadCast, putBroadCast } from "../middleware/httpBroadcast.js";
 
 const createWorkspace = asyncHandler(async (req, res) => {
   try {
     let workspaceCode = uuidv4();
     while (await Workspace.findOne({ workspaceCode: workspaceCode }))
       workspaceCode = uuidv4();
+    if (req.body.workspaceCode) {
+      workspaceCode = req.body.workspaceCode;
+    }
+
     const newWorkspace = await Workspace.create({
       workspaceCode: workspaceCode,
       workspaceName: req.body.workspaceName,
@@ -15,9 +20,13 @@ const createWorkspace = asyncHandler(async (req, res) => {
       groupTransform: req.body.groupTransform,
     });
     res.status(200).json(newWorkspace);
+    req.body.workspaceCode = workspaceCode;
   } catch (error) {
     const errMessage = error.message;
     res.status(400).json({ error: errMessage });
+  }
+  if (!req.body.isBroadcast) {
+    postBroadCast("/workspaces/", req.body);
   }
 });
 
@@ -110,6 +119,7 @@ const updateWorkspace = asyncHandler(async (req, res) => {
     const errMessage = error.message;
     res.status(400).json(errMessage);
   }
+  if (!req.body.isBroadcast) putBroadCast(`/workspaces/${req.params.workspaceCode}/`, req.body);
 });
 
 // not tested

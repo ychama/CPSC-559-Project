@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const endpointBase = process.env.BACKEND_URL || "http://localhost:5000/api";
+const endpointBase = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000/api";
 
 export const getAllWorkspaces = async () => {
   return axios.get(endpointBase + "/workspaces/").then((response) => {
