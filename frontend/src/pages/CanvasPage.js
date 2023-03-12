@@ -5,6 +5,7 @@ import SVG from "../svgcomponents/SVG.js";
 import { IconArrowLeft } from "@tabler/icons";
 import { useNavigate } from "react-router-dom";
 
+/*
 
 // TODO: Set up code for websocket connection when the user opens the canvas page with the coloring book
 
@@ -21,8 +22,6 @@ socket.addEventListener('message', (event) => {
 socket.addEventListener('close', (event) => {
   console.log('Disconnected from the WebSocket server!');
 });
-
-/*
 
 Use this to send JSON data to the server:   socket.send(JSON.stringify(message));
 This will be transmitted to all clients connected to the wss
