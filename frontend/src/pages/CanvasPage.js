@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 
 // TODO: Set up code for websocket connection when the user opens the canvas page with the coloring book
 
-const socket = new WebSocket('ws://backend:5001/');
+const socket = new WebSocket('ws://localhost:5999');
 
 socket.addEventListener('open', (event) => {
   console.log('Connected to the WebSocket server!');
