@@ -27,6 +27,7 @@ services:
     restart: unless-stopped
     ports:
       - 5000:5000
+      - 5999:5999
     environment:
       - SERVER_ID:1
       - MONGO_URI=mongodb://root:example@database:27017/

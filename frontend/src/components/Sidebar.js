@@ -36,6 +36,25 @@ const Sidebar = (props) => {
   const [user, setUser] = useState({});
   const [drawerOpened, setDrawerOpened] = useState(false);
 
+
+  // TEST CODE
+  const connect = () => {
+    const socket = new WebSocket('ws://localhost:5999');
+    
+    socket.addEventListener('open', (event) => {
+      console.log('Connected to the WebSocket server!');
+      socket.send("Hello from THE CLIENT YO");
+    });
+    
+    socket.addEventListener('message', (event) => {
+      console.log(`Received message: ${event.data}`);
+    });
+    
+    socket.addEventListener('close', (event) => {
+      console.log('Disconnected from the WebSocket server!');
+    });
+  };
+
   /**
    * Logs user out of application
    */
@@ -186,7 +205,7 @@ const Sidebar = (props) => {
                     backgroundColor: "rgb(245, 66, 66, 0.8)",
                     color: "white",
                   }}
-                  onClick={() => logout()}
+                  onClick={() => connect()}
                   className='button-red'
                 >
                   Logout
