@@ -3,12 +3,14 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+const { SECRET = "secret" } = process.env;
+
 const loggedIn = async (req, res, next) => {
   try {
     if (req.headers.authorization) {
       const userToken = req.headers.authorization.split(" ")[1];
       if (userToken) {
-        const payload = await jwt.verify(userToken, process.env.SECRET);
+        const payload = await jwt.verify(userToken, SECRET);
         if (payload) {
           console.log(payload);
           req.user = payload;

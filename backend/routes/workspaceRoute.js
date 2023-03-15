@@ -10,10 +10,10 @@ import loggedIn from "../middleware/userAuth.js";
 
 const workspaceRoute = express.Router();
 
-workspaceRoute.get("/", getAllWorkspaces);
-workspaceRoute.get("/:workspaceCode", getWorkspace);
-workspaceRoute.post("/", createWorkspace);
-workspaceRoute.put("/:workspaceCode", updateWorkspace);
-workspaceRoute.delete("/:workspaceCode", deleteWorkspace);
+workspaceRoute.get("/", loggedIn, getAllWorkspaces);
+workspaceRoute.get("/:workspaceCode", loggedIn, getWorkspace);
+workspaceRoute.post("/", loggedIn, createWorkspace);
+workspaceRoute.put("/:workspaceCode", loggedIn, updateWorkspace);
+workspaceRoute.delete("/:workspaceCode", loggedIn, deleteWorkspace);
 
 export default workspaceRoute;
