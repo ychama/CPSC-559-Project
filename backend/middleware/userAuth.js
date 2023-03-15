@@ -10,6 +10,7 @@ const loggedIn = async (req, res, next) => {
       if (userToken) {
         const payload = await jwt.verify(userToken, process.env.SECRET);
         if (payload) {
+          console.log(payload);
           req.user = payload;
           next();
         } else {
