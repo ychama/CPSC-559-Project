@@ -6,7 +6,29 @@ import {
 } from "../backendhelpers/workspaceHelper.js";
 import { Center, ColorPicker, Stack, TextInput, Title } from "@mantine/core";
 import { useInterval } from "../helpers/interval.js";
-const svgName = "flower1";
+
+const WS_URL = 'ws://localhost:5998'; // TODO use effect to get port?
+
+const connectWebsocket = () => {
+
+  const socket = new WebSocket(WS_URL);
+
+    socket.addEventListener('open', (event) => {
+      console.log('Connected to the WebSocket server!');
+      socket.send(`{ "workspaceCode": "${localStorage.getItem("workspaceCode")}" }`);
+    });
+
+    socket.addEventListener('message', (event) => {
+      console.log(`Received message: ${event.data}`);
+    });
+
+    socket.addEventListener('close', (event) => {
+      console.log('Disconnected from the WebSocket server!');
+      // TODO error handling
+    });
+
+  return socket;
+};
 
 const SVG = () => {
   const [SVGPaths, setSVGPaths] = useState([]);
@@ -14,33 +36,41 @@ const SVG = () => {
   const [groupTransform, setGroupTransform] = useState("");
   const [currentColor, setCurrentColor] = useState("#FFFFFF");
 
+  const socket = connectWebsocket();
+
   const updateColor = (index) => {
+    
     let newSVGPaths = SVGPaths.slice(0);
     newSVGPaths[index].svgFill = currentColor;
     setSVGPaths(newSVGPaths);
-    updateWorkspace(localStorage.getItem("workspaceCode"), {
-      paths: newSVGPaths,
-    });
+
+    socket.send(`{ "path": "${newSVGPaths}" }`);
+
+    // updateWorkspace(localStorage.getItem("workspaceCode"), {
+    //   paths: newSVGPaths,
+    // });
   };
 
+  // TODO convert to web socket
   useEffect(() => {
-    getWorkspace(localStorage.getItem("workspaceCode")).then((result) => {
-      const workspaceData = result.existingWorkspace;
-      setSVGTitleName(workspaceData.workspaceName);
-      setSVGPaths(workspaceData.paths);
-      setGroupTransform(workspaceData.groupTransform);
-    });
+    // getWorkspace(localStorage.getItem("workspaceCode")).then((result) => {
+    //   const workspaceData = result.existingWorkspace;
+    //   setSVGTitleName(workspaceData.workspaceName);
+    //   setSVGPaths(workspaceData.paths);
+    //   setGroupTransform(workspaceData.groupTransform);
+    // });
   }, []);
 
+  // TODO convert to web socket
   // Using interval to poll database in 1 second intervals for game updates
-  useInterval(() => {
-    getWorkspace(localStorage.getItem("workspaceCode")).then((result) => {
-      const workspaceData = result.existingWorkspace;
-      setSVGTitleName(workspaceData.workspaceName);
-      setSVGPaths(workspaceData.paths);
-      setGroupTransform(workspaceData.groupTransform);
-    });
-  }, 500);
+  // useInterval(() => {
+  //   getWorkspace(localStorage.getItem("workspaceCode")).then((result) => {
+  //     const workspaceData = result.existingWorkspace;
+  //     setSVGTitleName(workspaceData.workspaceName);
+  //     setSVGPaths(workspaceData.paths);
+  //     setGroupTransform(workspaceData.groupTransform);
+  //   });
+  // }, 500);
 
   return (
     // this is the breakdown for the flower image

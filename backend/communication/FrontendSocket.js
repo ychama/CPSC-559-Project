@@ -27,7 +27,6 @@ const startFrontendSocket = async () => {
         const userId = uuidv4();
         console.log(`FE connected with id: ${userId}`);
 
-
         // TODO send setup information
         connection.send("Hello from server: " + serverId);
 
