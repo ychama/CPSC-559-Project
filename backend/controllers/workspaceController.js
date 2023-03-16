@@ -43,48 +43,6 @@ const getAllWorkspaces = asyncHandler(async (req, res) => {
   }
 });
 
-async function getWorkspace(targetWorkspaceCode) {
-  
-  const existingWorkspace = await Workspace.findOne({
-    workspaceCode: targetWorkspaceCode,
-  });
-
-  if (existingWorkspace) {
-    return JSON.stringify(existingWorkspace);
-  } else {
-    throw new Error(`No Workspaces with the code ${workSpaceCode} were found.`);
-  }
-};
-
-// not tested
-const updateWorkspace = asyncHandler(async (req, res) => {
-  try {
-    if (!req.params.workspaceCode) {
-      res.status(400);
-      throw new Error("Workspace code not included in request body.");
-    }
-    if (!req.body.paths) {
-      res.status(400);
-      throw new Error("paths not included in request body.");
-    }
-
-    const query = { workspaceCode: req.params.workspaceCode };
-    const update = { paths: req.body.paths };
-
-    Workspace.findOneAndUpdate(query, update, { new: true }, (err, doc) => {
-      if (err) {
-        res.status(400);
-        throw new Error("Error updating Workspace Paths");
-      }
-      res.status(200).json({ doc });
-    });
-  } catch (error) {
-    const errMessage = error.message;
-    res.status(400).json(errMessage);
-  }
-  if (!req.body.isBroadcast) putBroadCast(`/workspaces/${req.params.workspaceCode}/`, req.body);
-});
-
 // not tested
 const deleteWorkspace = asyncHandler(async (req, res) => {
   try {
@@ -116,6 +74,32 @@ const deleteWorkspace = asyncHandler(async (req, res) => {
     res.status(400).json({ error: errMessage });
   }
 });
+
+async function getWorkspace(targetWorkspaceCode) {
+  
+  const existingWorkspace = await Workspace.findOne({
+    workspaceCode: targetWorkspaceCode,
+  });
+
+  if (existingWorkspace) {
+    return JSON.stringify(existingWorkspace);
+  } else {
+    throw new Error(`No Workspaces with the code ${workSpaceCode} were found.`);
+  }
+};
+
+async function updateWorkspace(targetWorkspaceCode, newPath) {
+  
+  // TODO Add queue to synchronize the replicas
+  const query = { workspaceCode: targetWorkspaceCode };
+  const update = { paths: newPath };
+
+  Workspace.findOneAndUpdate(query, update, { new: true }, (err, doc) => {
+    if (err) {
+      throw new Error("Error updating Workspace Paths");
+    }
+  });
+};
 
 export {
   getWorkspace,

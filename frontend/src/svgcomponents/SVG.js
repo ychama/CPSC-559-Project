@@ -1,9 +1,4 @@
 import { React, useState, useEffect } from "react";
-import { getTemplate } from "../backendhelpers/templateHelpers.js";
-import {
-  getWorkspace,
-  updateWorkspace,
-} from "../backendhelpers/workspaceHelper.js";
 import { Center, ColorPicker, Stack, TextInput, Title } from "@mantine/core";
 
 const WS_URL = 'ws://localhost:5998'; // TODO use effect to get port?
@@ -24,25 +19,22 @@ const SVG = () => {
     setSVGPaths(newSVGPaths);
 
     try{
-      socket.send(`{ "path": "${newSVGPaths}" }`);
-
+      socket.send(`{ "paths": ${JSON.stringify(SVGPaths)} }`);
     }catch(error){
       console.error(`Could not send color update: ${error}`);
     }
   };
 
-  // TODO convert to web socket
   useEffect(() => {
     socket = new WebSocket(WS_URL);
 
     // On connection
     socket.addEventListener('open', (event) => {
 
-      console.log('Connected to the WebSocket server!');
       socket.send(`{ "workspaceCode": "${localStorage.getItem("workspaceCode")}" }`);
     });
     
-    // On receive message from backend
+    // On message received
     socket.addEventListener('message', (event) => {
 
       try {        
