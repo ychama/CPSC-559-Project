@@ -1,6 +1,8 @@
 import axios from "axios";
-
-const endpointBase = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000/api";
+import { getBackendUrl } from "../backendhelpers/proxyHelper.js";
+import * as rax from "retry-axios";
+const endpointBase =
+  process.env.REACT_APP_BACKEND_URL || "http://localhost:5000/api";
 
 /*const customConfig = {
   withCredentials: true,
@@ -15,6 +17,10 @@ export const signUp = async (reqBody) => {
     .post(endpointBase + "/users/signup/", reqBody)
     .then((response) => {
       return response.data;
+    })
+    .catch(() => {
+      let backendURL = getBackendUrl();
+      localStorage.setItem("backendURL", backendURL);
     });
 };
 
