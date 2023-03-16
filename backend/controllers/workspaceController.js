@@ -43,55 +43,18 @@ const getAllWorkspaces = asyncHandler(async (req, res) => {
   }
 });
 
-const getWorkspace = asyncHandler(async (req, res) => {
-  try {
-    if (!req.params.workspaceCode) {
-      res.status(400);
-      throw new Error("Workspace code not included in request body.");
-    }
-    const existingWorkspace = await Workspace.findOne({
-      workspaceCode: req.params.workspaceCode,
-    });
-    if (!existingWorkspace) {
-      res.status(400);
-      throw new Error(
-        "No Workspaces with the code " +
-        req.params.workspaceCode +
-        " were found."
-      );
-    }
-    res.status(200).json({ existingWorkspace });
-  } catch (error) {
-    const errMessage = error.message;
-    res.status(400).json(errMessage);
+async function getWorkspace(targetWorkspaceCode) {
+  
+  const existingWorkspace = await Workspace.findOne({
+    workspaceCode: targetWorkspaceCode,
+  });
+
+  if (existingWorkspace) {
+    return JSON.stringify(existingWorkspace);
+  } else {
+    throw new Error(`No Workspaces with the code ${workSpaceCode} were found.`);
   }
-});
-
-// const updateSVG = asyncHandler(async (req, res) => {
-//   try {
-//     if (!req.body.templateName) {
-//       res.status(400);
-//       throw new Error("svgName not included in request body.");
-//     }
-//     if (!req.body.svgPaths) {
-//       res.status(400);
-//       throw new Error("svgPaths not included in request body.");
-//     }
-//     const query = { svgName: req.body.svgName };
-//     const update = { svgPaths: req.body.svgPaths };
-
-//     SVG.findOneAndUpdate(query, update, { new: true }, (err, doc) => {
-//       if (err) {
-//         res.status(400);
-//         throw new Error("Error updating SVG.");
-//       }
-//       res.status(200).json({ doc });
-//     });
-//   } catch (error) {
-//     const errMessage = error.message;
-//     res.status(400).json(errMessage);
-//   }
-// });
+};
 
 // not tested
 const updateWorkspace = asyncHandler(async (req, res) => {

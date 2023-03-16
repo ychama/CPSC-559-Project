@@ -5,30 +5,11 @@ import {
   updateWorkspace,
 } from "../backendhelpers/workspaceHelper.js";
 import { Center, ColorPicker, Stack, TextInput, Title } from "@mantine/core";
-import { useInterval } from "../helpers/interval.js";
 
 const WS_URL = 'ws://localhost:5998'; // TODO use effect to get port?
 
-const connectWebsocket = () => {
-
-  const socket = new WebSocket(WS_URL);
-
-    socket.addEventListener('open', (event) => {
-      console.log('Connected to the WebSocket server!');
-      socket.send(`{ "workspaceCode": "${localStorage.getItem("workspaceCode")}" }`);
-    });
-
-    socket.addEventListener('message', (event) => {
-      console.log(`Received message: ${event.data}`);
-    });
-
-    socket.addEventListener('close', (event) => {
-      console.log('Disconnected from the WebSocket server!');
-      // TODO error handling
-    });
-
-  return socket;
-};
+// Socket for canvas
+var socket;
 
 const SVG = () => {
   const [SVGPaths, setSVGPaths] = useState([]);
@@ -36,41 +17,58 @@ const SVG = () => {
   const [groupTransform, setGroupTransform] = useState("");
   const [currentColor, setCurrentColor] = useState("#FFFFFF");
 
-  const socket = connectWebsocket();
-
   const updateColor = (index) => {
     
     let newSVGPaths = SVGPaths.slice(0);
     newSVGPaths[index].svgFill = currentColor;
     setSVGPaths(newSVGPaths);
 
-    socket.send(`{ "path": "${newSVGPaths}" }`);
+    try{
+      socket.send(`{ "path": "${newSVGPaths}" }`);
 
-    // updateWorkspace(localStorage.getItem("workspaceCode"), {
-    //   paths: newSVGPaths,
-    // });
+    }catch(error){
+      console.error(`Could not send color update: ${error}`);
+    }
   };
 
   // TODO convert to web socket
   useEffect(() => {
-    // getWorkspace(localStorage.getItem("workspaceCode")).then((result) => {
-    //   const workspaceData = result.existingWorkspace;
-    //   setSVGTitleName(workspaceData.workspaceName);
-    //   setSVGPaths(workspaceData.paths);
-    //   setGroupTransform(workspaceData.groupTransform);
-    // });
-  }, []);
+    socket = new WebSocket(WS_URL);
 
-  // TODO convert to web socket
-  // Using interval to poll database in 1 second intervals for game updates
-  // useInterval(() => {
-  //   getWorkspace(localStorage.getItem("workspaceCode")).then((result) => {
-  //     const workspaceData = result.existingWorkspace;
-  //     setSVGTitleName(workspaceData.workspaceName);
-  //     setSVGPaths(workspaceData.paths);
-  //     setGroupTransform(workspaceData.groupTransform);
-  //   });
-  // }, 500);
+    // On connection
+    socket.addEventListener('open', (event) => {
+
+      console.log('Connected to the WebSocket server!');
+      socket.send(`{ "workspaceCode": "${localStorage.getItem("workspaceCode")}" }`);
+    });
+    
+    // On receive message from backend
+    socket.addEventListener('message', (event) => {
+
+      try {        
+        const jsonMsg = JSON.parse(event.data);
+  
+        if(jsonMsg.hasOwnProperty("workspaceName") &&
+            jsonMsg.hasOwnProperty("paths") &&
+            jsonMsg.hasOwnProperty("groupTransform")) {
+        
+          setSVGTitleName(jsonMsg['workspaceName']);
+          setSVGPaths(jsonMsg['paths']);
+          setGroupTransform(jsonMsg['groupTransform']);
+  
+        } else {
+          throw new Error(`Could not parse websocket update`);
+        }
+      } catch(error) {
+        console.error(`Error receiving message: ${error}`);
+      }
+    });
+
+    // On disconnect
+    socket.addEventListener('close', (event) => {
+      console.log('Disconnected from the WebSocket server!');
+    });
+  }, []);
 
   return (
     // this is the breakdown for the flower image
@@ -87,7 +85,6 @@ const SVG = () => {
           height='550.7067066666666'
           xmlns='http://www.w3.org/2000/svg'
         >
-          <title>Flower Template</title>
           <g
             id='layer1'
             inkscapelabel='Calque 1'

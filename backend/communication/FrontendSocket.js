@@ -1,6 +1,9 @@
 import http from 'http';
 import { WebSocketServer } from 'ws';
 import { v4 as uuidv4 } from 'uuid';
+import {
+    getWorkspace,
+  } from "../controllers/workspaceController.js";
 
 const socketPort = 5999;  // hard coded random port for now
 const serverId = process.env.SERVER_ID;
@@ -27,9 +30,6 @@ const startFrontendSocket = async () => {
         const userId = uuidv4();
         console.log(`FE connected with id: ${userId}`);
 
-        // TODO send setup information
-        connection.send("Hello from server: " + serverId);
-
         // Receive messages
         connection.on('message', function incoming(message){
             console.log(`Message from FE id: ${userId}, Message: ${message}`);
@@ -42,7 +42,12 @@ const startFrontendSocket = async () => {
 
             // get rid of client
             var workSpace = connectionToWorkspace[connection];
-            delete workspaceToConnection[workSpace];
+
+            // remove the connection from the workspace
+            const connectionIndex = workspaceToConnection[workSpace].indexOf(connection);
+            if(connectionIndex > -1) {
+                workspaceToConnection[workSpace].splice(connectionIndex, 1);
+            }
             delete connectionToWorkspace[connection];
         });
     });
@@ -51,18 +56,28 @@ const startFrontendSocket = async () => {
 async function processMessage(connection, message) {
 
     try{
-        var jsonMsg = JSON.parse(message);
+        const jsonMsg = JSON.parse(message);
 
         if(jsonMsg.hasOwnProperty('workspaceCode')){
 
+            const workspaceCode = jsonMsg['workspaceCode'];
+
             // map workspace to the connection
-            workspaceToConnection[jsonMsg['workspaceCode']] = connection;
+            if(workspaceCode in workspaceToConnection) {
+
+                workspaceToConnection[workspaceCode].unshift(connection);
+            }
+            else {
+                
+                workspaceToConnection[workspaceCode] = [connection];
+            }
 
             // map connection to the workspace
-            connectionToWorkspace[connection] = jsonMsg['workspaceCode'];
+            connectionToWorkspace[connection] = workspaceCode;
 
             // send workspace they want
-            // TODO
+            const workspace = await getWorkspace(workspaceCode);
+            connection.send(workspace);
 
         } else if (jsonMsg.hasOwnProperty('path')) {
 
@@ -77,7 +92,7 @@ async function processMessage(connection, message) {
         }
 
     } catch (error) {
-        console.log(`Error processing ws message from FE: ${error}`);
+        console.log(`Error processing ws message from FE: ${error}, ${error.stack}`);
         // Send error response to FE?
     }
 };
