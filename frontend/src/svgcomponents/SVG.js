@@ -1,7 +1,7 @@
 import { React, useState, useEffect } from "react";
 import { Center, ColorPicker, Stack, TextInput, Title } from "@mantine/core";
 
-const WS_URL = 'ws://localhost:5998'; // TODO use effect to get port?
+const websocketUrl = process.env.WEBSOCKET_BACKEND_URL || "ws://localhost:5999";
 
 // Socket for canvas
 var socket;
@@ -26,7 +26,7 @@ const SVG = () => {
   };
 
   useEffect(() => {
-    socket = new WebSocket(WS_URL);
+    socket = new WebSocket(websocketUrl);
 
     // On connection
     socket.addEventListener('open', (event) => {
