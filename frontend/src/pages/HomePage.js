@@ -21,6 +21,7 @@ const HomePage = () => {
 
   const [workspaces, setWorkspaces] = useState([]);
 
+
   useEffect(() => {
     if (!localStorage.getItem("token")) {
       navigate("/");

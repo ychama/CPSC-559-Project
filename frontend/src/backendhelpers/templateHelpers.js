@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const endpointBase = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000/api";
+const endpointBase = process.env.REACT_APP_PROXY_URL || "http://localhost:5000/api";
 
 /*const customConfig = {
   withCredentials: true,
@@ -11,13 +11,15 @@ const endpointBase = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000
 };*/
 
 export const getAllTemplates = async () => {
-  return axios.get(endpointBase + "/templates/").then((response) => {
+  let backendURL = localStorage.getItem("backendURL");
+  return axios.get(backendURL + "/templates/").then((response) => {
     return response.data;
   });
 };
 
 export const getTemplate = async (id) => {
-  return axios.get(endpointBase + "/templates/" + id).then((response) => {
+  let backendURL = localStorage.getItem("backendURL");
+  return axios.get(backendURL + "/templates/" + id).then((response) => {
     return response.data;
   });
 };

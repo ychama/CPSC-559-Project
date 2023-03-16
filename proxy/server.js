@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 
-
+import serverRoute from "./routes/serverRoute.js";
 
 const port = 4000;
 
@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 
-//app.use("/api/server", serverRoute);
+app.use("/api/server", serverRoute);
 
 
 
