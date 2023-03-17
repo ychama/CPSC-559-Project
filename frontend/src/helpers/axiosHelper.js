@@ -1,7 +1,11 @@
 import axios from "axios";
 import { getBackendUrl } from "../backendhelpers/proxyHelper.js";
 
-localStorage.setItem("backendURL", "http://localhost:5001/api")
+getBackendUrl().then((newBackendUrl) => {
+    localStorage.setItem("backendURL", newBackendUrl);
+}).catch((err) => {
+    localStorage.setItem("backendURL", "http://localhost:5001/api");
+});
 
 export const instance = axios.create({
     baseURL: '',

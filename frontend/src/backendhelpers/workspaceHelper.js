@@ -1,6 +1,4 @@
-import axios from "axios";
-
-const endpointBase = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000/api";
+import { instance } from "../helpers/axiosHelper.js";
 
 export const getAllWorkspaces = async () => {
   let response = await instance.get(localStorage.getItem("backendURL") + "/workspaces/").then((response) => {
