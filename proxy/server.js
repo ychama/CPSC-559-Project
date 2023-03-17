@@ -2,31 +2,28 @@ import express from "express";
 import cors from "cors";
 import axios from "axios";
 
-import serverRoute from "./routes/serverRoute.js";
+const SERVER_CLIENT_BASE_URL = "http://localhost:500{}/api";
+const SERVER_HEALTH_URL = "http://backend{}:5000/api/health/";
 
-const SERVER_BASE_URL = "http://localhost:500{}/api";
-let AVAILABLE_SERVERS = new Set([2, 3, 4]);
+let AVAILABLE_SERVERS = new Set([1, 2, 3, 4]);
 let OFFLINE_SERVERS = new Set([]);
 
 const healthCheck = async () => {
   AVAILABLE_SERVERS.forEach((serverID, index) => {
-    let serverURL = SERVER_BASE_URL.replace("{}", serverID);
+    let serverURL = SERVER_HEALTH_URL.replace(/{}/g, serverID);
 
-    console.log("AVAILABLE_SERVERS", AVAILABLE_SERVERS);
-    console.log("OFFLINE_SERVERS", OFFLINE_SERVERS);
     axios
-      .get(serverURL + "/health/")
+      .get(serverURL)
       .then((res) => {
         console.log(
           "server ",
           serverID,
-          " was succesful with the following message ",
+          " was successful with the following message ",
           res.data.message
         );
       })
       .catch((err) => {
         console.log("An error has occured, server ", serverID);
-
         OFFLINE_SERVERS.add(serverID);
       });
   });
@@ -34,6 +31,9 @@ const healthCheck = async () => {
   AVAILABLE_SERVERS = new Set(
     [...AVAILABLE_SERVERS].filter((x) => !OFFLINE_SERVERS.has(x))
   );
+
+  console.log("AVAILABLE_SERVERS", AVAILABLE_SERVERS);
+  console.log("OFFLINE_SERVERS", OFFLINE_SERVERS);
 };
 
 const port = 4000;
@@ -43,8 +43,6 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-//app.use("/api/server", serverRoute);
-
 app.route("/api/server").get((req, res) => {
   try {
     let TEMP_AVAILABLE_SERVERS = [...AVAILABLE_SERVERS];
@@ -52,8 +50,8 @@ app.route("/api/server").get((req, res) => {
       Math.random() * TEMP_AVAILABLE_SERVERS.length
     );
 
-    let serverURL = SERVER_BASE_URL.replace(
-      "{}",
+    let serverURL = SERVER_CLIENT_BASE_URL.replace(
+      /{}/g,
       TEMP_AVAILABLE_SERVERS[randomServer]
     );
 

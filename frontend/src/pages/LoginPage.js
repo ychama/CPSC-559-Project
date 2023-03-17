@@ -20,18 +20,12 @@ import logo from "../images/logo.png";
 import "../styles/LoginPage.css";
 import { isValidUsername } from "../helpers/validation";
 import { signIn } from "../backendhelpers/userHelpers.js";
-import { getBackendUrl } from "../backendhelpers/proxyHelper.js"
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const theme = useMantineTheme();
 
   useEffect(() => {
-    //get the backend url from the proxy 
-    if(!localStorage.getItem("backendURL")){
-      setBackendUrl();
-    }
-
     if (localStorage.getItem("token")) {
       navigate("/home");
     }
@@ -51,12 +45,6 @@ const LoginPage = () => {
       password: (value) => (value === "" ? "Invalid password" : null),
     },
   });
-
-  const setBackendUrl = async () => {
-      let backendURL = await getBackendUrl();
-      localStorage.setItem("backendURL", backendURL);
-      
-  }
 
   const handleSignIn = async (values) => {
     try {

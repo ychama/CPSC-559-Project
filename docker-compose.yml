@@ -121,6 +121,12 @@ services:
       SERVER_BASE_URL: http://backend{}:5000/api
       MONGO_URI: mongodb://root:example@database4:27017/
 
+  proxy1:
+    build: ./proxy
+    restart: unless-stopped
+    ports:
+      - 4000:4000
+
   frontend1:
     build:
       context: ./frontend
