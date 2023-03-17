@@ -17,9 +17,8 @@ instance.interceptors.response.use(
         // If the request succeeds, return the response directly
         return response;
     },
-    async (error) => {
+    (error) => {
         // If the request fails, find a new backend url
-        console.log(error);
         getBackendUrl().then((newBackendUrl) => {
             localStorage.setItem("backendURL", newBackendUrl);
         });
