@@ -1,81 +1,34 @@
 import { instance } from "../helpers/axiosHelper.js";
+import { retry } from "../helpers/retry.js";
 
 export const getAllWorkspaces = async () => {
-  let response = await instance.get(localStorage.getItem("backendURL") + "/workspaces/").then((response) => {
+  let httpRequest = async () => {
+    const response = await instance.get(localStorage.getItem("backendURL") + "/workspaces/");
     return response.data;
-  }).catch((err) => {
-    return "error";
-  });
-
-  let fail_count = 1;
-  while (response === "error" && fail_count < 3) {
-    response = await instance.get(localStorage.getItem("backendURL") + "/workspaces/").then((response) => {
-      return response.data;
-    }).catch((err) => {
-      return "error";
-    });
-    fail_count++;
-  }
-
-  return response
+  };
+  return retry(httpRequest);
 };
 
 export const getWorkspace = async (code) => {
-  let response = await instance.get(localStorage.getItem("backendURL") + "/workspaces/" + code).then((response) => {
+  let httpRequest = async () => {
+    const response = await instance.get(localStorage.getItem("backendURL") + "/workspaces/" + code);
     return response.data;
-  }).catch((err) => {
-    return "error";
-  });
-
-  let fail_count = 1;
-  while (response === "error" && fail_count < 3) {
-    response = await instance.get(localStorage.getItem("backendURL") + "/workspaces/" + code).then((response) => {
-      return response.data;
-    }).catch((err) => {
-      return "error";
-    });
-    fail_count++;
-  }
-
-  return response
+  };
+  return retry(httpRequest);
 };
 
 export const updateWorkspace = async (code, reqBody) => {
-  let response = await instance.put(localStorage.getItem("backendURL") + "/workspaces/" + code, reqBody).then((response) => {
+  let httpRequest = async () => {
+    const response = await instance.put(localStorage.getItem("backendURL") + "/workspaces/" + code, reqBody);
     return response.data;
-  }).catch((err) => {
-    return "error";
-  });
-
-  let fail_count = 1;
-  while (response === "error" && fail_count < 3) {
-    response = await instance.put(localStorage.getItem("backendURL") + "/workspaces/" + code, reqBody).then((response) => {
-      return response.data;
-    }).catch((err) => {
-      return "error";
-    });
-    fail_count++;
-  }
-
-  return response
+  };
+  return retry(httpRequest);
 };
 
 export const createWorkspace = async (reqBody) => {
-  let response = await instance.post(localStorage.getItem("backendURL") + "/workspaces/", reqBody).then((response) => {
+  let httpRequest = async () => {
+    const response = await instance.post(localStorage.getItem("backendURL") + "/workspaces/", reqBody)
     return response.data;
-  }).catch((err) => {
-    return "error";
-  });
-
-  let fail_count = 1;
-  while (response === "error" && fail_count < 3) {
-    response = await instance.post(localStorage.getItem("backendURL") + "/workspaces/", reqBody).then((response) => {
-      return response.data;
-    }).catch((err) => {
-      return "error";
-    });
-    fail_count++;
-  }
-
-  return response
+  };
+  return retry(httpRequest);
 };

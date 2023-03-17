@@ -1,6 +1,6 @@
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-export const retry = async (func, max_retries = 3, backoff = 100) => {
+export const retry = async (func, max_retries = 3, backoff = 500) => {
     let retries = 0;
     while (retries < max_retries) {
         try {
