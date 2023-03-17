@@ -1,25 +1,41 @@
 import axios from "axios";
-
-const endpointBase = process.env.REACT_APP_PROXY_URL || "http://localhost:5000/api";
-
-/*const customConfig = {
-  withCredentials: true,
-  credentials: "include",
-  headers: {
-    "Content-Type": "application/json",
-  },
-};*/
+import { instance } from "../helpers/axiosHelper.js";
 
 export const getAllTemplates = async () => {
-  let backendURL = localStorage.getItem("backendURL");
-  return axios.get(backendURL + "/templates/").then((response) => {
+  let response = await instance.get(localStorage.getItem("backendURL") + "/templates/").then((response) => {
     return response.data;
+  }).catch((err) => {
+    return "error";
   });
+
+  let fail_count = 1;
+  while (response === "error" && fail_count < 3) {
+    response = await instance.get(localStorage.getItem("backendURL") + "/templates/").then((response) => {
+      return response.data;
+    }).catch((err) => {
+      return "error";
+    });
+    fail_count++;
+  }
+  return response
 };
 
 export const getTemplate = async (id) => {
-  let backendURL = localStorage.getItem("backendURL");
-  return axios.get(backendURL + "/templates/" + id).then((response) => {
+  let response = await instance.get(localStorage.getItem("backendURL") + "/templates/" + id).then((response) => {
     return response.data;
+  }).catch((err) => {
+    return "error";
   });
+
+  let fail_count = 1;
+  while (response === "error" && fail_count < 3) {
+    response = await instance.get(localStorage.getItem("backendURL") + "/templates/" + id).then((response) => {
+      return response.data;
+    }).catch((err) => {
+      return "error";
+    });
+    fail_count++;
+  }
+
+  return response
 };
