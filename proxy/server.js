@@ -47,11 +47,14 @@ app.use(express.urlencoded({ extended: false }));
 
 app.route("/api/server").get((req, res) => {
   try {
-    const randomServer = Math.floor(Math.random() * AVAILABLE_SERVERS.length);
+    let TEMP_AVAILABLE_SERVERS = [...AVAILABLE_SERVERS];
+    const randomServer = Math.floor(
+      Math.random() * TEMP_AVAILABLE_SERVERS.length
+    );
 
     let serverURL = SERVER_BASE_URL.replace(
       "{}",
-      AVAILABLE_SERVERS[randomServer]
+      TEMP_AVAILABLE_SERVERS[randomServer]
     );
 
     res.status(200).json({ serverURL });
