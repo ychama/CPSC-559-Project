@@ -131,6 +131,3 @@ services:
       - backend1
     ports:
       - 3001:3000
-
-volumes:
-  mongo-data:
