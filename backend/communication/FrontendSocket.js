@@ -48,8 +48,7 @@ const startFrontendSocket = async () => {
 };
 
 async function processMessage(connection, message) {
-
-    console.log("Received Message");
+    
     try{
         const jsonMsg = JSON.parse(message);
 
