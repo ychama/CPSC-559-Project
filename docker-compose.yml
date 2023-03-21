@@ -19,6 +19,24 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
 
+  database3:
+    image: mongo
+    restart: unless-stopped
+    volumes:
+      - ./mongo-data-3:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  database4:
+    image: mongo
+    restart: unless-stopped
+    volumes:
+      - ./mongo-data-4:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
   mongo-express1:
     image: mongo-express
     restart: unless-stopped
@@ -39,15 +57,35 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
       ME_CONFIG_MONGODB_URL: mongodb://root:example@database2:27017/
 
+  mongo-express3:
+    image: mongo-express
+    restart: unless-stopped
+    ports:
+      - 8083:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@database3:27017/
+
+  mongo-express4:
+    image: mongo-express
+    restart: unless-stopped
+    ports:
+      - 8084:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@database4:27017/
+
   backend1:
     build: ./backend
     restart: unless-stopped
     ports:
       - 5001:5000
-      - 5999:5999
+      - 7001:7000
     environment:
       SERVER_ID: 1
-      OTHER_SERVERS: 2
+      OTHER_SERVERS: 2,3,4
       SERVER_BASE_URL: http://backend{}:5000/api
       MONGO_URI: mongodb://root:example@database1:27017/
 
@@ -56,34 +94,49 @@ services:
     restart: unless-stopped
     ports:
       - 5002:5000
-      - 5998:5999
+      - 7002:7000
     environment:
       SERVER_ID: 2
-      OTHER_SERVERS: 1
+      OTHER_SERVERS: 1,3,4
       SERVER_BASE_URL: http://backend{}:5000/api
       MONGO_URI: mongodb://root:example@database2:27017/
+
+  backend3:
+    build: ./backend
+    restart: unless-stopped
+    ports:
+      - 5003:5000
+      - 7003:7000
+    environment:
+      SERVER_ID: 3
+      OTHER_SERVERS: 1,2,4
+      SERVER_BASE_URL: http://backend{}:5000/api
+      MONGO_URI: mongodb://root:example@database3:27017/
+
+  backend4:
+    build: ./backend
+    restart: unless-stopped
+    ports:
+      - 5004:5000
+      - 7004:7000
+    environment:
+      SERVER_ID: 4
+      OTHER_SERVERS: 1,2,3
+      SERVER_BASE_URL: http://backend{}:5000/api
+      MONGO_URI: mongodb://root:example@database4:27017/
+
+  proxy1:
+    build: ./proxy
+    restart: unless-stopped
+    ports:
+      - 4000:4000
 
   frontend1:
     build:
       context: ./frontend
       args:
-        REACT_APP_BACKEND_URL: http://localhost:5001/api
-        WEBSOCKET_BACKEND_URL: ws://localhost:5999
+        REACT_APP_PROXY_URL: http://localhost:4000/api
     depends_on:
       - backend1
     ports:
       - 3001:3000
-
-  frontend2:
-    build:
-      context: ./frontend
-      args:
-        REACT_APP_BACKEND_URL: http://localhost:5002/api
-        WEBSOCKET_BACKEND_URL: ws://localhost:5998
-    depends_on:
-      - backend2
-    ports:
-      - 3002:3000
-
-volumes:
-  mongo-data:

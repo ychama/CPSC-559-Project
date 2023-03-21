@@ -5,7 +5,8 @@ import {
     updateWorkspace,
   } from "../controllers/workspaceController.js";
 
-const socketPort = 5999;  // hard coded random port for now
+// Clients reach us at this port
+const socketPort = 7000; 
 
 // maps workspace id to an array of client connections
 const workspaceToConnection = {};
@@ -48,6 +49,7 @@ const startFrontendSocket = async () => {
 
 async function processMessage(connection, message) {
 
+    console.log("Received Message");
     try{
         const jsonMsg = JSON.parse(message);
 

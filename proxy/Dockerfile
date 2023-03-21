@@ -1,14 +1,10 @@
 FROM node:14.16.1-alpine3.13
 
-ARG REACT_APP_PROXY_URL
-
-ENV REACT_APP_PROXY_URL $REACT_APP_PROXY_URL
-
 WORKDIR /app
 COPY package*.json ./
 RUN npm i
 COPY . .
 
-EXPOSE 3000
+EXPOSE 4000
 
 ENTRYPOINT [ "npm", "start" ]

@@ -1,7 +1,7 @@
 import { React, useState, useEffect } from "react";
 import { Center, ColorPicker, Stack, TextInput, Title } from "@mantine/core";
 
-const websocketUrl = process.env.WEBSOCKET_BACKEND_URL || "ws://localhost:5999";
+let websocketUrl = localStorage.getItem("websocketURL");
 
 // Socket for canvas
 var socket;
@@ -26,6 +26,7 @@ const SVG = () => {
   };
 
   useEffect(() => {
+    websocketUrl = localStorage.getItem("websocketURL");
     socket = new WebSocket(websocketUrl);
 
     // On connection

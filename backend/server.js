@@ -7,6 +7,7 @@ import userRoute from "./routes/userRoute.js";
 import workspaceRoute from "./routes/workspaceRoute.js";
 import templateRoute from "./routes/templateRoute.js";
 import startFrontendSocket from "./communication/FrontendSocket.js";
+import healthRoute from "./routes/healthRoute.js";
 
 connectMongoDB();
 
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/api/workspaces", workspaceRoute);
 app.use("/api/users", userRoute);
 app.use("/api/templates", templateRoute);
+app.use("/api/health", healthRoute);
 
 app.get(
   "/api/getUserCookie",
