@@ -6,8 +6,12 @@ import asyncHandler from "express-async-handler";
 import userRoute from "./routes/userRoute.js";
 import workspaceRoute from "./routes/workspaceRoute.js";
 import templateRoute from "./routes/templateRoute.js";
-import startFrontendSocket from "./communication/FrontendSocket.js";
 import healthRoute from "./routes/healthRoute.js";
+import startFrontendSocket from "./communication/ToFrontendSocket.js";
+import { 
+  listenForServers, 
+  connectToOtherServers,
+} from "./communication/ServerToServerSocket.js"
 
 connectMongoDB();
 
@@ -74,6 +78,11 @@ app.get(
 //   });
 // });
 
+listenForServers();
+
+connectToOtherServers();
+
 startFrontendSocket();
+
 
 app.listen(port, () => console.log("Server started on port " + port));
