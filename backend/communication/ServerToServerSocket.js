@@ -3,6 +3,7 @@ import {
     WebSocketServer, 
     WebSocket,
 } from 'ws';
+import { updateWorkspace } from "../controllers/workspaceController.js";
 
 const SERVER_CLIENT_WEBSOCKET_URL = "ws://backend{}:600{}";
 const PORT_TEMPLATE = "600{}";
@@ -14,6 +15,8 @@ const localPort = PORT_TEMPLATE.replace(
     /{}/g,
     localId
 );
+
+const serverConnections = {};
 
 const listenForServers = async () => {
 
@@ -57,29 +60,64 @@ const connectToOtherServers = async () => {
             const inferiorSocket = new WebSocket(serverAddress);
             
             inferiorSocket.addEventListener('open', function (event) {
+
+                console.log(`Connected to server ${id}`);
+
+                // send local id
                 inferiorSocket.send(`{ "serverId": ${localId} }`);
+
+                // store connection
+                serverConnections[id] = inferiorSocket;
             });
             
+            // receive message
             inferiorSocket.addEventListener('message', function (event) {
                 processIncomingMessage(inferiorSocket, event.data);
             });
-
-            // TODO store connection?
         }
     });
 };
 
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
+async function broadcastUpdate(timeStamp, workspaceCode, paths) {
+
+    const update = {
+        timeStamp: timeStamp,
+        workspaceCode: workspaceCode,
+        paths: paths
+    };
+    const jsonUpdate = JSON.stringify(update);
+
+    for (let id in serverConnections) {
+
+        serverConnections[id].send(jsonUpdate);
+    }
+};
+
 async function processIncomingMessage(socket, message) {
 
-    console.log(`Message Received: ${message}`);    // TODO remove
     try{
         const jsonMsg = JSON.parse(message);
 
         // This is a server on the client side of the connection telling us what server they are
         if(jsonMsg.hasOwnProperty("serverId")) {
-            // TODO store connection?
+
+            console.log(`Connected to server ${jsonMsg.serverId}`);
+
+            // Save connection with id
+            serverConnections[jsonMsg['serverId']] = socket;
+
+        // Update message from other server
+        } else if (
+            jsonMsg.hasOwnProperty("timeStamp") &&
+            jsonMsg.hasOwnProperty("workspaceCode") &&
+            jsonMsg.hasOwnProperty("paths")) {
+            
+            updateWorkspace(jsonMsg['workspaceCode'], jsonMsg['paths'], false, jsonMsg['timeStamp']);
+
+        } else {
+            throw new Error("Unrecognized message received from another server");
         }
 
     } catch(error) {
@@ -89,5 +127,6 @@ async function processIncomingMessage(socket, message) {
 
 export { 
     listenForServers, 
-    connectToOtherServers 
+    connectToOtherServers,
+    broadcastUpdate,
 };

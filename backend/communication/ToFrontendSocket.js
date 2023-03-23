@@ -9,10 +9,10 @@ import {
 const socketPort = 7000; 
 
 // maps workspace id to an array of client connections
-const workspaceToConnection = {};
+let workspaceToConnection = {};
 
 // maps connection to a workspace
-const connectionToWorkspace = {};
+let connectionToWorkspace = {};
 
 const startFrontendSocket = async () => {
     
@@ -47,19 +47,36 @@ const startFrontendSocket = async () => {
     });
 };
 
+async function updateClients(workspace, paths) {
+
+    // Send only to clients who care about this workspace
+    const clientSockets = workspaceToConnection[workspace];
+
+    if (Array.isArray(clientSockets)) {
+
+        for (const client of clientSockets) {
+    
+            client.send(`{ "paths": ${JSON.stringify(paths)} }`);
+        }
+    }
+};
+
 async function processMessage(connection, message) {
     
-    try{
+    try {
         const jsonMsg = JSON.parse(message);
 
+        // Received new connection
         if(jsonMsg.hasOwnProperty('workspaceCode')){
 
             const workspaceCode = jsonMsg['workspaceCode'];
 
+            console.log("Received workspace code from client");
+
             // map workspace to the connection
             if(workspaceCode in workspaceToConnection) {
 
-                workspaceToConnection[workspaceCode].unshift(connection);
+                workspaceToConnection[workspaceCode].push(connection);
             }
             else {
                 
@@ -73,12 +90,12 @@ async function processMessage(connection, message) {
             const workspace = await getWorkspace(workspaceCode);
             connection.send(workspace);
 
+        // Client updated workspace 
         } else if (jsonMsg.hasOwnProperty('paths')) {
 
-            await updateWorkspace(connectionToWorkspace[connection], jsonMsg["paths"]);
-            console.log("Updated coloring book");
+            updateWorkspace(connectionToWorkspace[connection], jsonMsg["paths"], true);
         } else {
-            throw new Error(`Unknown message type received: ${message}`);
+            throw new Error(`Unrecognize message receivedfrom client: ${message}`);
         }
 
     } catch (error) {
@@ -86,4 +103,7 @@ async function processMessage(connection, message) {
     }
 };
 
-export default startFrontendSocket;
+export {
+    startFrontendSocket,
+    updateClients,
+};

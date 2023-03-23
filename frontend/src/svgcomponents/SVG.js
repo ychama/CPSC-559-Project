@@ -49,6 +49,10 @@ const SVG = () => {
           setSVGPaths(jsonMsg['paths']);
           setGroupTransform(jsonMsg['groupTransform']);
   
+        } else if (jsonMsg.hasOwnProperty("paths")) {
+
+          setSVGPaths(jsonMsg['paths']);
+
         } else {
           throw new Error(`Could not parse websocket update`);
         }
