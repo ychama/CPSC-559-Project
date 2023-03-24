@@ -30,41 +30,61 @@ const SVG = () => {
     socket = new WebSocket(websocketUrl);
 
     // On connection
-    socket.addEventListener('open', (event) => {
-
+    const onConnected = (event) => {
       socket.send(`{ "workspaceCode": "${localStorage.getItem("workspaceCode")}" }`);
-    });
+    };
+    socket.addEventListener('open', onConnected);
     
     // On message received
-    socket.addEventListener('message', (event) => {
-
+    const onMessageReceived = (event) => {
       try {        
         const jsonMsg = JSON.parse(event.data);
-  
+        
         if(jsonMsg.hasOwnProperty("workspaceName") &&
             jsonMsg.hasOwnProperty("paths") &&
             jsonMsg.hasOwnProperty("groupTransform")) {
-        
+              
           setSVGTitleName(jsonMsg['workspaceName']);
           setSVGPaths(jsonMsg['paths']);
           setGroupTransform(jsonMsg['groupTransform']);
-  
+          
         } else if (jsonMsg.hasOwnProperty("paths")) {
-
+          
           setSVGPaths(jsonMsg['paths']);
-
+          
         } else {
           throw new Error(`Could not parse websocket update`);
         }
       } catch(error) {
         console.error(`Error receiving message: ${error}`);
       }
-    });
-
+    };
+    socket.addEventListener('message', onMessageReceived);
+    
     // On disconnect
-    socket.addEventListener('close', (event) => {
+    const onDisconnected = (event) => {
       console.log('Disconnected from the WebSocket server!');
-    });
+      // TODO send query for new URLS
+      // maybe call return
+      // USe the dependencies to re-mount the useEffect
+      // create new state to use a dependency
+    };
+    socket.addEventListener('close', onDisconnected);
+    
+    return () => {
+
+      if(socket != null) {
+
+        // unsub from events
+        socket.removeEventListener('open', onConnected);
+        socket.removeEventListener('message', onMessageReceived);
+        socket.removeEventListener('close', onDisconnected);
+
+        // disconnection
+        socket.close(1000, `User left workspace`);
+        socket = null;
+      }
+    };
   }, []);
 
   return (

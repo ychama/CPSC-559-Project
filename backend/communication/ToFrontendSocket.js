@@ -26,21 +26,27 @@ const startFrontendSocket = async () => {
     // On Client Connected
     wsServer.on('connection', function(connection) {
 
+        console.log('User joined workspace');
+
         // Receive messages
         connection.on('message', function incoming(message){
             processMessage(connection, message);
         });
 
         // FE disconnected
-        connection.on('close', () => {
+        connection.on('close', (code, reason) => {
+
+            console.log(`Front end disconnected with code ${code} because: "${reason}"`);
 
             // get rid of client
             var workSpace = connectionToWorkspace[connection];
 
             // remove the connection from the workspace
-            const connectionIndex = workspaceToConnection[workSpace].indexOf(connection);
-            if(connectionIndex > -1) {
-                workspaceToConnection[workSpace].splice(connectionIndex, 1);
+            if(Array.isArray(workspaceToConnection[workSpace])) {
+                const connectionIndex = workspaceToConnection[workSpace].indexOf(connection);
+                if(connectionIndex > -1) {
+                    workspaceToConnection[workSpace].splice(connectionIndex, 1);
+                }
             }
             delete connectionToWorkspace[connection];
         });
