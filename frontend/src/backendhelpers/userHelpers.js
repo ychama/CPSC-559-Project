@@ -1,19 +1,18 @@
-import axios from "axios";
-
-const endpointBase = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000/api";
+import { instance } from "../helpers/axiosHelper.js";
+import { retry } from "../helpers/retry.js";
 
 export const signUp = async (reqBody) => {
-  return axios
-    .post(endpointBase + "/users/signup/", reqBody)
-    .then((response) => {
-      return response.data;
-    });
+  let httpRequest = async () => {
+    const response = await instance.post(localStorage.getItem("backendURL") + "/users/signup/", reqBody);
+    return response.data;
+  };
+  return retry(httpRequest);
 };
 
 export const signIn = async (reqBody) => {
-  return axios
-    .post(endpointBase + "/users/login/", reqBody)
-    .then((response) => {
-      return response.data;
-    });
+  let httpRequest = async () => {
+    const response = await instance.post(localStorage.getItem("backendURL") + "/users/login/", reqBody);
+    return response.data;
+  };
+  return retry(httpRequest);
 };

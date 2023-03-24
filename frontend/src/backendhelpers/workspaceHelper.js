@@ -1,29 +1,34 @@
-import axios from "axios";
-
-const endpointBase = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000/api";
+import { instance } from "../helpers/axiosHelper.js";
+import { retry } from "../helpers/retry.js";
 
 export const getAllWorkspaces = async () => {
-  return axios.get(endpointBase + "/workspaces/", { headers: { "Authorization": localStorage.getItem('token') } }).then((response) => {
+  let httpRequest = async () => {
+    const response = await instance.get(localStorage.getItem("backendURL") + "/workspaces/", { headers: { "Authorization": localStorage.getItem('token') } });
     return response.data;
-  });
+  };
+  return retry(httpRequest);
 };
 
 export const getWorkspace = async (code) => {
-  return axios.get(endpointBase + "/workspaces/" + code, { headers: { "Authorization": localStorage.getItem('token') } }).then((response) => {
+  let httpRequest = async () => {
+    const response = await instance.get(localStorage.getItem("backendURL") + "/workspaces/" + code, { headers: { "Authorization": localStorage.getItem('token') } });
     return response.data;
-  });
+  };
+  return retry(httpRequest);
 };
 
 export const updateWorkspace = async (code, reqBody) => {
-  return axios
-    .put(endpointBase + "/workspaces/" + code, reqBody, { headers: { "Authorization": localStorage.getItem('token') } })
-    .then((response) => {
-      return response.data;
-    });
+  let httpRequest = async () => {
+    const response = await instance.put(localStorage.getItem("backendURL") + "/workspaces/" + code, reqBody, { headers: { "Authorization": localStorage.getItem('token') } });
+    return response.data;
+  };
+  return retry(httpRequest);
 };
 
 export const createWorkspace = async (reqBody) => {
-  return axios.post(endpointBase + "/workspaces/", reqBody, { headers: { "Authorization": localStorage.getItem('token') } }).then((response) => {
+  let httpRequest = async () => {
+    const response = await instance.post(localStorage.getItem("backendURL") + "/workspaces/", reqBody, { headers: { "Authorization": localStorage.getItem('token') } })
     return response.data;
-  });
+  };
+  return retry(httpRequest);
 };

@@ -1,15 +1,18 @@
-import axios from "axios";
-
-const endpointBase = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000/api";
+import { instance } from "../helpers/axiosHelper.js";
+import { retry } from "../helpers/retry.js";
 
 export const getAllTemplates = async () => {
-  return axios.get(endpointBase + "/templates/", { headers: { "Authorization": localStorage.getItem('token') } }).then((response) => {
+  let httpRequest = async () => {
+    const response = await instance.get(localStorage.getItem("backendURL") + "/templates/", { headers: { "Authorization": localStorage.getItem('token') } });
     return response.data;
-  });
+  };
+  return retry(httpRequest);
 };
 
 export const getTemplate = async (id) => {
-  return axios.get(endpointBase + "/templates/" + id, { headers: { "Authorization": localStorage.getItem('token') } }).then((response) => {
+  let httpRequest = async () => {
+    const response = await instance.get(localStorage.getItem("backendURL") + "/templates/" + id, { headers: { "Authorization": localStorage.getItem('token') } });
     return response.data;
-  });
+  };
+  return retry(httpRequest);
 };
