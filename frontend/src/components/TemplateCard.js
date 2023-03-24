@@ -36,7 +36,6 @@ const TemplateCard = ({ _id, templateName, paths, groupTransform }) => {
     }
     const req = {
       workspaceName: workspaceName,
-      workspaceOwner: "tk",
       paths: paths,
       groupTransform: groupTransform,
     };

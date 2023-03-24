@@ -15,7 +15,7 @@ const createWorkspace = asyncHandler(async (req, res) => {
     const newWorkspace = await Workspace.create({
       workspaceCode: workspaceCode,
       workspaceName: req.body.workspaceName,
-      workspaceOwner: req.body.workspaceOwner,
+      workspaceOwner: req.user,
       paths: req.body.paths,
       groupTransform: req.body.groupTransform,
     });
@@ -134,7 +134,7 @@ const deleteWorkspace = asyncHandler(async (req, res) => {
         "Workspace with code " + req.params.workspaceCode + " not found."
       );
     }
-    if (existingWorkspace.workspaceOwner != req.params.userName) {
+    if (existingWorkspace.workspaceOwner != req.user) {
       res.status(400);
       throw new Error(
         "User " +

@@ -12,8 +12,7 @@ const loggedIn = async (req, res, next) => {
       if (userToken) {
         const payload = await jwt.verify(userToken, SECRET);
         if (payload) {
-          console.log(payload);
-          req.user = payload;
+          req.user = payload.userName;
           next();
         } else {
           res.status(400).json({ error: "Token not valid." });
