@@ -36,7 +36,7 @@ const SVG = () => {
       localStorage.setItem("backendURL", urls.serverURL);
       localStorage.setItem("websocketURL", urls.websocketURL);
 
-      console.log("Server urls reset, reconnecting...")
+      console.log("Server urls reset, reconnecting...");
 
       setReconnectToSocket(!reconnectToSocket); // When this changes we reload the effect
     };
@@ -51,7 +51,7 @@ const SVG = () => {
     socket.addEventListener('open', onConnected);
     
     // On message received
-    const onMessageReceived = () => {
+    const onMessageReceived = (event) => {
       try {        
         const jsonMsg = JSON.parse(event.data);
         
