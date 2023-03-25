@@ -1,5 +1,6 @@
 import { React, useState, useEffect } from "react";
 import { Center, ColorPicker, Stack, TextInput, Title } from "@mantine/core";
+import { getBackendUrl } from "../backendhelpers/proxyHelper.js"
 
 let websocketUrl = localStorage.getItem("websocketURL");
 
@@ -11,6 +12,7 @@ const SVG = () => {
   const [SVGTitleName, setSVGTitleName] = useState("");
   const [groupTransform, setGroupTransform] = useState("");
   const [currentColor, setCurrentColor] = useState("#FFFFFF");
+  const [reconnectToSocket, setReconnectToSocket] = useState(false);
 
   const updateColor = (index) => {
     
@@ -26,23 +28,36 @@ const SVG = () => {
   };
 
   useEffect(() => {
+
+    // Get new backend URLs on server side failure
+    async function getNewUrls() {
+
+      const urls = await getBackendUrl();
+      localStorage.setItem("backendURL", urls.serverURL);
+      localStorage.setItem("websocketURL", urls.websocketURL);
+
+      console.log("Server urls reset, reconnecting...")
+
+      setReconnectToSocket(!reconnectToSocket); // When this changes we reload the effect
+    };
+
     websocketUrl = localStorage.getItem("websocketURL");
     socket = new WebSocket(websocketUrl);
 
     // On connection
-    const onConnected = (event) => {
+    const onConnected = () => {
       socket.send(`{ "workspaceCode": "${localStorage.getItem("workspaceCode")}" }`);
     };
     socket.addEventListener('open', onConnected);
     
     // On message received
-    const onMessageReceived = (event) => {
+    const onMessageReceived = () => {
       try {        
         const jsonMsg = JSON.parse(event.data);
         
         if(jsonMsg.hasOwnProperty("workspaceName") &&
-            jsonMsg.hasOwnProperty("paths") &&
-            jsonMsg.hasOwnProperty("groupTransform")) {
+           jsonMsg.hasOwnProperty("paths") &&
+           jsonMsg.hasOwnProperty("groupTransform")) {
               
           setSVGTitleName(jsonMsg['workspaceName']);
           setSVGPaths(jsonMsg['paths']);
@@ -62,15 +77,12 @@ const SVG = () => {
     socket.addEventListener('message', onMessageReceived);
     
     // On disconnect
-    const onDisconnected = (event) => {
-      console.log('Disconnected from the WebSocket server!');
-      // TODO send query for new URLS
-      // maybe call return
-      // USe the dependencies to re-mount the useEffect
-      // create new state to use a dependency
+    const onDisconnected = () => {
+      console.log('Disconnected from the WebSocket server, reconnecting...');
+      getNewUrls();
     };
     socket.addEventListener('close', onDisconnected);
-    
+
     return () => {
 
       if(socket != null) {
@@ -85,7 +97,7 @@ const SVG = () => {
         socket = null;
       }
     };
-  }, []);
+  }, [reconnectToSocket]);
 
   return (
     // this is the breakdown for the flower image
