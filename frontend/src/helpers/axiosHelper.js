@@ -5,6 +5,7 @@ getBackendUrl().then((newBackendUrl) => {
     localStorage.setItem("backendURL", newBackendUrl);
 }).catch((err) => {
     localStorage.setItem("backendURL", "http://localhost:5001/api");
+    localStorage.setItem("websocketURL", "ws://localhost:7001");
 });
 
 export const instance = axios.create({
@@ -18,9 +19,10 @@ instance.interceptors.response.use(
         return response;
     },
     (error) => {
-        // If the request fails, find a new backend url
-        getBackendUrl().then((newBackendUrl) => {
-            localStorage.setItem("backendURL", newBackendUrl);
+        // If the request fails, find a new backend urls
+        getBackendUrl().then((urls) => {
+            localStorage.setItem("backendURL", urls.serverURL);
+            localStorage.setItem("websocketURL", urls.websocketURL);
         });
         return Promise.reject(error);
     }

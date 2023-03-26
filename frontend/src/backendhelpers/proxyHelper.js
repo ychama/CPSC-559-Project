@@ -5,6 +5,9 @@ const proxyBase =
 
 export const getBackendUrl = async () => {
   return await axios.get(proxyBase + "/server").then((res) => {
-    return res.data.serverURL;
+    return { 
+      'serverURL': res.data.serverURL,
+      'websocketURL': res.data.websocketURL,
+    }
   });
 };

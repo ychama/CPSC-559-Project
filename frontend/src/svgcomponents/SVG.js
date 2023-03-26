@@ -1,46 +1,103 @@
 import { React, useState, useEffect } from "react";
-import { getTemplate } from "../backendhelpers/templateHelpers.js";
-import {
-  getWorkspace,
-  updateWorkspace,
-} from "../backendhelpers/workspaceHelper.js";
 import { Center, ColorPicker, Stack, TextInput, Title } from "@mantine/core";
-import { useInterval } from "../helpers/interval.js";
-const svgName = "flower1";
+import { getBackendUrl } from "../backendhelpers/proxyHelper.js"
+
+let websocketUrl = localStorage.getItem("websocketURL");
+
+// Socket for canvas
+var socket;
 
 const SVG = () => {
   const [SVGPaths, setSVGPaths] = useState([]);
   const [SVGTitleName, setSVGTitleName] = useState("");
   const [groupTransform, setGroupTransform] = useState("");
   const [currentColor, setCurrentColor] = useState("#FFFFFF");
+  const [reconnectToSocket, setReconnectToSocket] = useState(false);
 
   const updateColor = (index) => {
+    
     let newSVGPaths = SVGPaths.slice(0);
     newSVGPaths[index].svgFill = currentColor;
     setSVGPaths(newSVGPaths);
-    updateWorkspace(localStorage.getItem("workspaceCode"), {
-      paths: newSVGPaths,
-    });
+
+    try{
+      socket.send(`{ "paths": ${JSON.stringify(SVGPaths)} }`);
+    }catch(error){
+      console.error(`Could not send color update: ${error}`);
+    }
   };
 
   useEffect(() => {
-    getWorkspace(localStorage.getItem("workspaceCode")).then((result) => {
-      const workspaceData = result.existingWorkspace;
-      setSVGTitleName(workspaceData.workspaceName);
-      setSVGPaths(workspaceData.paths);
-      setGroupTransform(workspaceData.groupTransform);
-    });
-  }, []);
 
-  // Using interval to poll database in 1 second intervals for game updates
-  useInterval(() => {
-    getWorkspace(localStorage.getItem("workspaceCode")).then((result) => {
-      const workspaceData = result.existingWorkspace;
-      setSVGTitleName(workspaceData.workspaceName);
-      setSVGPaths(workspaceData.paths);
-      setGroupTransform(workspaceData.groupTransform);
-    });
-  }, 500);
+    // Get new backend URLs on server side failure
+    async function getNewUrls() {
+
+      const urls = await getBackendUrl();
+      localStorage.setItem("backendURL", urls.serverURL);
+      localStorage.setItem("websocketURL", urls.websocketURL);
+
+      console.log("Server urls reset, reconnecting...");
+
+      setReconnectToSocket(!reconnectToSocket); // When this changes we reload the effect
+    };
+
+    websocketUrl = localStorage.getItem("websocketURL");
+    socket = new WebSocket(websocketUrl);
+
+    // On connection
+    const onConnected = () => {
+      socket.send(`{ "workspaceCode": "${localStorage.getItem("workspaceCode")}" }`);
+    };
+    socket.addEventListener('open', onConnected);
+    
+    // On message received
+    const onMessageReceived = (event) => {
+      try {        
+        const jsonMsg = JSON.parse(event.data);
+        
+        if(jsonMsg.hasOwnProperty("workspaceName") &&
+           jsonMsg.hasOwnProperty("paths") &&
+           jsonMsg.hasOwnProperty("groupTransform")) {
+              
+          setSVGTitleName(jsonMsg['workspaceName']);
+          setSVGPaths(jsonMsg['paths']);
+          setGroupTransform(jsonMsg['groupTransform']);
+          
+        } else if (jsonMsg.hasOwnProperty("paths")) {
+          
+          setSVGPaths(jsonMsg['paths']);
+          
+        } else {
+          throw new Error(`Could not parse websocket update`);
+        }
+      } catch(error) {
+        console.error(`Error receiving message: ${error}`);
+      }
+    };
+    socket.addEventListener('message', onMessageReceived);
+    
+    // On disconnect
+    const onDisconnected = () => {
+      console.log('Disconnected from the WebSocket server, reconnecting...');
+      getNewUrls();
+    };
+    socket.addEventListener('close', onDisconnected);
+
+    return () => {
+
+      if(socket != null) {
+
+        // unsub from events
+        socket.removeEventListener('open', onConnected);
+        socket.removeEventListener('message', onMessageReceived);
+        socket.removeEventListener('close', onDisconnected);
+
+        // disconnection
+        socket.close(1000, `User left workspace`);
+        socket = null;
+      }
+    };
+  }, [reconnectToSocket]);
 
   return (
     // this is the breakdown for the flower image
@@ -57,7 +114,6 @@ const SVG = () => {
           height='550.7067066666666'
           xmlns='http://www.w3.org/2000/svg'
         >
-          <title>Flower Template</title>
           <g
             id='layer1'
             inkscapelabel='Calque 1'
