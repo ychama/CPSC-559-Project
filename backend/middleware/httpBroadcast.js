@@ -12,13 +12,13 @@ const server_id = process.env.SERVER_ID
   },
 };*/
 
-export const postBroadCast = async (endpoint, reqBody) => {
+export const postBroadCast = async (endpoint, reqBody, token) => {
     server_list.forEach(element => {
         if (server_id === element) return;
         reqBody.isBroadcast = true;
         let url = endpointBase.replace(/{}/g, element) + endpoint;
         axios
-            .post(url, reqBody, { timeout: 1000 })
+            .post(url, reqBody, { headers: { "Authorization": "Bearer " + token }, timeout: 1000 })
             .then((res) => {
                 console.log(res);
             })
@@ -28,13 +28,13 @@ export const postBroadCast = async (endpoint, reqBody) => {
     });
 }
 
-export const putBroadCast = async (endpoint, reqBody) => {
+export const putBroadCast = async (endpoint, reqBody, token) => {
     server_list.forEach(element => {
         if (server_id === element) return;
         reqBody.isBroadcast = true;
         let url = endpointBase.replace(/{}/g, element) + endpoint;
         axios
-            .put(url, reqBody, { timeout: 1000 })
+            .put(url, reqBody, { headers: { "Authorization": "Bearer " + token }, timeout: 1000 })
             .then((res) => {
                 console.log(res);
             })
@@ -44,6 +44,6 @@ export const putBroadCast = async (endpoint, reqBody) => {
     });
 }
 
-export const deleteBroadCast = async (endpoint, reqBody) => {
+export const deleteBroadCast = async (endpoint, reqBody, token) => {
     // TODO
 } 
