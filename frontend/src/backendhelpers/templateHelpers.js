@@ -3,7 +3,7 @@ import { retry } from "../helpers/retry.js";
 
 export const getAllTemplates = async () => {
   let httpRequest = async () => {
-    const response = await instance.get(localStorage.getItem("backendURL") + "/templates/");
+    const response = await instance.get(localStorage.getItem("backendURL") + "/templates/", { headers: { "Authorization": "Bearer " + localStorage.getItem('token') } });
     return response.data;
   };
   return retry(httpRequest);
@@ -11,7 +11,7 @@ export const getAllTemplates = async () => {
 
 export const getTemplate = async (id) => {
   let httpRequest = async () => {
-    const response = await instance.get(localStorage.getItem("backendURL") + "/templates/" + id);
+    const response = await instance.get(localStorage.getItem("backendURL") + "/templates/" + id, { headers: { "Authorization": "Bearer " + localStorage.getItem('token') } });
     return response.data;
   };
   return retry(httpRequest);

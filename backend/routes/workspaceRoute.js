@@ -7,8 +7,13 @@ import {
 
 const workspaceRoute = express.Router();
 
-workspaceRoute.get("/", getAllWorkspaces);
-workspaceRoute.post("/", createWorkspace);
-workspaceRoute.delete("/:workspaceCode", deleteWorkspace);
+workspaceRoute.get("/", loggedIn, getAllWorkspaces);
+workspaceRoute.get("/:workspaceCode", loggedIn, getWorkspace);
+workspaceRoute.post("/", loggedIn, createWorkspace);
+workspaceRoute.put("/:workspaceCode", loggedIn, updateWorkspace);
+workspaceRoute.delete("/:workspaceCode", loggedIn, deleteWorkspace);
+
+
+
 
 export default workspaceRoute;
