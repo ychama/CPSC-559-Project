@@ -1,8 +1,9 @@
 import axios from "axios";
 import { getBackendUrl } from "../backendhelpers/proxyHelper.js";
 
-getBackendUrl().then((newBackendUrl) => {
-    localStorage.setItem("backendURL", newBackendUrl);
+getBackendUrl().then((urls) => {
+    localStorage.setItem("backendURL", urls.serverURL);
+    localStorage.setItem("websocketURL", urls.websocketURL);
 }).catch((err) => {
     localStorage.setItem("backendURL", "http://localhost:5001/api");
     localStorage.setItem("websocketURL", "ws://localhost:7001");
