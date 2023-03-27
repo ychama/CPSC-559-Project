@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const endpointBase = process.env.SERVER_BASE_URL
+const endpointBase = "http://backend{}:5000/api"
 const server_list = process.env.OTHER_SERVERS.split(",")
 const server_id = process.env.SERVER_ID
 

@@ -3,6 +3,7 @@ import cors from "cors";
 import axios from "axios";
 
 const SERVER_CLIENT_BASE_URL = "http://localhost:500{}/api";
+const SERVER_CLIENT_WEBSOCKET_URL = "ws://localhost:700{}";
 const SERVER_HEALTH_URL = "http://backend{}:5000/api/health/";
 
 let AVAILABLE_SERVERS = new Set([1, 2, 3, 4]);
@@ -55,7 +56,12 @@ app.route("/api/server").get((req, res) => {
       TEMP_AVAILABLE_SERVERS[randomServer]
     );
 
-    res.status(200).json({ serverURL });
+    let websocketURL = SERVER_CLIENT_WEBSOCKET_URL.replace(
+      /{}/g,
+      TEMP_AVAILABLE_SERVERS[randomServer]
+    );
+
+    res.status(200).json({ serverURL, websocketURL });
   } catch (error) {
     const errMessage = error.message;
     res.status(400).json(errMessage);

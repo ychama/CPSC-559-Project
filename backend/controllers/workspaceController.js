@@ -1,7 +1,17 @@
 import asyncHandler from "express-async-handler";
 import Workspace from "../models/workspaceModel.js";
 import { v4 as uuidv4 } from "uuid";
-import { postBroadCast, putBroadCast } from "../middleware/httpBroadcast.js";
+import { postBroadCast } from "../middleware/httpBroadcast.js";
+import { UpdateQueue } from "../util/updateQueue.js"
+import { updateClients } from "../communication/ToFrontendSocket.js"
+import { broadcastUpdate } from "../communication/ServerToServerSocket.js"
+
+// logical timestamp for this object
+var localTimeStamp = 0;
+
+// queue for processing messages
+const queue = new UpdateQueue();
+queue.on('pendingUpdate', () => { processEnqueuedUpdate(); } );
 
 const createWorkspace = asyncHandler(async (req, res) => {
   try {
@@ -43,85 +53,6 @@ const getAllWorkspaces = asyncHandler(async (req, res) => {
   }
 });
 
-const getWorkspace = asyncHandler(async (req, res) => {
-  try {
-    if (!req.params.workspaceCode) {
-      res.status(400);
-      throw new Error("Workspace code not included in request body.");
-    }
-    const existingWorkspace = await Workspace.findOne({
-      workspaceCode: req.params.workspaceCode,
-    });
-    if (!existingWorkspace) {
-      res.status(400);
-      throw new Error(
-        "No Workspaces with the code " +
-        req.params.workspaceCode +
-        " were found."
-      );
-    }
-    res.status(200).json({ existingWorkspace });
-  } catch (error) {
-    const errMessage = error.message;
-    res.status(400).json(errMessage);
-  }
-});
-
-// const updateSVG = asyncHandler(async (req, res) => {
-//   try {
-//     if (!req.body.templateName) {
-//       res.status(400);
-//       throw new Error("svgName not included in request body.");
-//     }
-//     if (!req.body.svgPaths) {
-//       res.status(400);
-//       throw new Error("svgPaths not included in request body.");
-//     }
-//     const query = { svgName: req.body.svgName };
-//     const update = { svgPaths: req.body.svgPaths };
-
-//     SVG.findOneAndUpdate(query, update, { new: true }, (err, doc) => {
-//       if (err) {
-//         res.status(400);
-//         throw new Error("Error updating SVG.");
-//       }
-//       res.status(200).json({ doc });
-//     });
-//   } catch (error) {
-//     const errMessage = error.message;
-//     res.status(400).json(errMessage);
-//   }
-// });
-
-// not tested
-const updateWorkspace = asyncHandler(async (req, res) => {
-  try {
-    if (!req.params.workspaceCode) {
-      res.status(400);
-      throw new Error("Workspace code not included in request body.");
-    }
-    if (!req.body.paths) {
-      res.status(400);
-      throw new Error("paths not included in request body.");
-    }
-
-    const query = { workspaceCode: req.params.workspaceCode };
-    const update = { paths: req.body.paths };
-
-    Workspace.findOneAndUpdate(query, update, { new: true }, (err, doc) => {
-      if (err) {
-        res.status(400);
-        throw new Error("Error updating Workspace Paths");
-      }
-      res.status(200).json({ doc });
-    });
-  } catch (error) {
-    const errMessage = error.message;
-    res.status(400).json(errMessage);
-  }
-  if (!req.body.isBroadcast) putBroadCast(`/workspaces/${req.params.workspaceCode}/`, req.body);
-});
-
 // not tested
 const deleteWorkspace = asyncHandler(async (req, res) => {
   try {
@@ -153,6 +84,75 @@ const deleteWorkspace = asyncHandler(async (req, res) => {
     res.status(400).json({ error: errMessage });
   }
 });
+
+async function getWorkspace(targetWorkspaceCode) {
+  
+  const existingWorkspace = await Workspace.findOne({
+    workspaceCode: targetWorkspaceCode,
+  });
+
+  if (existingWorkspace) {
+    return JSON.stringify(existingWorkspace);
+  } else {
+    throw new Error(`No Workspaces with the code ${workSpaceCode} were found.`);
+  }
+};
+
+async function updateWorkspace(targetWorkspaceCode, newPaths, isClient, updateTimeStamp = 0) {
+  
+  if (isClient) {
+
+    // This server sets the timestamp for the client communications
+    updateTimeStamp = localTimeStamp;
+
+  } else {
+
+    // Update the timestamp to max of updateTimeStamp and localTimeStamp
+    localTimeStamp = updateTimeStamp > localTimeStamp ? updateTimeStamp : localTimeStamp;
+  }
+  localTimeStamp += 1;  // always increment local timestamp
+
+  const payload = {
+    workspaceCode: targetWorkspaceCode,
+    paths: newPaths,
+  };
+  
+  queue.enqueue(updateTimeStamp, payload, isClient)
+};
+
+function processEnqueuedUpdate(){
+
+  while(!queue.isEmpty()) {
+
+    const update = queue.dequeue();
+
+    // TODO find out how to update just the part that has changed?
+
+    // Update our database
+    const query = { workspaceCode: update.payload.workspaceCode };
+    const dbUpdate = { paths: update.payload.paths };  // TODO use the paths were only relevant changes are made
+
+    Workspace.findOneAndUpdate(query, dbUpdate, { new: true }, (err, doc) => {
+      if (err) {
+        console.log("Error updating Workspace Paths in DB");
+      }
+    });
+
+    // broadcast all changes to the client
+    updateClients(update.payload.workspaceCode, update.payload.paths); // TODO use the paths were only relevant changes are made
+
+    // broadcast only client changes to the other servers
+    if(update.isClient) {
+
+      broadcastUpdate(
+        update.timeStamp, 
+        update.payload.workspaceCode, 
+        update.payload.paths
+      ); 
+      // TODO use the paths were only relevant changes are made
+    }
+  }
+};
 
 export {
   getWorkspace,
