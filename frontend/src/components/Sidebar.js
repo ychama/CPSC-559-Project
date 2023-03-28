@@ -61,9 +61,10 @@ const Sidebar = (props) => {
   }, []);
 
   const setUserInfo = async () => {
-    let user = await userInfo({}, localStorage.getItem("userName"));
+    console.log("Trying to get user information\n");
+    let user = await userInfo(localStorage.getItem("userName"));
     console.log(user);
-    setUser(JSON.parse(user));
+    setUser(user);
   };
 
   return (
@@ -172,11 +173,11 @@ const Sidebar = (props) => {
                     <Box sx={{ flex: 1 }}>
                       <Text size="sm" weight={500}>
                         {/* {"@" + user.username} */}
-                        {"@John"}
+                        {"@" + user.userName}
                       </Text>
                       <Text color="white" size="xs">
                         {/* {user.firstName + " " + user.lastName} */}
-                        {"John Smith"}
+                        {user.userFirstName + " " + user.userLastName}
                       </Text>
                     </Box>
 

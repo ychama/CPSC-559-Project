@@ -23,14 +23,18 @@ export const signIn = async (reqBody) => {
   return retry(httpRequest);
 };
 
-export const userInfo = async (reqBody, userName) => {
+export const userInfo = async (userName) => {
   let httpRequest = async () => {
     const response = await instance.get(
       localStorage.getItem("backendURL") + "/users/" + userName,
-      reqBody,
       { headers: { Authorization: "Bearer " + localStorage.getItem("token") } }
     );
-    return response.data;
+    return {
+      userEmail: response.data.userEmail,
+      userFirstName: response.data.userFirstName,
+      userLastName: response.data.userLastName,
+      userName: response.data.userName,
+    };
   };
   return retry(httpRequest);
 };
