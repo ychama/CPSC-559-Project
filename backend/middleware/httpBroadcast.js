@@ -16,9 +16,12 @@ export const postBroadCast = async (endpoint, reqBody, token) => {
     server_list.forEach(element => {
         if (server_id === element) return;
         reqBody.isBroadcast = true;
+        let headers = {}
+        if (token != "")
+            headers = { "Authorization": "Bearer " + token };
         let url = endpointBase.replace(/{}/g, element) + endpoint;
         axios
-            .post(url, reqBody, { headers: { "Authorization": "Bearer " + token }, timeout: 1000 })
+            .post(url, reqBody, { headers: headers, timeout: 1000 })
             .then((res) => {
                 console.log(res);
             })
@@ -32,9 +35,12 @@ export const putBroadCast = async (endpoint, reqBody, token) => {
     server_list.forEach(element => {
         if (server_id === element) return;
         reqBody.isBroadcast = true;
+        let headers = {}
+        if (token != "")
+            headers = { "Authorization": "Bearer " + token };
         let url = endpointBase.replace(/{}/g, element) + endpoint;
         axios
-            .put(url, reqBody, { headers: { "Authorization": "Bearer " + token }, timeout: 1000 })
+            .put(url, reqBody, { headers: headers, timeout: 1000 })
             .then((res) => {
                 console.log(res);
             })
