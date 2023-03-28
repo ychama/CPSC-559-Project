@@ -125,13 +125,67 @@ services:
     build: ./proxy
     restart: unless-stopped
     ports:
-      - 4000:4000
-
+      - 4001:4000
+    depends_on:
+      - backend1
+      - backend2
+      - backend3
+      - backend4
+      - database1
+      - database2
+      - database3
+      - database4
+  proxy2:
+    build: ./proxy
+    restart: unless-stopped
+    ports:
+      - 4002:4000
+    depends_on:
+      - backend1
+      - backend2
+      - backend3
+      - backend4
+      - database1
+      - database2
+      - database3
+      - database4
+  proxy3:
+    build: ./proxy
+    restart: unless-stopped
+    ports:
+      - 4003:4000
+    depends_on:
+      - backend1
+      - backend2
+      - backend3
+      - backend4
+      - database1
+      - database2
+      - database3
+      - database4
+  proxy4:
+    build: ./proxy
+    restart: unless-stopped
+    ports:
+      - 4004:4000
+    depends_on:
+      - backend1
+      - backend2
+      - backend3
+      - backend4
+      - database1
+      - database2
+      - database3
+      - database4
   frontend1:
     build:
       context: ./frontend
       args:
-        REACT_APP_PROXY_URL: http://localhost:4000/api
+        REACT_APP_PROXY_URL_1: http://localhost:4001/api
+        REACT_APP_PROXY_URL_2: http://localhost:4002/api
+        REACT_APP_PROXY_URL_3: http://localhost:4003/api
+        REACT_APP_PROXY_URL_4: http://localhost:4004/api
+
     depends_on:
       - backend1
     ports:

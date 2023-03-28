@@ -131,7 +131,8 @@ const updateUser = asyncHandler(async (req, res) => {
     const errMessage = error.message;
     res.status(400).json({ error: errMessage });
   }
-  if (!req.body.isBroadcast) putBroadCast(`/users/${req.params.userName}/`, req.body);
+  if (!req.body.isBroadcast)
+    putBroadCast(`/users/${req.params.userName}/`, req.body);
 });
 
 const getUserInfo = asyncHandler(async (req, res) => {
@@ -155,23 +156,5 @@ const getUserInfo = asyncHandler(async (req, res) => {
     res.status(400).json(errMessage);
   }
 });
-
-// const getUserWorkspaces = asyncHandler(async (req, res) => {
-//   try {
-//     const existingUser = await User.findOne({
-//       userName: req.params.userName,
-//     });
-//     if (!existingUser) {
-//       res.status(400);
-//       throw new Error('User "' + req.params.userName + '" not found.');
-//     }
-//     res.status(200).json({
-//       userWorkspaces: existingUser.userWorkspaces,
-//     });
-//   } catch (error) {
-//     const errMessage = error.message;
-//     res.status(400).json(errMessage);
-//   }
-// });
 
 export { createUser, deleteUser, getUser, updateUser, getUserInfo };

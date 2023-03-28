@@ -21,7 +21,6 @@ const HomePage = () => {
 
   const [workspaces, setWorkspaces] = useState([]);
 
-
   useEffect(() => {
     if (!localStorage.getItem("token")) {
       navigate("/");
@@ -53,23 +52,23 @@ const HomePage = () => {
   };
 
   return (
-    <AppShell navbar={<Sidebar activePage='HOME' />}>
-      <SimpleGrid cols={3} m='lg'>
+    <AppShell navbar={<Sidebar activePage="HOME" />}>
+      <SimpleGrid cols={3} m="lg">
         {workspaces.map((workspace, index) => (
-          <Card key={index} shadow='sm' p='lg' radius='md' withBorder>
+          <Card key={index} shadow="sm" p="lg" radius="md" withBorder>
             <Card.Section>
               <Image
-                mt='lg'
+                mt="lg"
                 src={findImage(workspace.workspaceName)}
                 height={160}
-                alt='Stock Image'
-                fit='contain'
+                alt="Stock Image"
+                fit="contain"
               />
             </Card.Section>
-            <Text mt='sm' weight={500}>
+            <Text mt="sm" weight={500}>
               {workspace.workspaceName}
             </Text>
-            <Text mb='sm' size='sm' color='dimmed'>
+            <Text mb="sm" size="sm" color="dimmed">
               Owner: {workspace.workspaceOwner}
             </Text>
             {/* {canvas.participants < canvas.capacity && (
@@ -83,7 +82,7 @@ const HomePage = () => {
               </Badge>
             )} */}
             <Button
-              shadow='sm'
+              shadow="sm"
               fullWidth
               disabled={false}
               onClick={() => {
