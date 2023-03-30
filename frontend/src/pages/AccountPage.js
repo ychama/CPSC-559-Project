@@ -5,7 +5,7 @@ import {
   updateUser,
   deleteUser,
 } from "../backendhelpers/userHelpers";
-import { isValidEmail, isValidUsername } from "../helpers/validation";
+import { isValidEmail } from "../helpers/validation";
 import { useDisclosure } from "@mantine/hooks";
 import {
   AppShell,
@@ -57,9 +57,6 @@ const AccountPage = () => {
     if (temp.userEmail === user.userEmail) {
       delete temp.userEmail;
     }
-    if (temp.userName === user.userName) {
-      delete temp.userName;
-    }
     let updatedUser = await updateUser(user.userName, temp);
     if (
       updatedUser.userName &&
@@ -100,20 +97,6 @@ const AccountPage = () => {
           </Text>
           {edit ? (
             <>
-              <TextInput
-                label="Username"
-                error={userNameError ? "Invalid Username" : ""}
-                withAsterisk
-                m="md"
-                value={updates.userName}
-                onChange={(event) => {
-                  setUserNameError(false);
-                  setUpdates({
-                    ...updates,
-                    ["userName"]: event.currentTarget.value,
-                  });
-                }}
-              />
               <TextInput
                 label="First Name"
                 withAsterisk
@@ -212,7 +195,6 @@ const AccountPage = () => {
               onClick={() => {
                 if (edit) {
                   if (
-                    updates.userName === user.userName &&
                     user.userFirstName === updates.userFirstName &&
                     user.userLastName === updates.userLastName &&
                     updates.userEmail === user.userEmail
@@ -221,7 +203,6 @@ const AccountPage = () => {
                     return;
                   }
                   if (
-                    updates.userName ||
                     (user.userFirstName !== updates.userFirstName &&
                       updates.userFirstName) ||
                     (user.userLastName !== updates.userLastName &&
@@ -229,10 +210,6 @@ const AccountPage = () => {
                     updates.userEmail ||
                     updates.userPassword
                   ) {
-                    if (!isValidUsername(updates.userName)) {
-                      setUserNameError(true);
-                      return;
-                    }
                     if (!isValidEmail(updates.userEmail)) {
                       setEmailError(true);
                       return;
