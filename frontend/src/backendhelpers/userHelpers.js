@@ -38,3 +38,37 @@ export const userInfo = async (userName) => {
   };
   return retry(httpRequest);
 };
+
+export const updateUser = async (userName, reqBody) => {
+  let httpRequest = async () => {
+    const response = await instance
+      .put(localStorage.getItem("backendURL") + "/users/" + userName, reqBody, {
+        headers: { Authorization: "Bearer " + localStorage.getItem("token") },
+      })
+      .catch((err) => {
+        if (err.response.status == 400 && err.response.data.code === 999)
+          return { error: 999 };
+      });
+
+    if (response.error === 999) {
+      return response;
+    }
+    if (response.status >= 200) return response.data.updatedUser;
+    //console.log("Response: " + JSON.stringify(response));
+  };
+  return retry(httpRequest);
+};
+
+export const deleteUser = async (userName) => {
+  let httpRequest = async () => {
+    const response = await instance.delete(
+      localStorage.getItem("backendURL") + "/users/" + userName,
+      {
+        headers: { Authorization: "Bearer " + localStorage.getItem("token") },
+      }
+    );
+    return response;
+    //console.log("Response: " + JSON.stringify(response));
+  };
+  return retry(httpRequest);
+};

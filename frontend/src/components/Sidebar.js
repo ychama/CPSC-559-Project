@@ -61,9 +61,9 @@ const Sidebar = (props) => {
   }, []);
 
   const setUserInfo = async () => {
-    console.log("Trying to get user information\n");
+    //console.log("Trying to get user information\n");
     let user = await userInfo(localStorage.getItem("userName"));
-    console.log(user);
+    //console.log(user);
     setUser(user);
   };
 

@@ -1,8 +1,8 @@
 import axios from "axios";
 
-const endpointBase = "http://backend{}:5000/api"
-const server_list = process.env.OTHER_SERVERS.split(",")
-const server_id = process.env.SERVER_ID
+const endpointBase = "http://backend{}:5000/api";
+const server_list = process.env.OTHER_SERVERS.split(",");
+const server_id = process.env.SERVER_ID;
 
 /*const customConfig = {
   withCredentials: true,
@@ -13,37 +13,59 @@ const server_id = process.env.SERVER_ID
 };*/
 
 export const postBroadCast = async (endpoint, reqBody) => {
-    server_list.forEach(element => {
-        if (server_id === element) return;
-        reqBody.isBroadcast = true;
-        let url = endpointBase.replace(/{}/g, element) + endpoint;
-        axios
-            .post(url, reqBody, { timeout: 1000 })
-            .then((res) => {
-                console.log(res);
-            })
-            .catch((err) => {
-                console.log(err);
-            })
-    });
-}
+  server_list.forEach((element) => {
+    if (server_id === element) return;
+    reqBody.isBroadcast = true;
+    let url = endpointBase.replace(/{}/g, element) + endpoint;
+    axios
+      .post(url, reqBody, { timeout: 1000 })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  });
+};
 
-export const putBroadCast = async (endpoint, reqBody) => {
-    server_list.forEach(element => {
-        if (server_id === element) return;
-        reqBody.isBroadcast = true;
-        let url = endpointBase.replace(/{}/g, element) + endpoint;
-        axios
-            .put(url, reqBody, { timeout: 1000 })
-            .then((res) => {
-                console.log(res);
-            })
-            .catch((err) => {
-                console.log(err);
-            })
-    });
-}
+export const putBroadCast = async (endpoint, reqBody, auth) => {
+  server_list.forEach((element) => {
+    if (server_id === element) return;
+    reqBody.isBroadcast = true;
+    let url = endpointBase.replace(/{}/g, element) + endpoint;
+    axios
+      .put(url, reqBody, {
+        timeout: 1000,
+        headers: {
+          Authorization: auth,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  });
+};
 
-export const deleteBroadCast = async (endpoint, reqBody) => {
-    // TODO
-} 
+export const deleteBroadCast = async (endpoint, headers) => {
+  server_list.forEach((element) => {
+    if (server_id === element) return;
+    headers.isBroadcast = true;
+    let url = endpointBase.replace(/{}/g, element) + endpoint;
+    axios
+      .delete(url, {
+        timeout: 1000,
+        headers: {
+          Authorization: headers.authorization,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  });
+};
