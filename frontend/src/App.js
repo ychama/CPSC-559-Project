@@ -8,6 +8,7 @@ import HomePage from "./pages/HomePage";
 import CanvasPage from "./pages/CanvasPage";
 import CreatePage from "./pages/CreatePage";
 import GalleryPage from "./pages/GalleryPage";
+import AccountPage from "./pages/AccountPage";
 import { useColorScheme } from "@mantine/hooks";
 
 function App() {
@@ -107,12 +108,13 @@ function App() {
       >
         <BrowserRouter>
           <Routes>
-            <Route path='/' element={<LoginPage />} />
-            <Route path='signup' element={<SignUpPage />} />
-            <Route path='home' element={<HomePage />} />
-            <Route path='canvas' element={<CanvasPage />} />
-            <Route path='gallery' element={<GalleryPage />} />
-            <Route path='create' element={<CreatePage />} />
+            <Route path="/" element={<LoginPage />} />
+            <Route path="signup" element={<SignUpPage />} />
+            <Route path="home" element={<HomePage />} />
+            <Route path="canvas" element={<CanvasPage />} />
+            <Route path="gallery" element={<GalleryPage />} />
+            <Route path="create" element={<CreatePage />} />
+            <Route path="account" element={<AccountPage />} />
           </Routes>
         </BrowserRouter>
       </MantineProvider>

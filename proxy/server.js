@@ -6,11 +6,12 @@ const SERVER_CLIENT_BASE_URL = "http://localhost:500{}/api";
 const SERVER_CLIENT_WEBSOCKET_URL = "ws://localhost:700{}";
 const SERVER_HEALTH_URL = "http://backend{}:5000/api/health/";
 
+let ALL_SERVERS = new Set([1, 2, 3, 4]);
 let AVAILABLE_SERVERS = new Set([1, 2, 3, 4]);
 let OFFLINE_SERVERS = new Set([]);
 
 const healthCheck = async () => {
-  AVAILABLE_SERVERS.forEach((serverID, index) => {
+  ALL_SERVERS.forEach((serverID, index) => {
     let serverURL = SERVER_HEALTH_URL.replace(/{}/g, serverID);
 
     axios
@@ -22,16 +23,16 @@ const healthCheck = async () => {
           " was successful with the following message ",
           res.data.message
         );
+
+        OFFLINE_SERVERS.delete(serverID);
+        AVAILABLE_SERVERS.add(serverID);
       })
       .catch((err) => {
-        console.log("An error has occured, server ", serverID);
+        console.log("Server " + serverID + " is down");
+        AVAILABLE_SERVERS.delete(serverID);
         OFFLINE_SERVERS.add(serverID);
       });
   });
-
-  AVAILABLE_SERVERS = new Set(
-    [...AVAILABLE_SERVERS].filter((x) => !OFFLINE_SERVERS.has(x))
-  );
 
   console.log("AVAILABLE_SERVERS", AVAILABLE_SERVERS);
   console.log("OFFLINE_SERVERS", OFFLINE_SERVERS);

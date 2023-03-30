@@ -1,8 +1,8 @@
 import axios from "axios";
 
-const endpointBase = "http://backend{}:5000/api"
-const server_list = process.env.OTHER_SERVERS.split(",")
-const server_id = process.env.SERVER_ID
+const endpointBase = "http://backend{}:5000/api";
+const server_list = process.env.OTHER_SERVERS.split(",");
+const server_id = process.env.SERVER_ID;
 
 /*const customConfig = {
   withCredentials: true,
@@ -51,5 +51,20 @@ export const putBroadCast = async (endpoint, reqBody, token) => {
 }
 
 export const deleteBroadCast = async (endpoint, reqBody, token) => {
-    // TODO
-} 
+    server_list.forEach((element) => {
+        if (server_id === element) return;
+        reqBody.isBroadcast = true;
+        let headers = {}
+        if (token != "")
+            headers = { "Authorization": "Bearer " + token };
+        let url = endpointBase.replace(/{}/g, element) + endpoint;
+        axios
+            .delete(url, { headers: headers, timeout: 1000 })
+            .then((res) => {
+                console.log(res);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    });
+}
