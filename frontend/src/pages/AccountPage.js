@@ -53,6 +53,7 @@ const AccountPage = () => {
   };
 
   const updateUserInfo = async () => {
+    delete temp.userName;
     const temp = updates;
     if (temp.userEmail === user.userEmail) {
       delete temp.userEmail;
