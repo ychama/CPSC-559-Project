@@ -13,6 +13,16 @@ const SVG = () => {
   const [groupTransform, setGroupTransform] = useState("");
   const [currentColor, setCurrentColor] = useState("#FFFFFF");
   const [reconnectToSocket, setReconnectToSocket] = useState(false);
+  const [viewBox, setViewBox] = useState("0 0 500 550");
+
+  useEffect(() => {
+    const svgGroup = document.getElementById("layer1");
+    if (svgGroup) {
+      const bbox = svgGroup.getBBox();
+      const newViewBox = `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`;
+      setViewBox(newViewBox);
+    }
+  }, [SVGPaths]);
 
   const updateColor = (pathId) => {
     let newSVGPaths = SVGPaths.slice(0);
@@ -126,24 +136,25 @@ const SVG = () => {
     // this is the breakdown for the flower image
     // keep the sizing
     <>
-      <Stack direction='column' spacing='md'>
+      <Stack direction="column" spacing="md">
         <Center>
-          <Title order={1} color='br-turq'>
+          <Title order={1} color="br-turq">
             {SVGTitleName}
           </Title>
         </Center>
         <svg
-          width='500.70076'
-          height='550.7067066666666'
-          xmlns='http://www.w3.org/2000/svg'
+          width="500.70076"
+          height="550.7067066666666"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox={viewBox}
         >
           <g
-            id='layer1'
-            inkscapelabel='Calque 1'
-            inkscapegroupmode='layer'
-            transform={groupTransform}
+            id="layer1"
+            inkscapelabel="Calque 1"
+            inkscapegroupmode="layer"
+            //transform={groupTransform}
           >
-            <g id='g3020'>
+            <g id="g3020">
               {SVGPaths.map((path, index) => {
                 return (
                   <path
@@ -151,7 +162,7 @@ const SVG = () => {
                     strokeWidth={path.svgStrokeWidth}
                     strokeMiterlimit={path.svgStrokeMiterLimit}
                     d={path.svgD}
-                    stroke='#000000'
+                    stroke="#000000"
                     transform={path.svgTransform}
                     onClick={() => {
                       updateColor(path._id);
@@ -165,16 +176,16 @@ const SVG = () => {
         </svg>
         <Center>
           <ColorPicker
-            format='hex'
+            format="hex"
             value={currentColor}
             onChange={setCurrentColor}
           />
         </Center>
-        <Center mt='sm'>
+        <Center mt="sm">
           <TextInput
-            placeholder='#FFFFFF'
+            placeholder="#FFFFFF"
             value={currentColor}
-            label='Current color'
+            label="Current color"
             onChange={(e) => setCurrentColor(e.target.value)}
           ></TextInput>
         </Center>
