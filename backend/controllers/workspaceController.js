@@ -11,7 +11,7 @@ var localTimeStamp = 0;
 
 // queue for processing messages
 const queue = new UpdateQueue();
-queue.on('pendingUpdate', () => { processEnqueuedUpdate(); } );
+queue.on('pendingUpdate', () => { processEnqueuedUpdate(); });
 
 const createWorkspace = asyncHandler(async (req, res) => {
   try {
@@ -36,7 +36,7 @@ const createWorkspace = asyncHandler(async (req, res) => {
     res.status(400).json({ error: errMessage });
   }
   if (!req.body.isBroadcast) {
-    postBroadCast("/workspaces/", req.body);
+    postBroadCast("/workspaces/", req.body, req.headers.authorization.split(" ")[1]);
   }
 });
 
@@ -86,7 +86,7 @@ const deleteWorkspace = asyncHandler(async (req, res) => {
 });
 
 async function getWorkspace(targetWorkspaceCode) {
-  
+
   const existingWorkspace = await Workspace.findOne({
     workspaceCode: targetWorkspaceCode,
   });
@@ -99,7 +99,7 @@ async function getWorkspace(targetWorkspaceCode) {
 };
 
 async function updateWorkspace(targetWorkspaceCode, newPaths, isClient, updateTimeStamp = 0) {
-  
+
   if (isClient) {
 
     // This server sets the timestamp for the client communications
@@ -116,13 +116,13 @@ async function updateWorkspace(targetWorkspaceCode, newPaths, isClient, updateTi
     workspaceCode: targetWorkspaceCode,
     paths: newPaths,
   };
-  
+
   queue.enqueue(updateTimeStamp, payload, isClient)
 };
 
-function processEnqueuedUpdate(){
+function processEnqueuedUpdate() {
 
-  while(!queue.isEmpty()) {
+  while (!queue.isEmpty()) {
 
     const update = queue.dequeue();
 
@@ -142,13 +142,13 @@ function processEnqueuedUpdate(){
     updateClients(update.payload.workspaceCode, update.payload.paths); // TODO use the paths were only relevant changes are made
 
     // broadcast only client changes to the other servers
-    if(update.isClient) {
+    if (update.isClient) {
 
       broadcastUpdate(
-        update.timeStamp, 
-        update.payload.workspaceCode, 
+        update.timeStamp,
+        update.payload.workspaceCode,
         update.payload.paths
-      ); 
+      );
       // TODO use the paths were only relevant changes are made
     }
   }
