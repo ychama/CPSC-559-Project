@@ -14,6 +14,7 @@ import Sidebar from "../components/Sidebar";
 import flower from "../images/flower.png";
 import pumpkin from "../images/pumpkin.png";
 import brasil from "../images/brasil.png";
+import SVGThumbnail from "../svgcomponents/SVGThumbnail";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -56,7 +57,10 @@ const HomePage = () => {
       <SimpleGrid cols={3} m="lg">
         {workspaces.map((workspace, index) => (
           <Card key={index} shadow="sm" p="lg" radius="md" withBorder>
-            <Card.Section>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <SVGThumbnail paths={workspace.paths} width={100} height={110} />
+            </div>
+            {/*  <Card.Section>
               <Image
                 mt="lg"
                 src={findImage(workspace.workspaceName)}
@@ -64,7 +68,7 @@ const HomePage = () => {
                 alt="Stock Image"
                 fit="contain"
               />
-            </Card.Section>
+            </Card.Section>*/}
             <Text mt="sm" weight={500}>
               {workspace.workspaceName}
             </Text>
