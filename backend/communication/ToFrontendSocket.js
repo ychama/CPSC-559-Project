@@ -60,12 +60,6 @@ async function updateClients(workspace, data) {
   // Send only to clients who care about this workspace
   const clientSockets = workspaceToConnection[workspace];
 
-  // if (Array.isArray(clientSockets)) {
-  //   for (const client of clientSockets) {
-  //     client.send(`{ "paths": ${JSON.stringify(paths)} }`);
-  //   }
-  // }
-
   if (Array.isArray(clientSockets)) {
     for (const client of clientSockets) {
       client.send(`{ "update_color": ${JSON.stringify(data)} }`);

@@ -68,9 +68,7 @@ const deleteUser = asyncHandler(async (req, res) => {
       res.status(400);
       throw new Error("User " + req.params.userName + " not found.");
     }
-    //await Workspace.deleteMany({
-    // workspaceOwner: existingUser.userName,
-    //});
+
     await existingUser.remove();
     res.status(200).json({
       message: "Removed user account with username: " + req.params.userName,
