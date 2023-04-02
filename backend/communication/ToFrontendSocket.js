@@ -2,7 +2,7 @@ import http from "http";
 import { WebSocketServer } from "ws";
 import {
   getWorkspace,
-  updateWorkspace,
+  processClientUpdateMessage,
 } from "../controllers/workspaceController.js";
 
 // Clients reach us at this port
@@ -95,18 +95,11 @@ async function processMessage(connection, message) {
       connection.send(workspace);
 
       // Client updated workspace
-    } else if (jsonMsg.hasOwnProperty("paths")) {
-      updateWorkspace(
-        connectionToWorkspace[connection],
-        jsonMsg["paths"],
-        true
-      );
     } else if (jsonMsg.hasOwnProperty("update_color")) {
-      updateWorkspace(
+      processClientUpdateMessage(
         connectionToWorkspace[connection],
         jsonMsg["update_color"]["path_id"],
-        jsonMsg["update_color"]["color"],
-        true
+        jsonMsg["update_color"]["color"]
       );
     } else {
       throw new Error(`Unrecognize message receivedfrom client: ${message}`);

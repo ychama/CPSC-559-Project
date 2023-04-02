@@ -5,7 +5,6 @@ const getHealth = asyncHandler(async (req, res) => {
     const mongodb_admin = mongoose.connection.db.admin();
     const result = await mongodb_admin.command({ ping: 1 });
     res.status(200).json({ message: "alive" });
-    console.log("MongoDB instance alive:", result);
   } catch (err) {
     res.status(500).json({ message: "MongoDB failure." }); // internal server error
     console.log("Error checking MongoDB status:", err);

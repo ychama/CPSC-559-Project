@@ -7,8 +7,11 @@ import { updateClients } from "../communication/ToFrontendSocket.js";
 import { broadcastUpdate } from "../communication/ServerToServerSocket.js";
 import mongoose from "mongoose";
 
-// logical timestamp for this object
-var localTimeStamp = 0;
+const localId = process.env.SERVER_ID;
+const otherIds = process.env.OTHER_SERVERS.split(",");
+
+// logical timestamps for this object
+var TS = Array(otherIds.length + 2).fill(0);
 
 // queue for processing messages
 const queue = new UpdateQueue();
@@ -76,9 +79,9 @@ const deleteWorkspace = asyncHandler(async (req, res) => {
       res.status(400);
       throw new Error(
         "User " +
-          req.params.userName +
-          " is not the owner of the Workspace: " +
-          existingWorkspace.workspaceName
+        req.params.userName +
+        " is not the owner of the Workspace: " +
+        existingWorkspace.workspaceName
       );
     }
     const workspaceName = existingWorkspace.workspaceName;
@@ -104,46 +107,30 @@ async function getWorkspace(targetWorkspaceCode) {
   }
 }
 
-// async function updateWorkspace(
-//   targetWorkspaceCode,
-//   newPaths,
-//   isClient,
-//   updateTimeStamp = 0
-// ) {
-//   if (isClient) {
-//     // This server sets the timestamp for the client communications
-//     updateTimeStamp = localTimeStamp;
-//   } else {
-//     // Update the timestamp to max of updateTimeStamp and localTimeStamp
-//     localTimeStamp =
-//       updateTimeStamp > localTimeStamp ? updateTimeStamp : localTimeStamp;
-//   }
-//   localTimeStamp += 1; // always increment local timestamp
+async function processClientUpdateMessage(
+  targetWorkspaceCode,
+  path_id,
+  color
+) {
+  console.log("start processClientUpdateMessage")
 
-//   const payload = {
-//     workspaceCode: targetWorkspaceCode,
-//     paths: newPaths,
-//   };
+  TS[parseInt(localId)] += 1; // increment local timestamp
+  await broadcastUpdate(TS[parseInt(localId)], targetWorkspaceCode, path_id, color, false);
 
-//   queue.enqueue(updateTimeStamp, payload, isClient);
-// }
+  console.log("end processClientUpdateMessage")
+}
 
-async function updateWorkspace(
+async function processServerUpdateMessage(
   targetWorkspaceCode,
   path_id,
   color,
-  isClient,
-  updateTimeStamp = 0
+  serverId,
+  updateTimeStamp,
+  isAck
 ) {
-  if (isClient) {
-    // This server sets the timestamp for the client communications
-    updateTimeStamp = localTimeStamp;
-  } else {
-    // Update the timestamp to max of updateTimeStamp and localTimeStamp
-    localTimeStamp =
-      updateTimeStamp > localTimeStamp ? updateTimeStamp : localTimeStamp;
-  }
-  localTimeStamp += 1; // always increment local timestamp
+  console.log("start processServerUpdateMessage")
+
+  TS[serverId] = updateTimeStamp;
 
   const payload = {
     workspaceCode: targetWorkspaceCode,
@@ -151,72 +138,57 @@ async function updateWorkspace(
     color: color,
   };
 
-  queue.enqueue(updateTimeStamp, payload, isClient);
+  if (!isAck) {
+    queue.enqueue(serverId, updateTimeStamp, payload);
+
+    if (updateTimeStamp > TS[parseInt(localId)]) {
+      TS[parseInt(localId)] = updateTimeStamp;
+      await broadcastUpdate(TS[parseInt(localId)], targetWorkspaceCode, path_id, color, true);
+    }
+  }
+
+  console.log("end processServerUpdateMessage")
 }
 
-// function processEnqueuedUpdate() {
-//   while (!queue.isEmpty()) {
-//     const update = queue.dequeue();
-
-//     // TODO find out how to update just the part that has changed?
-
-//     // Update our database
-//     const query = { workspaceCode: update.payload.workspaceCode };
-//     const dbUpdate = { paths: update.payload.paths }; // TODO use the paths were only relevant changes are made
-
-//     Workspace.findOneAndUpdate(query, dbUpdate, { new: true }, (err, doc) => {
-//       if (err) {
-//         console.log("Error updating Workspace Paths in DB");
-//       }
-//     });
-
-//     // broadcast all changes to the client
-//     updateClients(update.payload.workspaceCode, update.payload.paths); // TODO use the paths were only relevant changes are made
-
-//     // broadcast only client changes to the other servers
-//     if (update.isClient) {
-//       broadcastUpdate(
-//         update.timeStamp,
-//         update.payload.workspaceCode,
-//         update.payload.paths
-//       );
-//       // TODO use the paths were only relevant changes are made
-//     }
-//   }
-// }
+function checkServerTimeStamps(updateTimeStamp) {
+  console.log("start checkServerTimeStamps")
+  for (let i = 0; i < otherIds.length; i++) {
+    if (updateTimeStamp > TS[parseInt(otherIds[i])])
+      return false;
+  }
+  return true;
+}
 
 function processEnqueuedUpdate() {
   while (!queue.isEmpty()) {
-    const update = queue.dequeue();
+    const update = queue.front();
 
-    const workspaceCode = update.payload.workspaceCode;
-    const path_id = update.payload.path_id;
-    const color = update.payload.color;
+    if (checkServerTimeStamps(update.timeStamp)) {
+      queue.dequeue();
 
-    Workspace.updateOne(
-      {
-        workspaceCode: workspaceCode,
-      },
-      { $set: { "paths.$[element].svgFill": color } },
-      { arrayFilters: [{ "element._id": mongoose.Types.ObjectId(path_id) }] },
-      (err, doc) => {
-        if (err) {
-          console.log(err);
-          console.log("Error updating Workspace Paths in DB");
+      const workspaceCode = update.payload.workspaceCode;
+      const path_id = update.payload.path_id;
+      const color = update.payload.color;
+
+      Workspace.updateOne(
+        {
+          workspaceCode: workspaceCode,
+        },
+        { $set: { "paths.$[element].svgFill": color } },
+        { arrayFilters: [{ "element._id": mongoose.Types.ObjectId(path_id) }] },
+        (err, doc) => {
+          if (err) {
+            console.log(err);
+            console.log("Error updating Workspace Paths in DB");
+          }
         }
-      }
-    );
+      );
 
-    let data = {
-      path_id: path_id,
-      color: color,
-    };
-
-    updateClients(update.payload.workspaceCode, data);
-
-    if (update.isClient) {
-      broadcastUpdate(update.timeStamp, update.payload.workspaceCode, data);
-      // TODO use the paths were only relevant changes are made
+      let data = {
+        path_id: path_id,
+        color: color,
+      };
+      updateClients(update.payload.workspaceCode, data);
     }
   }
 }
@@ -224,7 +196,8 @@ function processEnqueuedUpdate() {
 export {
   getWorkspace,
   getAllWorkspaces,
-  updateWorkspace,
+  processClientUpdateMessage,
+  processServerUpdateMessage,
   deleteWorkspace,
   createWorkspace,
 };
