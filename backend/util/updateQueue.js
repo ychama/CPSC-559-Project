@@ -1,5 +1,3 @@
-import { EventEmitter } from 'node:events';
-
 class Update {
     constructor(serverId, timeStamp, payload) {
         this.serverId = serverId;
@@ -8,10 +6,9 @@ class Update {
     }
 }
 
-class UpdateQueue extends EventEmitter {
+class UpdateQueue {
 
     constructor() {
-        super();
         this.queue = [];
     }
 
@@ -22,7 +19,6 @@ class UpdateQueue extends EventEmitter {
     enqueue(serverId, timeStamp, payload) {
         var update = new Update(serverId, timeStamp, payload);
         var added = false;
-        const wasEmpty = this.isEmpty();
 
         for (var i = 0; i < this.queue.length; i++) {
             // lowest timestamp goes first. If there's a tie, lowest serverId goes first
@@ -39,10 +35,6 @@ class UpdateQueue extends EventEmitter {
 
         if (!added) {
             this.queue.push(update);
-        }
-
-        if (wasEmpty) {
-            this.emit('pendingUpdate');
         }
     }
 

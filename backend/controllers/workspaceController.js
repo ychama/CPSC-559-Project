@@ -15,9 +15,6 @@ var TS = Array(otherIds.length + 2).fill(0);
 
 // queue for processing messages
 const queue = new UpdateQueue();
-queue.on("pendingUpdate", () => {
-  setTimeout(processEnqueuedUpdate, 10);
-});
 
 const createWorkspace = asyncHandler(async (req, res) => {
   try {
@@ -122,9 +119,11 @@ async function processClientUpdateMessage(
     color: color,
   };
   console.log(payload);
-  queue.enqueue(parseInt(localId), TS[parseInt(localId)], payload);
 
+  queue.enqueue(parseInt(localId), TS[parseInt(localId)], payload);
+  processEnqueuedUpdate();
   await broadcastUpdate(TS[parseInt(localId)], targetWorkspaceCode, path_id, color, false);
+
   console.log("end processClientUpdateMessage")
 }
 
@@ -146,13 +145,13 @@ async function processServerUpdateMessage(
     color: color,
   };
 
-  if (!isAck) {
+  if (!isAck)
     queue.enqueue(serverId, updateTimeStamp, payload);
+  processEnqueuedUpdate();
 
-    if (updateTimeStamp > TS[parseInt(localId)]) {
-      TS[parseInt(localId)] = updateTimeStamp;
-      await broadcastUpdate(TS[parseInt(localId)], targetWorkspaceCode, path_id, color, true);
-    }
+  if (!isAck && updateTimeStamp > TS[parseInt(localId)]) {
+    TS[parseInt(localId)] = updateTimeStamp;
+    await broadcastUpdate(TS[parseInt(localId)], targetWorkspaceCode, path_id, color, true);
   }
 
   console.log("end processServerUpdateMessage")
@@ -168,7 +167,7 @@ function checkServerTimeStamps(updateTimeStamp) {
 }
 
 function processEnqueuedUpdate() {
-  while (!queue.isEmpty()) {
+  if (!queue.isEmpty()) {
     const update = queue.front();
 
     if (checkServerTimeStamps(update.timeStamp)) {
