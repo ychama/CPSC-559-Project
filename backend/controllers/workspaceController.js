@@ -16,7 +16,7 @@ var TS = Array(otherIds.length + 2).fill(0);
 // queue for processing messages
 const queue = new UpdateQueue();
 queue.on("pendingUpdate", () => {
-  processEnqueuedUpdate();
+  setTimeout(processEnqueuedUpdate, 10);
 });
 
 const createWorkspace = asyncHandler(async (req, res) => {
@@ -115,8 +115,16 @@ async function processClientUpdateMessage(
   console.log("start processClientUpdateMessage")
 
   TS[parseInt(localId)] += 1; // increment local timestamp
-  await broadcastUpdate(TS[parseInt(localId)], targetWorkspaceCode, path_id, color, false);
 
+  const payload = {
+    workspaceCode: targetWorkspaceCode,
+    path_id: path_id,
+    color: color,
+  };
+  console.log(payload);
+  queue.enqueue(parseInt(localId), TS[parseInt(localId)], payload);
+
+  await broadcastUpdate(TS[parseInt(localId)], targetWorkspaceCode, path_id, color, false);
   console.log("end processClientUpdateMessage")
 }
 
@@ -151,7 +159,7 @@ async function processServerUpdateMessage(
 }
 
 function checkServerTimeStamps(updateTimeStamp) {
-  console.log("start checkServerTimeStamps")
+  // console.log("start checkServerTimeStamps")
   for (let i = 0; i < otherIds.length; i++) {
     if (updateTimeStamp > TS[parseInt(otherIds[i])])
       return false;
