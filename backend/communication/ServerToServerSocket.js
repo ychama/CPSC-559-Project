@@ -1,6 +1,6 @@
 import http from "http";
 import { WebSocketServer, WebSocket } from "ws";
-import { processServerUpdateMessage } from "../controllers/workspaceController.js";
+import { processServerUpdateMessage } from "../communication/WorkspaceSocketTOB.js";
 
 const SERVER_CLIENT_WEBSOCKET_URL = "ws://backend{}:600{}";
 const PORT_TEMPLATE = "600{}";

@@ -1,9 +1,12 @@
 import http from "http";
 import { WebSocketServer } from "ws";
 import {
-  getWorkspace,
-  processClientUpdateMessage,
+  getWorkspace
 } from "../controllers/workspaceController.js";
+
+import {
+  processClientUpdateMessage
+} from "../communication/WorkspaceSocketTOB.js"
 
 // Clients reach us at this port
 const socketPort = 7000;
