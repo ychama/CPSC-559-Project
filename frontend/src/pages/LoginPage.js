@@ -21,16 +21,23 @@ import "../styles/LoginPage.css";
 import { isValidUsername } from "../helpers/validation";
 import { signIn } from "../backendhelpers/userHelpers.js";
 
+// LOGIN PAGE
+
+// Login page/Landing page that allows a user to log into the application.
+// After login validation, a user may use the app's functionality
 const LoginPage = () => {
   const navigate = useNavigate();
   const theme = useMantineTheme();
 
+  // Check if there is a JSON Web Token in local storage and log the user in automatically if there is
   useEffect(() => {
     if (localStorage.getItem("token")) {
       navigate("/home");
     }
   }, []);
 
+  // Function for the login form using the Mantine form function "useForm"
+  // We validate the username before logging the user in
   const loginForm = useForm({
     initialValues: {
       username: "",
@@ -46,16 +53,21 @@ const LoginPage = () => {
     },
   });
 
+  // Function to handle user log in
+  // This will send a request to the backend using the backend helper "signIn"
   const handleSignIn = async (values) => {
     try {
+      // Try to log the user in and receive the JSON Web Token response for authentication
       let token = await signIn({
         userName: values.username,
         userPassword: values.password,
       });
+      // Update local storage variables and navigate to the home page, successful user login
       localStorage.setItem("token", token);
       localStorage.setItem("userName", values.username);
       navigate("/home");
     } catch (err) {
+      // Check status for invalid username/password codes to notify the user
       if (err.response.status === 402) {
         loginForm.setErrors({ username: "Invalid username" });
       }
@@ -65,6 +77,7 @@ const LoginPage = () => {
     }
   };
 
+  // Return the page with the form for log in, this uses built in Mantine components and the functions above for the login page logic
   return (
     <>
       <Header

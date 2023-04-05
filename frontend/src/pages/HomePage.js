@@ -16,13 +16,20 @@ import pumpkin from "../images/pumpkin.png";
 import brasil from "../images/brasil.png";
 import SVGThumbnail from "../svgcomponents/SVGThumbnail";
 
+// HOME PAGE
+
+// This is the page a user sees when they initially log in
+// This page has all of the workspaces that a user can join and that have already been created.
+
 const HomePage = () => {
   const navigate = useNavigate();
   const theme = useMantineTheme();
 
   const [workspaces, setWorkspaces] = useState([]);
 
+  // Get all the workspaces that have been created (that exist in the backend)
   useEffect(() => {
+    // Get them only if the user is logged in with a stored JSON Web Token for authentication
     if (!localStorage.getItem("token")) {
       navigate("/");
     } else {
@@ -30,13 +37,16 @@ const HomePage = () => {
     }
   }, []);
 
+  // Using the workspace code, navigate to the canvas page with the selected workspace to allow a user to work in it.
   const handleJoinCanvas = (code) => {
     localStorage.setItem("workspaceCode", code);
     navigate("/canvas");
   };
 
+  // Function to get all workspaces using the backend helper
   const getWorkspaces = async () => {
     try {
+      // Get the workspaces and set them in the component State variables to be displayed to the user
       let res = await getAllWorkspaces();
       setWorkspaces(res.existingWorkspaces);
     } catch (err) {
@@ -44,14 +54,16 @@ const HomePage = () => {
     }
   };
 
-  const findImage = (templateName) => {
+  /*const findImage = (templateName) => {
     if (templateName === "pumpkin") {
       return pumpkin;
     } else if (templateName === "flower" || templateName === "flower1") {
       return flower;
     } else return brasil;
-  };
+  };*/
 
+  // Return the page which includes a sidebar and a grid of all workspaces a user can join.
+  // Each component of the grid will have a thumbnail image of the coloring book (snapshot of last edited state) and owner information
   return (
     <AppShell navbar={<Sidebar activePage="HOME" />}>
       <SimpleGrid cols={3} m="lg">

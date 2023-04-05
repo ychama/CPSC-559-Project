@@ -2,21 +2,39 @@ import express from "express";
 import cors from "cors";
 import axios from "axios";
 
+// CPSC 559 Group Project
+
+// PROXY LAYER/LOAD BALANCER
+
+// This process is a simple node.js server that is responsible for routing clients (frontend processes) to available server processes and checking server health.
+
+// This process is replicated as can be seen in the docker-compose.yml for the project.
+
+
+
+
+// keep constant URL strings for checking health and directing users to available servers (using both HTTP and web socket "connections"). 
 const SERVER_CLIENT_BASE_URL = "http://localhost:500{}/api";
 const SERVER_CLIENT_WEBSOCKET_URL = "ws://localhost:700{}";
 const SERVER_HEALTH_URL = "http://backend{}:5000/api/health/";
 
+// Keep a list of all servers, available servers (have not crashed) and offline servers (have crashed)
 let ALL_SERVERS = new Set([1, 2, 3, 4]);
 let AVAILABLE_SERVERS = new Set([1, 2, 3, 4]);
 let OFFLINE_SERVERS = new Set([]);
 
+// Function to loop through all servers in the system and check their health at an endpoint. 
+// This also checks the database health as documented in the server endpoints (backend folder).
 const healthCheck = async () => {
+  // Loop through ALL servers
   ALL_SERVERS.forEach((serverID, index) => {
+    // get server URL
     let serverURL = SERVER_HEALTH_URL.replace(/{}/g, serverID);
-
+    // Send a request at the health endpoint and process the result
     axios
       .get(serverURL)
       .then((res) => {
+        // If successful (server is healthy), delete the server from offline servers and add it to the set of available servers (users can connect to it)
         console.log(
           "server ",
           serverID,
@@ -28,30 +46,34 @@ const healthCheck = async () => {
         AVAILABLE_SERVERS.add(serverID);
       })
       .catch((err) => {
+        // If there is an error (timeout, connection refused, etc...), remove the server from the set of available servers and add it to the set of offline servers (users will not be directed to it)
         console.log("Server " + serverID + " is down");
         AVAILABLE_SERVERS.delete(serverID);
         OFFLINE_SERVERS.add(serverID);
       });
   });
-
+  // Log available/offline servers
   console.log("AVAILABLE_SERVERS", AVAILABLE_SERVERS);
   console.log("OFFLINE_SERVERS", OFFLINE_SERVERS);
 };
 
 const port = 4000;
 
+// Setting up the server process with Express and CORS
 const app = express();
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Creating an endpoint at the proxy process for clients to request server URL's 
 app.route("/api/server").get((req, res) => {
   try {
+    // Attempt to retrieve a random server from the available servers
     let TEMP_AVAILABLE_SERVERS = [...AVAILABLE_SERVERS];
     const randomServer = Math.floor(
       Math.random() * TEMP_AVAILABLE_SERVERS.length
     );
-
+      // Return both server and websocket URL's for the client to connect to the server
     let serverURL = SERVER_CLIENT_BASE_URL.replace(
       /{}/g,
       TEMP_AVAILABLE_SERVERS[randomServer]
@@ -61,14 +83,15 @@ app.route("/api/server").get((req, res) => {
       /{}/g,
       TEMP_AVAILABLE_SERVERS[randomServer]
     );
-
+    // send successful responjse
     res.status(200).json({ serverURL, websocketURL });
   } catch (error) {
+    // Return any error to the client, which will result in the client attempting to connect with a different load balancer
     const errMessage = error.message;
     res.status(400).json(errMessage);
   }
 });
-
+// Start server and listen for requests
 app.listen(port, () => {
   console.log("Server started on port " + port);
 

@@ -4,6 +4,9 @@ import SVG from "./models/svgModel.js";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 
+//SCRIPT TO UPLOAD SVG'S TO THE DATABASE
+// NOT USED IN PROJECT CODE, USED FOR TESTING ADDING NEW SVG CANVAS TEMPLATES TO THE DATABASE
+
 dotenv.config({ path: ".env" });
 const fileName = "spiderman.svg";
 const coloringBookName = "Spider-Man";
