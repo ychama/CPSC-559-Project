@@ -1,5 +1,8 @@
 import mongoose from "mongoose";
 
+// User Model
+
+// This has all of the user information that is stored in the backend for a single user.
 const userSchema = mongoose.Schema({
   userName: {
     type: String,

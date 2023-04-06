@@ -15,13 +15,16 @@ import brasil from "../images/brasil.png";
 import { createWorkspace } from "../backendhelpers/workspaceHelper.js";
 import { useNavigate } from "react-router-dom";
 
+// Template Card used in the Create Page to preview the canvas a user will be creating.
 const TemplateCard = ({ _id, templateName, paths, groupTransform }) => {
+  // Required state variables and Mantine Theme
   const theme = useMantineTheme();
   const navigate = useNavigate();
   const [opened, setOpened] = useState(false);
   const [workspaceName, setWorkspaceName] = useState("");
   const [error, setError] = useState(false);
 
+  // Function to get the image of the canvas template to display on the card
   const findImage = () => {
     if (templateName === "pumpkin") {
       return pumpkin;
@@ -30,6 +33,8 @@ const TemplateCard = ({ _id, templateName, paths, groupTransform }) => {
     } else return brasil;
   };
 
+  // Function to create a new workspace from the selected template
+  // When a user clicks the button to create a workspace from the selected canvas template, this will trigger creating a new workspace with a backend request
   const onNewWorkspace = () => {
     if (!workspaceName) {
       setError(true);
@@ -39,7 +44,7 @@ const TemplateCard = ({ _id, templateName, paths, groupTransform }) => {
       paths: paths,
       groupTransform: groupTransform,
     };
-
+    // Uses the backend helper function to create the new workspace and store the workspace code in local storage.
     createWorkspace(req)
       .then((res) => {
         console.log(res);
@@ -48,24 +53,24 @@ const TemplateCard = ({ _id, templateName, paths, groupTransform }) => {
       })
       .catch((err) => console.log(err));
   };
-
+  // Return the Template Card component made up of Mantine components
   return (
     <>
-      <Card shadow='sm' p='lg' radius='md' withBorder>
+      <Card shadow="sm" p="lg" radius="md" withBorder>
         <Card.Section>
           <Image
-            mt='lg'
+            mt="lg"
             src={findImage()}
             height={160}
-            alt='Stock Image'
-            fit='contain'
+            alt="Stock Image"
+            fit="contain"
           />
         </Card.Section>
-        <Text mt='sm' mb='sm' weight={500}>
+        <Text mt="sm" mb="sm" weight={500}>
           Template Name: {templateName}
         </Text>
         <Button
-          shadow='sm'
+          shadow="sm"
           fullWidth
           disabled={false}
           onClick={() => {
@@ -78,7 +83,7 @@ const TemplateCard = ({ _id, templateName, paths, groupTransform }) => {
       <Modal
         opened={opened}
         onClose={() => setOpened(false)}
-        title='Create a Workspace'
+        title="Create a Workspace"
         centered
         overlayColor={
           theme.colorScheme === "dark"
@@ -91,14 +96,14 @@ const TemplateCard = ({ _id, templateName, paths, groupTransform }) => {
         <Image
           src={findImage()}
           height={200}
-          alt='Stock Image'
-          radius='md'
-          fit='contain'
+          alt="Stock Image"
+          radius="md"
+          fit="contain"
         />
         <TextInput
-          mt='xl'
-          placeholder='Workspace #1'
-          label='Workspace Name'
+          mt="xl"
+          placeholder="Workspace #1"
+          label="Workspace Name"
           withAsterisk
           value={workspaceName}
           onChange={(e) => {
@@ -106,7 +111,7 @@ const TemplateCard = ({ _id, templateName, paths, groupTransform }) => {
           }}
           error={error}
         />
-        <Center mt='xl'>
+        <Center mt="xl">
           <Button onClick={onNewWorkspace}>Create Workspace</Button>
         </Center>
       </Modal>

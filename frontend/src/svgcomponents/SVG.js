@@ -7,7 +7,9 @@ let websocketUrl = localStorage.getItem("websocketURL");
 // Socket for canvas
 var socket;
 
+// SVG Component for Coloring Books, used in the Canvas Page
 const SVG = () => {
+  // Component state variables
   const [SVGPaths, setSVGPaths] = useState([]);
   const [SVGTitleName, setSVGTitleName] = useState("");
   const [groupTransform, setGroupTransform] = useState("");
@@ -15,6 +17,7 @@ const SVG = () => {
   const [reconnectToSocket, setReconnectToSocket] = useState(false);
   const [viewBox, setViewBox] = useState("0 0 500 550");
 
+  // Centering the SVG component in the middle of the viewport
   useEffect(() => {
     const svgGroup = document.getElementById("layer1");
     if (svgGroup) {
@@ -24,6 +27,7 @@ const SVG = () => {
     }
   }, [SVGPaths]);
 
+  // Update the color of the SVG canvas, responds to user clicks and the color selected on the color picker
   const updateColor = (pathId) => {
     let newSVGPaths = SVGPaths.slice(0);
     newSVGPaths = newSVGPaths.map((path) => {
@@ -35,19 +39,15 @@ const SVG = () => {
       path_id: pathId,
       color: currentColor,
     };
-
+    // Send the message through the socket when you want to update the color of the canvas
     try {
       socket.send(`{"update_color": ${JSON.stringify(svgReq)}}`);
     } catch (error) {
       console.error(`Could not send color update: ${error}`);
     }
-
-    // try {
-    //   socket.send(`{ "paths": ${JSON.stringify(SVGPaths)} }`);
-    // } catch (error) {
-    //   console.error(`Could not send color update: ${error}`);
-    // }
   };
+
+  // PLEASE DOCUMENT BELOW
 
   useEffect(() => {
     // Get new backend URLs on server side failure
@@ -133,8 +133,7 @@ const SVG = () => {
   }, [reconnectToSocket]);
 
   return (
-    // this is the breakdown for the flower image
-    // keep the sizing
+    // Return the SVG component generated dynamically from the SVG paths in the selected canvas
     <>
       <Stack direction="column" spacing="md">
         <Center>
@@ -157,6 +156,7 @@ const SVG = () => {
             <g id="g3020">
               {SVGPaths.map((path, index) => {
                 return (
+                  // Map each SVG path to an SVG Path element in the virtual DOM for react to render
                   <path
                     key={index}
                     strokeWidth={path.svgStrokeWidth}

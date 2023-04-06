@@ -26,11 +26,12 @@ import {
 import "../styles/Sidebar.css";
 
 /**
- * Sidebar for the application
+ * Sidebar for the application, Component is reused in several pages when the user is logged in.
  * @param activePage to set the colour of the active page to black
  * @returns Sidebar
  */
 const Sidebar = (props) => {
+  // Required state variables and Mantine theme
   const theme = useMantineTheme();
   const navigate = useNavigate();
   const [activePage, setActivePage] = useState(props.activePage);
@@ -41,18 +42,11 @@ const Sidebar = (props) => {
    * Logs user out of application
    */
   const logout = () => {
-    // fetch("/user/logout/", {
-    //   method: "POST",
-    // }).then((response) => {
-    //   navigate("/");
-    // });
     localStorage.removeItem("token");
     navigate("/");
   };
 
-  /**
-   * Use Effect
-   */
+  // Gets the user name with the userName local storage variable and updates the sidebar component information
   useEffect(() => {
     const userName = localStorage.getItem("userName");
     if (userName) {
@@ -60,17 +54,18 @@ const Sidebar = (props) => {
     }
   }, []);
 
+  // Sets the user information by sending a request to retrieve the information from the backend
   const setUserInfo = async () => {
-    //console.log("Trying to get user information\n");
     let user = await userInfo(localStorage.getItem("userName"));
-    //console.log(user);
     setUser(user);
   };
 
+  // Return the react component using built in Mantine components in the sidebar
+  // This corresponds to the sidebar visible on a screen when you are logged in. From here, users can navigate, log out, etc...
   return (
     <>
       <Burger
-        className='burger'
+        className="burger"
         color={theme.colors["br-black"][7]}
         opened={drawerOpened}
         onClick={() => setDrawerOpened((open) => !open)}
@@ -80,43 +75,43 @@ const Sidebar = (props) => {
         withCloseButton={false}
         onClose={() => setDrawerOpened((o) => !o)}
       >
-        <Navbar p='xs' className='sidebar'>
+        <Navbar p="xs" className="sidebar">
           <Navbar.Section>
             <Burger onClick={() => setDrawerOpened((o) => !o)} />
-            <Space h='lg' />
+            <Space h="lg" />
             <Center>
-              <Title color='white'>Bob Ross Together</Title>
+              <Title color="white">Bob Ross Together</Title>
             </Center>
           </Navbar.Section>
-          <Navbar.Section grow mt='md'>
+          <Navbar.Section grow mt="md">
             {!user.isAdmin ? ( // only render the button if user.isAdmin is false
               <Button
-                variant='subtle'
+                variant="subtle"
                 leftIcon={<IconHome2 size={50} />}
-                size='xl'
+                size="xl"
                 color={activePage === "HOME" ? "br-black" : "br-white"}
                 onClick={() => {
                   navigate("/home");
                 }}
                 fullWidth
-                className='button'
+                className="button"
               >
                 HOME
               </Button>
             ) : null}
             {!user.isAdmin ? (
               <>
-                <Space h='xl' />
+                <Space h="xl" />
                 <Button
-                  variant='subtle'
+                  variant="subtle"
                   leftIcon={<IconPhotoSearch size={50} />}
-                  size='xl'
+                  size="xl"
                   color={activePage === "CREATE" ? "br-black" : "br-white"}
                   onClick={() => {
                     navigate("/create");
                   }}
                   fullWidth
-                  className='button'
+                  className="button"
                 >
                   CREATE
                 </Button>
@@ -124,17 +119,17 @@ const Sidebar = (props) => {
             ) : null}
             {!user.isAdmin ? (
               <>
-                <Space h='xl' />
+                <Space h="xl" />
                 <Button
-                  variant='subtle'
+                  variant="subtle"
                   leftIcon={<IconBrush size={50} />}
-                  size='xl'
+                  size="xl"
                   color={activePage === "GALLERY" ? "br-black" : "br-white"}
                   onClick={() => {
                     navigate("/gallery");
                   }}
                   fullWidth
-                  className='button'
+                  className="button"
                 >
                   GALLERY
                 </Button>
@@ -169,13 +164,13 @@ const Sidebar = (props) => {
                   }}
                 >
                   <Group>
-                    <Avatar radius='xl' />
+                    <Avatar radius="xl" />
                     <Box sx={{ flex: 1 }}>
-                      <Text size='sm' weight={500}>
+                      <Text size="sm" weight={500}>
                         {/* {"@" + user.username} */}
                         {"@" + user.userName}
                       </Text>
-                      <Text color='white' size='xs'>
+                      <Text color="white" size="xs">
                         {/* {user.firstName + " " + user.lastName} */}
                         {user.userFirstName + " " + user.userLastName}
                       </Text>
@@ -189,7 +184,7 @@ const Sidebar = (props) => {
                   </Group>
                 </UnstyledButton>
               ) : null}
-              <Space h='sm' />
+              <Space h="sm" />
               <Center>
                 <Button
                   sx={{
@@ -205,7 +200,7 @@ const Sidebar = (props) => {
                     localStorage.removeItem("userName");
                     localStorage.removeItem("paths");
                   }}
-                  className='button-red'
+                  className="button-red"
                 >
                   Logout
                 </Button>

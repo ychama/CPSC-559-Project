@@ -1,17 +1,22 @@
 import express from "express";
 import loggedIn from "../middleware/userAuth.js";
 import {
-  deleteWorkspace,
+  //deleteWorkspace,
   createWorkspace,
   getAllWorkspaces,
   getWorkspace,
 } from "../controllers/workspaceController.js";
 
+// Creating an express route for the workspace endpoints using the controller functions and logged in middleware
+// These functions will only be triggered at the endpoint when a requestor's JSON Web Token is authorized successfully
 const workspaceRoute = express.Router();
 
 workspaceRoute.get("/", loggedIn, getAllWorkspaces);
-workspaceRoute.get("/:workspaceCode", loggedIn, getWorkspace);
 workspaceRoute.post("/", loggedIn, createWorkspace);
-workspaceRoute.delete("/:workspaceCode", loggedIn, deleteWorkspace);
+// These two functions require workspaceCode as a parameter as well.
+workspaceRoute.get("/:workspaceCode", loggedIn, getWorkspace);
+workspaceRoute.put("/:workspaceCode", loggedIn, updateWorkspace);
+// NOT USED
+//workspaceRoute.delete("/:workspaceCode", loggedIn, deleteWorkspace);
 
 export default workspaceRoute;
