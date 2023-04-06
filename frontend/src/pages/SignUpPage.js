@@ -20,12 +20,17 @@ import logo from "../images/logo.png";
 import { isValidEmail, isValidUsername } from "../helpers/validation";
 import { signUp } from "../backendhelpers/userHelpers.js";
 
+// SIGN UP PAGE
+
+// Page that allows a user to sign up to an account
+
 const SignUpPage = () => {
   const navigate = useNavigate();
   const theme = useMantineTheme();
 
   useEffect(() => {}, []);
 
+  // Function used for the page's sign up form. This function uses the built in Mantine form function "useForm"
   const signUpForm = useForm({
     initialValues: {
       username: "",
@@ -35,7 +40,7 @@ const SignUpPage = () => {
       password: "",
       confirmPassword: "",
     },
-
+    // Validate the values in the form
     validate: {
       username: (value) =>
         !isValidUsername(value)
@@ -48,8 +53,11 @@ const SignUpPage = () => {
     },
   });
 
+  // Function to handle user sign up
+  // This function will make a request to the backend using the backend helper "signUp" and attempt to sign a new user up into the application
   const handleSignUp = async (values) => {
     try {
+      // Send a request to the backend using a helper
       let token = await signUp({
         userName: values.username,
         userEmail: values.email,
@@ -57,14 +65,17 @@ const SignUpPage = () => {
         userLastName: values.lastName,
         userPassword: values.password,
       });
+      // Upon success, update the local storage variables for the username and JSON Web Token for authentication of future requests.
       localStorage.setItem("token", token);
       localStorage.setItem("userName", values.username);
+      // Go to the home page
       navigate("/home");
     } catch (err) {
       console.log(err);
     }
   };
 
+  // Return the sign up page. This uses built in Mantine Components and the functions above to implement the functionality of the signup page
   return (
     <>
       <Header

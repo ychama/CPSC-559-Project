@@ -1,9 +1,12 @@
 import { React, useState, useEffect, useRef } from "react";
 
+// SVG Thumbnail used in the gallery component of the application
+//Similar to SVG but with adjusted sizing to fit in the gallery
 const SVGThumbnail = ({ paths, width, height }) => {
   const svgGroupRef = useRef(null);
   const [viewBox, setViewBox] = useState("0 0 500 550");
 
+  // Used to resize and center the SVG in the viewport of the SVG
   useEffect(() => {
     const svgGroup = svgGroupRef.current;
     if (svgGroup) {
@@ -28,6 +31,7 @@ const SVGThumbnail = ({ paths, width, height }) => {
         >
           <g id="g3020">
             {paths.map((path, index) => {
+              // Map each SVG path in the paths prop to dislay the coloring book as a template in the frontend.
               return (
                 <path
                   key={index}

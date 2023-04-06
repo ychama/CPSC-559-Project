@@ -2,7 +2,8 @@ import fs from "fs";
 import xml2js from "xml2js";
 const fileToUpdate = "./spiderman.svg";
 const svgFile = fs.readFileSync(fileToUpdate, "utf-8");
-
+//SCRIPT TO UPLOAD SVG'S TO THE DATABASE
+// NOT USED IN PROJECT CODE, USED FOR TESTING MODIFYING NEW SVG CANVAS TEMPLATES THAT WILL BE UPLOADED TO THE DATABASE
 xml2js.parseString(svgFile, (err, result) => {
   if (err) {
     console.error(err);

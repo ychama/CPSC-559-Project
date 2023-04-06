@@ -8,25 +8,27 @@ import workspaceRoute from "./routes/workspaceRoute.js";
 import templateRoute from "./routes/templateRoute.js";
 import healthRoute from "./routes/healthRoute.js";
 import { startFrontendSocket } from "./communication/ToFrontendSocket.js";
-import { 
-  listenForServers, 
+import {
+  listenForServers,
   connectToOtherServers,
-} from "./communication/ServerToServerSocket.js"
-
+} from "./communication/ServerToServerSocket.js";
+// Connect to MongoDB instance using config function
 connectMongoDB();
 
 const port = process.env.PORT || 5000;
-
+// Create HTTP server
 const app = express();
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Add endpoints to the server using the routes
 app.use("/api/workspaces", workspaceRoute);
 app.use("/api/users", userRoute);
 app.use("/api/templates", templateRoute);
 app.use("/api/health", healthRoute);
 
+// Unused
 app.get(
   "/api/getUserCookie",
   asyncHandler(async (req, res) => {
@@ -37,6 +39,7 @@ app.get(
   })
 );
 
+// Unused
 app.get(
   "/api/deleteUserCookie",
   asyncHandler(async (req, res) => {
@@ -51,5 +54,5 @@ listenForServers();
 connectToOtherServers();
 startFrontendSocket();
 
-// Server endpoints
+// Start the server and listen for requests.
 app.listen(port, () => console.log("Server started on port " + port));

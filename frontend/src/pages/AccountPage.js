@@ -25,18 +25,22 @@ import {
 } from "@mantine/core";
 import Sidebar from "../components/Sidebar";
 import logo from "../images/logo.png";
+
+// ACCOUNT PAGE
+
+// Page that displays user information and allows a user to update their information
+
 const AccountPage = () => {
+  // Required state and theme variables
   const theme = useMantineTheme();
   const navigate = useNavigate();
   const [user, setUser] = useState({});
   const [updates, setUpdates] = useState({});
   const [edit, setEdit] = useState(false);
-  const [userNameError, setUserNameError] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [opened, { open, close }] = useDisclosure();
-  const [success, setSuccess] = useState(false);
-  const [failure, setFailure] = useState(false);
 
+  // Get user information and set it with local storage user name variable
   useEffect(() => {
     const userName = localStorage.getItem("userName");
     if (userName) {
@@ -44,14 +48,16 @@ const AccountPage = () => {
     }
   }, []);
 
+  // Set the retrieved user information from the backend into the state variables.
   const setUserInfo = async () => {
-    //console.log("Trying to get user information\n");
     let user = await userInfo(localStorage.getItem("userName"));
-    //console.log(user);
     setUser(user);
     setUpdates(user);
   };
 
+  // Function that triggers when a user wants to save their updated information
+  // This will send an update request to the backend using the backend helpers.
+  // The response is then processed and the user will be notified of success or failure (failure if the email is taken by someone else)
   const updateUserInfo = async () => {
     delete temp.userName;
     const temp = updates;
@@ -59,13 +65,16 @@ const AccountPage = () => {
       delete temp.userEmail;
     }
     let updatedUser = await updateUser(user.userName, temp);
+    // Send update request and wait for a successful response that has these attributes
     if (
       updatedUser.userName &&
       updatedUser.userFirstName &&
       updatedUser.userLastName
     ) {
+      // Update user with the response information
       setUser(updatedUser);
       localStorage.setItem("userName", updatedUser.userName);
+      // Log any errors that may occur
     } else if (updatedUser.error === 999) {
       console.log("User Email or UserName already exists!!");
     } else {
@@ -74,11 +83,12 @@ const AccountPage = () => {
       );
     }
   };
-
+  // Function to log out in case a user deletes their account.
   const logout = () => {
     localStorage.removeItem("token");
     navigate("/");
   };
+  // Return the page components, including the sidebar and user information components
   return (
     <AppShell navbar={<Sidebar activePage="HOME" />}>
       <Container>

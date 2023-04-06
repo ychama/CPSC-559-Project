@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+// Configuration to establish a connection to the MongoDB instance using the environment variable URL
 const connectMongoDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
