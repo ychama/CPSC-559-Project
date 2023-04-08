@@ -12,11 +12,14 @@ const localPort = PORT_TEMPLATE.replace(/{}/g, localId);
 
 const serverConnections = {};
 
+
+
 const listenForServers = async () => {
+
   const server = http.createServer();
 
   // overwrite this port when we create the web socket server
-  server.listen(localId, "0.0.0.0", function () {});
+  server.listen(localId, "0.0.0.0", function () { });
 
   // Set up server
   const webSocketServer = new WebSocketServer({
@@ -27,10 +30,21 @@ const listenForServers = async () => {
 
   // Connection from another server
   webSocketServer.on("connection", function connection(superSocket) {
+    console.log(" --------> A connection HAS been established");
+
     superSocket.on("message", function incoming(message) {
       processIncomingMessage(superSocket, message);
     });
+
+    superSocket.on('close', function failure(message) {
+      console.log(superSocket)
+      console.log("FAILURE OCCURED ---------->", message)
+    })
   });
+
+
+
+
 };
 
 const connectToOtherServers = async () => {
@@ -52,6 +66,18 @@ const connectToOtherServers = async () => {
 
         // store connection
         serverConnections[id] = inferiorSocket;
+      });
+
+      inferiorSocket.addEventListener("close", function (event) {
+
+        if (!process.env.DOWNED_SERVERS) {
+          process.env.DOWNED_SERVERS = id;
+        }
+        else {
+          process.env.DOWNED_SERVERS = process.env.DOWNED_SERVERS + "," + id;
+        }
+
+        // Now we need to signal that we should now be updating the queue 
       });
 
       // receive message

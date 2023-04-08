@@ -91,9 +91,9 @@ const deleteWorkspace = asyncHandler(async (req, res) => {
       res.status(400);
       throw new Error(
         "User " +
-          req.params.userName +
-          " is not the owner of the Workspace: " +
-          existingWorkspace.workspaceName
+        req.params.userName +
+        " is not the owner of the Workspace: " +
+        existingWorkspace.workspaceName
       );
     }
     const workspaceName = existingWorkspace.workspaceName;

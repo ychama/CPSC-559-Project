@@ -1,7 +1,7 @@
 import express from "express";
 import loggedIn from "../middleware/userAuth.js";
 import {
-  //deleteWorkspace,
+  deleteWorkspace,
   createWorkspace,
   getAllWorkspaces,
   getWorkspace,
@@ -18,6 +18,6 @@ workspaceRoute.post("/", loggedIn, createWorkspace);
 workspaceRoute.get("/:workspaceCode", loggedIn, getWorkspace);
 workspaceRoute.put("/:workspaceCode", loggedIn, updateWorkspace);
 // NOT USED
-//workspaceRoute.delete("/:workspaceCode", loggedIn, deleteWorkspace);
+workspaceRoute.delete("/:workspaceCode", loggedIn, deleteWorkspace);
 
 export default workspaceRoute;
