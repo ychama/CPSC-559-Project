@@ -76,8 +76,7 @@ const getAllWorkspaces = asyncHandler(async (req, res) => {
 });
 
 // NOT USED
-
-/*const deleteWorkspace = asyncHandler(async (req, res) => {
+const deleteWorkspace = asyncHandler(async (req, res) => {
   try {
     const existingWorkspace = await User.findOne({
       workspaceCode: req.params.workspaceCode,
@@ -106,7 +105,7 @@ const getAllWorkspaces = asyncHandler(async (req, res) => {
     const errMessage = error.message;
     res.status(400).json({ error: errMessage });
   }
-});*/
+});
 
 // Function to get workspace with the workspace code as a parameter
 async function getWorkspace(targetWorkspaceCode) {
