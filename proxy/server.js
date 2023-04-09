@@ -73,15 +73,17 @@ app.route("/api/server").get((req, res) => {
     const randomServer = Math.floor(
       Math.random() * TEMP_AVAILABLE_SERVERS.length
     );
-      // Return both server and websocket URL's for the client to connect to the server
-    let serverURL = SERVER_CLIENT_BASE_URL.replace(
-      /{}/g,
-      TEMP_AVAILABLE_SERVERS[randomServer]
-    );
 
     let websocketURL = SERVER_CLIENT_WEBSOCKET_URL.replace(
       /{}/g,
       TEMP_AVAILABLE_SERVERS[randomServer]
+    );
+
+    // always picking the lowest available server id for http requests
+    TEMP_AVAILABLE_SERVERS.sort();
+    let serverURL = SERVER_CLIENT_BASE_URL.replace(
+      /{}/g,
+      TEMP_AVAILABLE_SERVERS[0]
     );
     // send successful responjse
     res.status(200).json({ serverURL, websocketURL });
