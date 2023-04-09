@@ -1,9 +1,12 @@
 import http from "http";
 import { WebSocketServer } from "ws";
 import {
-  getWorkspace,
-  updateWorkspace,
+  getWorkspace
 } from "../controllers/workspaceController.js";
+
+import {
+  processClientUpdateMessage
+} from "../communication/WorkspaceSocketTOB.js"
 
 // Clients reach us at this port
 const socketPort = 7000;
@@ -57,12 +60,6 @@ async function updateClients(workspace, data) {
   // Send only to clients who care about this workspace
   const clientSockets = workspaceToConnection[workspace];
 
-  // if (Array.isArray(clientSockets)) {
-  //   for (const client of clientSockets) {
-  //     client.send(`{ "paths": ${JSON.stringify(paths)} }`);
-  //   }
-  // }
-
   if (Array.isArray(clientSockets)) {
     for (const client of clientSockets) {
       client.send(`{ "update_color": ${JSON.stringify(data)} }`);
@@ -95,18 +92,11 @@ async function processMessage(connection, message) {
       connection.send(workspace);
 
       // Client updated workspace
-    } else if (jsonMsg.hasOwnProperty("paths")) {
-      updateWorkspace(
-        connectionToWorkspace[connection],
-        jsonMsg["paths"],
-        true
-      );
     } else if (jsonMsg.hasOwnProperty("update_color")) {
-      updateWorkspace(
+      processClientUpdateMessage(
         connectionToWorkspace[connection],
         jsonMsg["update_color"]["path_id"],
-        jsonMsg["update_color"]["color"],
-        true
+        jsonMsg["update_color"]["color"]
       );
     } else {
       throw new Error(`Unrecognize message receivedfrom client: ${message}`);

@@ -5,7 +5,6 @@ import {
   createWorkspace,
   getAllWorkspaces,
   getWorkspace,
-  updateWorkspace,
 } from "../controllers/workspaceController.js";
 
 // Creating an express route for the workspace endpoints using the controller functions and logged in middleware

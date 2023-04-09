@@ -4,14 +4,6 @@ const endpointBase = "http://backend{}:5000/api";
 const server_list = process.env.OTHER_SERVERS.split(",");
 const server_id = process.env.SERVER_ID;
 
-/*const customConfig = {
-  withCredentials: true,
-  credentials: "include",
-  headers: {
-    "Content-Type": "application/json",
-  },
-};*/
-
 export const postBroadCast = async (endpoint, reqBody, token) => {
     server_list.forEach(element => {
         if (server_id === element) return;

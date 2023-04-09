@@ -14,7 +14,6 @@ const getHealth = asyncHandler(async (req, res) => {
     const result = await mongodb_admin.command({ ping: 1 });
     // If successful, respond to the load balancer process with a confirmation that server and database are active
     res.status(200).json({ message: "alive" });
-    console.log("MongoDB instance alive:", result);
   } catch (err) {
     // If there is an error, respond to the load balancer specifying that the MongoDB instance is down
     res.status(500).json({ message: "MongoDB failure." }); // internal server error
