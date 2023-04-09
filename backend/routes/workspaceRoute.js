@@ -15,7 +15,6 @@ workspaceRoute.get("/", loggedIn, getAllWorkspaces);
 workspaceRoute.post("/", loggedIn, createWorkspace);
 // These two functions require workspaceCode as a parameter as well.
 workspaceRoute.get("/:workspaceCode", loggedIn, getWorkspace);
-workspaceRoute.put("/:workspaceCode", loggedIn, updateWorkspace);
 // NOT USED
 //workspaceRoute.delete("/:workspaceCode", loggedIn, deleteWorkspace);
 
