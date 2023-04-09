@@ -59,12 +59,15 @@ const AccountPage = () => {
   // This will send an update request to the backend using the backend helpers.
   // The response is then processed and the user will be notified of success or failure (failure if the email is taken by someone else)
   const updateUserInfo = async () => {
-    delete temp.userName;
     const temp = updates;
+    delete temp.userName;
     if (temp.userEmail === user.userEmail) {
       delete temp.userEmail;
     }
+    //console.log("Sending user update with: " + JSON.stringify(temp));
     let updatedUser = await updateUser(user.userName, temp);
+    //console.log("Received: " + updatedUser);
+    delete updatedUser.userPassword;
     // Send update request and wait for a successful response that has these attributes
     if (
       updatedUser.userName &&
@@ -72,7 +75,12 @@ const AccountPage = () => {
       updatedUser.userLastName
     ) {
       // Update user with the response information
-      setUser(updatedUser);
+      setUser({
+        userName: updatedUser.userName,
+        userFirstName: updatedUser.userFirstName,
+        userLastName: updatedUser.userLastName,
+        userEmail: updatedUser.userEmail,
+      });
       localStorage.setItem("userName", updatedUser.userName);
       // Log any errors that may occur
     } else if (updatedUser.error === 999) {
@@ -208,7 +216,8 @@ const AccountPage = () => {
                   if (
                     user.userFirstName === updates.userFirstName &&
                     user.userLastName === updates.userLastName &&
-                    updates.userEmail === user.userEmail
+                    updates.userEmail === user.userEmail &&
+                    !updates.userPassword
                   ) {
                     setEdit(!edit);
                     return;

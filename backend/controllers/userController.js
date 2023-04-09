@@ -86,9 +86,14 @@ const deleteUser = asyncHandler(async (req, res) => {
     // Check if this request was broadcasted by other servers, if it was not (it was a client request) then broadcast it to other servers using broadcast helper
     if (!req.headers.isBroadcast) {
       console.log(
-        "\n\nHERE IS THE REQ HEADERS: " + JSON.stringify(req.headers)
+        "\n\nHERE IS THE REQ HEADERS: " +
+          JSON.stringify(req.headers.authorization)
       );
-      deleteBroadCast(`/users/${req.params.userName}/`, req.headers);
+      deleteBroadCast(
+        `/users/${req.params.userName}/`,
+        {},
+        req.headers.authorization.split(" ")[1]
+      );
     }
   } catch (error) {
     // Catch and log any errors
@@ -175,7 +180,7 @@ const updateUser = asyncHandler(async (req, res) => {
     } else {
       // If they do not already exist find the user document to update
       const user = await User.findOne({ userName: req.params.userName });
-      const userName = user.userName;
+      let request = { ...req.body };
       // If it does not exist return an error
       if (!user) {
         res.status(400);
@@ -184,10 +189,13 @@ const updateUser = asyncHandler(async (req, res) => {
       // Change the user password by encrypting it first
       if (req.body.userPassword) {
         const hashedPassword = await bcrypt.hash(req.body.userPassword, 10);
-        req.body.userPassword = hashedPassword;
+        request.userPassword = hashedPassword;
       }
+      //console.log("Original request: " + JSON.stringify(req.body));
+      //console.log("New request: " + JSON.stringify(request));
+
       // Update the user with the request body information
-      const updatedUser = await User.findByIdAndUpdate(user._id, req.body, {
+      const updatedUser = await User.findByIdAndUpdate(user._id, request, {
         new: true,
       });
       //      const response = Workspace.updateMany(
