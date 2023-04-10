@@ -19,6 +19,7 @@ import { useForm } from "@mantine/form";
 import logo from "../images/logo.png";
 import { isValidEmail, isValidUsername } from "../helpers/validation";
 import { signUp } from "../backendhelpers/userHelpers.js";
+import { setHTTPBackendURL } from "../backendhelpers/proxyHelper";
 
 // SIGN UP PAGE
 
@@ -28,7 +29,9 @@ const SignUpPage = () => {
   const navigate = useNavigate();
   const theme = useMantineTheme();
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    setHTTPBackendURL();
+  }, []);
 
   // Function used for the page's sign up form. This function uses the built in Mantine form function "useForm"
   const signUpForm = useForm({

@@ -20,6 +20,7 @@ import logo from "../images/logo.png";
 import "../styles/LoginPage.css";
 import { isValidUsername } from "../helpers/validation";
 import { signIn } from "../backendhelpers/userHelpers.js";
+import { setHTTPBackendURL } from "../backendhelpers/proxyHelper";
 
 // LOGIN PAGE
 
@@ -34,6 +35,7 @@ const LoginPage = () => {
     if (localStorage.getItem("token")) {
       navigate("/home");
     }
+    setHTTPBackendURL;
   }, []);
 
   // Function for the login form using the Mantine form function "useForm"

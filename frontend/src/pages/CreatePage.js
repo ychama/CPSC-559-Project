@@ -4,6 +4,7 @@ import { Stack, AppShell, Text, Card, SimpleGrid } from "@mantine/core";
 import Sidebar from "../components/Sidebar";
 import { getAllTemplates } from "../backendhelpers/templateHelpers.js";
 import TemplateCard from "../components/TemplateCard";
+import { setHTTPBackendURL } from "../backendhelpers/proxyHelper";
 
 // CREATE PAGE
 
@@ -20,6 +21,7 @@ const CreatePage = () => {
     } else {
       getTemplates();
     }
+    setHTTPBackendURL();
   }, []);
 
   // Function to get all templates and set them as a State variable in the component to be displayed in the returned DOM elements

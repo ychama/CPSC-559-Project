@@ -59,3 +59,29 @@ export const getBackendUrl = async () => {
     console.log("Failed to get serverURL/websocketURL from all proxies.");
   }
 };
+
+// Sets a new HTTP backend URL, used when a user navigates to a new page to ensure primary HTTP replica is being communicated with
+export const setHTTPBackendURL = async () => {
+  getBackendUrl()
+    .then((urls) => {
+      localStorage.setItem("backendURL", urls.serverURL);
+      //localStorage.setItem("websocketURL", urls.websocketURL);
+    })
+    .catch((err) => {
+      localStorage.setItem("backendURL", "http://localhost:5001/api");
+      //localStorage.setItem("websocketURL", "ws://localhost:7001");
+    });
+};
+
+// Sets a new Web Socket backend URL, used when a user navigates to the canvas page to ensure an active Web Socket server replica is being communicated with
+export const setWSBackendURL = async () => {
+  getBackendUrl()
+    .then((urls) => {
+      //localStorage.setItem("backendURL", urls.serverURL);
+      localStorage.setItem("websocketURL", urls.websocketURL);
+    })
+    .catch((err) => {
+      //localStorage.setItem("backendURL", "http://localhost:5001/api");
+      localStorage.setItem("websocketURL", "ws://localhost:7001");
+    });
+};

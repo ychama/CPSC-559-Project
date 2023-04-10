@@ -25,6 +25,7 @@ import {
 } from "@mantine/core";
 import Sidebar from "../components/Sidebar";
 import logo from "../images/logo.png";
+import { setHTTPBackendURL } from "../backendhelpers/proxyHelper";
 
 // ACCOUNT PAGE
 
@@ -46,6 +47,7 @@ const AccountPage = () => {
     if (userName) {
       setUserInfo();
     }
+    setHTTPBackendURL();
   }, []);
 
   // Set the retrieved user information from the backend into the state variables.

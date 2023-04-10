@@ -15,6 +15,7 @@ import flower from "../images/flower.png";
 import pumpkin from "../images/pumpkin.png";
 import brasil from "../images/brasil.png";
 import SVGThumbnail from "../svgcomponents/SVGThumbnail";
+import { setHTTPBackendURL } from "../backendhelpers/proxyHelper";
 
 // HOME PAGE
 
@@ -35,6 +36,7 @@ const HomePage = () => {
     } else {
       getWorkspaces();
     }
+    setHTTPBackendURL();
   }, []);
 
   // Using the workspace code, navigate to the canvas page with the selected workspace to allow a user to work in it.

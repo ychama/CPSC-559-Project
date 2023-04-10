@@ -10,10 +10,7 @@ import axios from "axios";
 
 // This process is replicated as can be seen in the docker-compose.yml for the project.
 
-
-
-
-// keep constant URL strings for checking health and directing users to available servers (using both HTTP and web socket "connections"). 
+// keep constant URL strings for checking health and directing users to available servers (using both HTTP and web socket "connections").
 const SERVER_CLIENT_BASE_URL = "http://localhost:500{}/api";
 const SERVER_CLIENT_WEBSOCKET_URL = "ws://localhost:700{}";
 const SERVER_HEALTH_URL = "http://backend{}:5000/api/health/";
@@ -22,8 +19,9 @@ const SERVER_HEALTH_URL = "http://backend{}:5000/api/health/";
 let ALL_SERVERS = new Set([1, 2, 3, 4]);
 let AVAILABLE_SERVERS = new Set([1, 2, 3, 4]);
 let OFFLINE_SERVERS = new Set([]);
+let currentServer = AVAILABLE_SERVERS[0];
 
-// Function to loop through all servers in the system and check their health at an endpoint. 
+// Function to loop through all servers in the system and check their health at an endpoint.
 // This also checks the database health as documented in the server endpoints (backend folder).
 const healthCheck = async () => {
   // Loop through ALL servers
@@ -65,7 +63,7 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Creating an endpoint at the proxy process for clients to request server URL's 
+// Creating an endpoint at the proxy process for clients to request server URL's
 app.route("/api/server").get((req, res) => {
   try {
     // Attempt to retrieve a random server from the available servers
@@ -79,12 +77,16 @@ app.route("/api/server").get((req, res) => {
       TEMP_AVAILABLE_SERVERS[randomServer]
     );
 
-    // always picking the lowest available server id for http requests
-    TEMP_AVAILABLE_SERVERS.sort();
-    let serverURL = SERVER_CLIENT_BASE_URL.replace(
-      /{}/g,
-      TEMP_AVAILABLE_SERVERS[0]
-    );
+    // Check that the current "Primary" HTTP server is still available
+    if (!TEMP_AVAILABLE_SERVERS.includes(currentServer)) {
+      // If it is not available, change the current primary server
+
+      // always picking the lowest available server id for new HTTP primary server
+      TEMP_AVAILABLE_SERVERS.sort();
+      currentServer = TEMP_AVAILABLE_SERVERS[0];
+    }
+    //TEMP_AVAILABLE_SERVERS.sort();
+    let serverURL = SERVER_CLIENT_BASE_URL.replace(/{}/g, currentServer);
     // send successful responjse
     res.status(200).json({ serverURL, websocketURL });
   } catch (error) {
