@@ -26,7 +26,7 @@ import {
 import Sidebar from "../components/Sidebar";
 import logo from "../images/logo.png";
 import { setHTTPBackendURL } from "../backendhelpers/proxyHelper";
-
+import { useInterval } from "../helpers/interval";
 // ACCOUNT PAGE
 
 // Page that displays user information and allows a user to update their information
@@ -49,6 +49,9 @@ const AccountPage = () => {
     }
     setHTTPBackendURL();
   }, []);
+
+  // Reset Backend HTTP URL every 8 minutes, to ensure the primary replica is being used
+  useInterval(setHTTPBackendURL, 480000);
 
   // Set the retrieved user information from the backend into the state variables.
   const setUserInfo = async () => {

@@ -20,7 +20,7 @@ import logo from "../images/logo.png";
 import { isValidEmail, isValidUsername } from "../helpers/validation";
 import { signUp } from "../backendhelpers/userHelpers.js";
 import { setHTTPBackendURL } from "../backendhelpers/proxyHelper";
-
+import { useInterval } from "../helpers/interval";
 // SIGN UP PAGE
 
 // Page that allows a user to sign up to an account
@@ -32,7 +32,8 @@ const SignUpPage = () => {
   useEffect(() => {
     setHTTPBackendURL();
   }, []);
-
+  // Reset Backend HTTP URL every 8 minutes, to ensure the primary replica is being used
+  useInterval(setHTTPBackendURL, 480000);
   // Function used for the page's sign up form. This function uses the built in Mantine form function "useForm"
   const signUpForm = useForm({
     initialValues: {

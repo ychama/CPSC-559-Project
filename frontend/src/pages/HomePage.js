@@ -16,7 +16,7 @@ import pumpkin from "../images/pumpkin.png";
 import brasil from "../images/brasil.png";
 import SVGThumbnail from "../svgcomponents/SVGThumbnail";
 import { setHTTPBackendURL } from "../backendhelpers/proxyHelper";
-
+import { useInterval } from "../helpers/interval";
 // HOME PAGE
 
 // This is the page a user sees when they initially log in
@@ -38,6 +38,9 @@ const HomePage = () => {
     }
     setHTTPBackendURL();
   }, []);
+
+  // Reset Backend HTTP URL every 8 minutes, to ensure the primary replica is being used
+  useInterval(setHTTPBackendURL, 480000);
 
   // Using the workspace code, navigate to the canvas page with the selected workspace to allow a user to work in it.
   const handleJoinCanvas = (code) => {

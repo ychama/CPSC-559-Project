@@ -21,11 +21,13 @@ import "../styles/LoginPage.css";
 import { isValidUsername } from "../helpers/validation";
 import { signIn } from "../backendhelpers/userHelpers.js";
 import { setHTTPBackendURL } from "../backendhelpers/proxyHelper";
+import { useInterval } from "../helpers/interval";
 
 // LOGIN PAGE
 
 // Login page/Landing page that allows a user to log into the application.
 // After login validation, a user may use the app's functionality
+
 const LoginPage = () => {
   const navigate = useNavigate();
   const theme = useMantineTheme();
@@ -37,6 +39,9 @@ const LoginPage = () => {
     }
     setHTTPBackendURL;
   }, []);
+
+  // Reset Backend HTTP URL every 8 minutes, to ensure the primary replica is being used
+  useInterval(setHTTPBackendURL, 480000);
 
   // Function for the login form using the Mantine form function "useForm"
   // We validate the username before logging the user in

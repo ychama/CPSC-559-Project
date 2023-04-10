@@ -5,10 +5,11 @@ import Sidebar from "../components/Sidebar";
 import { getAllTemplates } from "../backendhelpers/templateHelpers.js";
 import TemplateCard from "../components/TemplateCard";
 import { setHTTPBackendURL } from "../backendhelpers/proxyHelper";
-
+import { useInterval } from "../helpers/interval";
 // CREATE PAGE
 
 // Page that allows a user to create a new workspace from a canvas template
+
 const CreatePage = () => {
   const [templates, setTemplates] = useState([]);
   const navigate = useNavigate();
@@ -23,6 +24,9 @@ const CreatePage = () => {
     }
     setHTTPBackendURL();
   }, []);
+
+  // Reset Backend HTTP URL every 8 minutes, to ensure the primary replica is being used
+  useInterval(setHTTPBackendURL, 480000);
 
   // Function to get all templates and set them as a State variable in the component to be displayed in the returned DOM elements
   const getTemplates = async () => {
