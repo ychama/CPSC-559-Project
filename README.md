@@ -13,6 +13,10 @@
    - Run `docker-compose down` to bring down all the containers
 1. Go to the mongo-express service (`localhost:8081`) to manage the MongoDB database and add SVGs using their JSON representation (sunflower/ironma/spiderman) as well as workspaces.
 
+# Deployment
+
+In order to test the system in a realistic environment ngrok is used to expose the ports of each of the backend instances that ngrok communicates with. Because the Ngrok Urls are tied to one device a separate Ngrok branch exists to expose the ports. When live, the develop branch is designed to be only be accessed by local clients
+
 ```
 sunflower SVG
 
