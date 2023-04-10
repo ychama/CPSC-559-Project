@@ -75,7 +75,7 @@ export const setHTTPBackendURL = async () => {
 
 // Sets a new Web Socket backend URL, used when a user navigates to the canvas page to ensure an active Web Socket server replica is being communicated with
 export const setWSBackendURL = async () => {
-  getBackendUrl()
+  await getBackendUrl()
     .then((urls) => {
       //localStorage.setItem("backendURL", urls.serverURL);
       localStorage.setItem("websocketURL", urls.websocketURL);

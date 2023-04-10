@@ -47,7 +47,7 @@ const SVG = () => {
     }
   };
 
-  // PLEASE DOCUMENT BELOW
+  //  DOCUMENT BELOW
 
   useEffect(() => {
     // Get new backend URLs on server side failure
