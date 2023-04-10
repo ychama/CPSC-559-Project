@@ -30,7 +30,6 @@ async function processClientUpdateMessage(targetWorkspaceCode, path_id, color) {
     path_id: path_id,
     color: color,
   };
-  console.log(payload);
 
   queue.enqueue(parseInt(localId), TS[parseInt(localId)], payload);
   processEnqueuedUpdate();
@@ -81,32 +80,15 @@ async function processServerUpdateMessage(
 }
 
 function checkServerTimeStamps(updateTimeStamp) {
-  // console.log("start checkServerTimeStamps")
   for (let i = 0; i < otherIds.length; i++) {
-    console.log(process.env.DOWNED_SERVERS);
     if (process.env.DOWNED_SERVERS) {
       let downedServers = process.env.DOWNED_SERVERS.split(",");
-
-      console.log("downedServers", downedServers);
-      console.log("(parseInt(otherIds[i])", parseInt(otherIds[i]));
       if (downedServers.includes(otherIds[i])) {
-        console.log(
-          "downedServers",
-          downedServers,
-          " includes otherIds[i] ",
-          parseInt(otherIds[i])
-        );
         continue;
       }
     }
-    console.log("updateTimeStamp", updateTimeStamp);
-    console.log("parseInt(otherIds[i])", TS[parseInt(otherIds[i])]);
-
-    console.log(updateTimeStamp > TS[parseInt(otherIds[i])]);
-
     if (updateTimeStamp > TS[parseInt(otherIds[i])]) return false;
   }
-
   return true;
 }
 
@@ -114,10 +96,7 @@ function processEnqueuedUpdate() {
   if (!queue.isEmpty()) {
     const update = queue.front();
 
-    console.log("HERE ======================>");
-
     if (checkServerTimeStamps(update.timeStamp)) {
-      console.log("In the IF STATEMENT ======================>");
       queue.dequeue();
 
       const workspaceCode = update.payload.workspaceCode;
@@ -148,8 +127,6 @@ function processEnqueuedUpdate() {
       if (process.env.DOWNED_SERVERS) {
         let downedServers = process.env.DOWNED_SERVERS.split(",");
 
-        console.log(downedServers);
-
         if (downedServers.length > 0) {
           for (const [key, value] of Object.entries(serverCanvasUpdates)) {
             let tempUpdates = [...value];
@@ -158,8 +135,6 @@ function processEnqueuedUpdate() {
 
             serverCanvasUpdates[key] = tempUpdates;
           }
-
-          console.log("--------------->", serverCanvasUpdates);
         }
       }
     }

@@ -16,7 +16,7 @@ const listenForServers = async () => {
   const server = http.createServer();
 
   // overwrite this port when we create the web socket server
-  server.listen(localId, "0.0.0.0", function () {});
+  server.listen(localId, "0.0.0.0", function () { });
 
   // Set up server
   const webSocketServer = new WebSocketServer({
@@ -27,15 +27,29 @@ const listenForServers = async () => {
   console.log(`Websocket Server open to other servers on port ${localPort}`);
 
   // Connection from another server
-  webSocketServer.on("connection", function connection(superSocket) {
+  webSocketServer.on("connection", function connection(superSocket, req) {
     console.log(" --------> A connection HAS been established");
 
+    let id = -1;
+
     superSocket.on("message", function incoming(message) {
-      processIncomingMessage(superSocket, message);
+      const res = processIncomingMessage(superSocket, message);
+      if (res != -1) id = res;
     });
 
-    superSocket.on("close", function failure(message) {
-      console.log(superSocket);
+    superSocket.on("close", function failure(message, reason) {
+      if (!process.env.DOWNED_SERVERS) {
+        process.env.DOWNED_SERVERS = String(id) + ",";
+      } else {
+        process.env.DOWNED_SERVERS = process.env.DOWNED_SERVERS + String(id) + ",";
+      }
+
+      delete serverConnections[String(id)];
+
+      console.log(
+        "---------------------> server is down",
+        process.env.DOWNED_SERVERS
+      );
     });
   });
 };
@@ -50,6 +64,8 @@ const connectToOtherServers = async () => {
       const serverAddress = SERVER_CLIENT_WEBSOCKET_URL.replace(/{}/g, id);
 
       const inferiorSocket = new WebSocket(serverAddress);
+
+      inferiorSocket.addEventListener("error", console.error);
 
       inferiorSocket.addEventListener("open", function (event) {
         console.log(`Connected to server ${id}`);
@@ -68,7 +84,7 @@ const connectToOtherServers = async () => {
           process.env.DOWNED_SERVERS = process.env.DOWNED_SERVERS + id + ",";
         }
 
-        // We need to update the otherIds list
+        delete serverConnections[id];
 
         console.log(
           "---------------------> server is down",
@@ -110,7 +126,7 @@ async function broadcastUpdate(
   console.log("end broadcastUpdate");
 }
 
-async function processIncomingMessage(socket, message) {
+function processIncomingMessage(socket, message) {
   try {
     const jsonMsg = JSON.parse(message);
 
@@ -130,12 +146,15 @@ async function processIncomingMessage(socket, message) {
         jsonMsg["timeStamp"],
         jsonMsg["isAck"]
       );
+
+      return -1;
     } else if (jsonMsg.hasOwnProperty("serverId")) {
       // This is a server on the client side of the connection telling us what server they are
       console.log(`Connected to server ${jsonMsg.serverId}`);
 
       // Save connection with id
       serverConnections[jsonMsg["serverId"]] = socket;
+      return parseInt(jsonMsg["serverId"]);
     } else {
       throw new Error("Unrecognized message received from another server");
     }
