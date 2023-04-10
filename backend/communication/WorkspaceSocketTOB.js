@@ -1,7 +1,7 @@
 import Workspace from "../models/workspaceModel.js";
 import { UpdateQueue } from "../util/updateQueue.js";
 import { updateClients } from "../communication/ToFrontendSocket.js";
-import { broadcastUpdate } from "../communication/ServerToServerSocket.js";
+import { broadcastUpdate, getDownedServers } from "../communication/ServerToServerSocket.js";
 import mongoose from "mongoose";
 
 const localId = process.env.SERVER_ID;
@@ -81,12 +81,9 @@ async function processServerUpdateMessage(
 
 function checkServerTimeStamps(updateTimeStamp) {
   for (let i = 0; i < otherIds.length; i++) {
-    if (process.env.DOWNED_SERVERS) {
-      let downedServers = process.env.DOWNED_SERVERS.split(",");
-      if (downedServers.includes(otherIds[i])) {
-        continue;
-      }
-    }
+    let downedServers = getDownedServers();
+    if (downedServers.has(otherIds[i]))
+      continue;
     if (updateTimeStamp > TS[parseInt(otherIds[i])]) return false;
   }
   return true;
@@ -124,18 +121,12 @@ function processEnqueuedUpdate() {
 
       updateClients(update.payload.workspaceCode, data);
 
-      if (process.env.DOWNED_SERVERS) {
-        let downedServers = process.env.DOWNED_SERVERS.split(",");
+      for (const [key, value] of Object.entries(serverCanvasUpdates)) {
+        let tempUpdates = [...value];
 
-        if (downedServers.length > 0) {
-          for (const [key, value] of Object.entries(serverCanvasUpdates)) {
-            let tempUpdates = [...value];
+        tempUpdates.push(jsonMsg);
 
-            tempUpdates.push(jsonMsg);
-
-            serverCanvasUpdates[key] = tempUpdates;
-          }
-        }
+        serverCanvasUpdates[key] = tempUpdates;
       }
     }
   }
