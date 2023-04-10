@@ -12,20 +12,18 @@ const localPort = PORT_TEMPLATE.replace(/{}/g, localId);
 
 const serverConnections = {};
 
-
-
 const listenForServers = async () => {
-
   const server = http.createServer();
 
   // overwrite this port when we create the web socket server
-  server.listen(localId, "0.0.0.0", function () { });
+  server.listen(localId, "0.0.0.0", function () {});
 
   // Set up server
   const webSocketServer = new WebSocketServer({
     port: localPort,
     httpServer: server,
   });
+
   console.log(`Websocket Server open to other servers on port ${localPort}`);
 
   // Connection from another server
@@ -36,15 +34,10 @@ const listenForServers = async () => {
       processIncomingMessage(superSocket, message);
     });
 
-    superSocket.on('close', function failure(message) {
-      console.log(superSocket)
-      console.log("FAILURE OCCURED ---------->", message)
-    })
+    superSocket.on("close", function failure(message) {
+      console.log(superSocket);
+    });
   });
-
-
-
-
 };
 
 const connectToOtherServers = async () => {
@@ -69,15 +62,18 @@ const connectToOtherServers = async () => {
       });
 
       inferiorSocket.addEventListener("close", function (event) {
-
         if (!process.env.DOWNED_SERVERS) {
-          process.env.DOWNED_SERVERS = id;
-        }
-        else {
-          process.env.DOWNED_SERVERS = process.env.DOWNED_SERVERS + "," + id;
+          process.env.DOWNED_SERVERS = id + ",";
+        } else {
+          process.env.DOWNED_SERVERS = process.env.DOWNED_SERVERS + id + ",";
         }
 
-        // Now we need to signal that we should now be updating the queue 
+        // We need to update the otherIds list
+
+        console.log(
+          "---------------------> server is down",
+          process.env.DOWNED_SERVERS
+        );
       });
 
       // receive message
@@ -90,22 +86,28 @@ const connectToOtherServers = async () => {
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
-async function broadcastUpdate(timeStamp, workspaceCode, path_id, color, isAck) {
-  console.log("start broadcastUpdate")
+async function broadcastUpdate(
+  timeStamp,
+  workspaceCode,
+  path_id,
+  color,
+  isAck
+) {
+  console.log("start broadcastUpdate");
   const update = {
     serverId: parseInt(localId),
     timeStamp: timeStamp,
     workspaceCode: workspaceCode,
     path_id: path_id,
     color: color,
-    isAck: isAck
+    isAck: isAck,
   };
   const jsonUpdate = JSON.stringify(update);
 
   for (let id in serverConnections) {
     serverConnections[id].send(jsonUpdate);
   }
-  console.log("end broadcastUpdate")
+  console.log("end broadcastUpdate");
 }
 
 async function processIncomingMessage(socket, message) {
