@@ -241,11 +241,15 @@ function processIncomingMessage(socket, message) {
         jsonMsg["timeStamp"],
         jsonMsg["isAck"]
       );
-    } else if (jsonMsg.hasOwnProperty("updates")) {
+    } else if (
+      jsonMsg.hasOwnProperty("canvasUpdates") ||
+      jsonMsg.hasOwnProperty("httpUpdates")
+    ) {
       //Manually apply these updates
 
       let canvasUpdates = jsonMsg["canvasUpdates"];
       let httpUpdates = jsonMsg["httpUpdates"];
+
       setTS(jsonMsg["TS"]);
       setServerCanvasUpdates(jsonMsg["otherCanvasUpdates"], -1);
 
