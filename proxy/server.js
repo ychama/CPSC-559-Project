@@ -15,6 +15,26 @@ const SERVER_CLIENT_BASE_URL = "http://localhost:500{}/api";
 const SERVER_CLIENT_WEBSOCKET_URL = "ws://localhost:700{}";
 const SERVER_HEALTH_URL = "http://backend{}:5000/api/health/";
 
+// Map all server IDs to the URLs exposed by ngrok
+const SERVER_URLS = {
+  '1': { 
+    http: 'https://2d75348aa827.ngrok.app/api',
+    ws: 'wss://4a58bf67a36e.ngrok.app',
+  },
+  '2': { 
+    http: 'https://7975def44381.ngrok.app/api',
+    ws: 'wss://9f9b3b5a0052.ngrok.app',
+  },
+  '3': { 
+    http: 'https://82301c974abb.ngrok.app/api',
+    ws: 'wss://4d8e49b5cb98.ngrok.app',
+  },
+  '4': { 
+    http: 'https://7a7f7bbefd4e.ngrok.app/api',
+    ws: 'wss://b75544472862.ngrok.app',
+  },
+}
+
 // Keep a list of all servers, available servers (have not crashed) and offline servers (have crashed)
 let ALL_SERVERS = new Set([1, 2, 3, 4]);
 let AVAILABLE_SERVERS = new Set([1, 2, 3, 4]);
@@ -72,10 +92,8 @@ app.route("/api/server").get((req, res) => {
       Math.random() * TEMP_AVAILABLE_SERVERS.length
     );
 
-    let websocketURL = SERVER_CLIENT_WEBSOCKET_URL.replace(
-      /{}/g,
-      TEMP_AVAILABLE_SERVERS[randomServer]
-    );
+    // Get the Web socket URL
+    let websocketURL = SERVER_URLS[randomServer].ws;
 
     // Check that the current "Primary" HTTP server is still available
     if (!TEMP_AVAILABLE_SERVERS.includes(currentServer)) {
@@ -85,9 +103,11 @@ app.route("/api/server").get((req, res) => {
       TEMP_AVAILABLE_SERVERS.sort();
       currentServer = TEMP_AVAILABLE_SERVERS[0];
     }
-    //TEMP_AVAILABLE_SERVERS.sort();
-    let serverURL = SERVER_CLIENT_BASE_URL.replace(/{}/g, currentServer);
-    // send successful responjse
+    
+    // Get the HTTP URL
+    let serverURL = SERVER_URLS[currentServer].http;
+
+    // send successful response
     res.status(200).json({ serverURL, websocketURL });
   } catch (error) {
     // Return any error to the client, which will result in the client attempting to connect with a different load balancer

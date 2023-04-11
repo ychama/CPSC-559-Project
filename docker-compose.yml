@@ -181,10 +181,10 @@ services:
     build:
       context: ./frontend
       args:
-        REACT_APP_PROXY_URL_1: http://localhost:4001/api
-        REACT_APP_PROXY_URL_2: http://localhost:4002/api
-        REACT_APP_PROXY_URL_3: http://localhost:4003/api
-        REACT_APP_PROXY_URL_4: http://localhost:4004/api
+        REACT_APP_PROXY_URL_1: https://328995431ca3.ngrok.app/api
+        REACT_APP_PROXY_URL_2: https://0c37759af7fa.ngrok.app/api
+        REACT_APP_PROXY_URL_3: https://cd96aaef4413.ngrok.app/api
+        REACT_APP_PROXY_URL_4: https://1ebe22b4bb37.ngrok.app/api
 
     depends_on:
       - backend1
