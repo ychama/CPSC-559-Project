@@ -162,10 +162,20 @@ async function createWorkspace(workspaceInfo) {
 }
 
 async function createUser(userInfo) {
-  delete userInfo["type"];
-
   try {
-    const newUser = await User.create(userInfo);
+    delete userInfo["type"];
+
+    // Check if the username or email exist in the database
+    const userNameExists = await User.exists({
+      userName: userInfo["userName"],
+    });
+    const userEmailExists = await User.exists({
+      userEmail: userInfo["userEmail"],
+    });
+
+    if (!userEmailExists && !userNameExist) {
+      const newUser = await User.create(userInfo);
+    }
   } catch (err) {
     console.log(
       "An error has occured while creating a user, after a server has recorvered with the following error ",
@@ -178,6 +188,7 @@ async function deleteUser(userInfo) {
   delete userInfo["type"];
 
   try {
+    console.log(userInfo);
     const existingUser = await User.findOne(userInfo);
 
     if (existingUser) {
@@ -192,16 +203,20 @@ async function deleteUser(userInfo) {
 }
 
 async function updateUser(userInfo) {
-  delete userInfo["type"];
-
   try {
-    const updatedUser = await User.findByIdAndUpdate(
-      userInfo["user_id"],
-      userInfo["request"],
-      {
-        new: true,
-      }
-    );
+    delete userInfo["type"];
+    const user = await User.findOne({ userName: userInfo["userName"] });
+
+    if (user) {
+      const updatedUser = await User.findByIdAndUpdate(
+        user._id,
+        userInfo["request"],
+        {
+          new: true,
+        }
+      );
+    }
+    console.log(userInfo);
   } catch (err) {
     console.log(
       "An error has occured while updating a user, after a server has recorvered with the following error ",
