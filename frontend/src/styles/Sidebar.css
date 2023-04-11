@@ -1,6 +1,7 @@
 .sidebar {
-  background-color: #9cc5a1;
+  /* background-color: #9cc5a1; */
 }
+
 .burger {
   position: sticky;
   top: 0;

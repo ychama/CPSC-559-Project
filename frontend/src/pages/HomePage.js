@@ -8,6 +8,8 @@ import {
   Button,
   useMantineTheme,
   SimpleGrid,
+  Badge,
+  Group,
 } from "@mantine/core";
 import { getAllWorkspaces } from "../backendhelpers/workspaceHelper";
 import Sidebar from "../components/Sidebar";
@@ -53,57 +55,35 @@ const HomePage = () => {
     try {
       // Get the workspaces and set them in the component State variables to be displayed to the user
       let res = await getAllWorkspaces();
-      setWorkspaces(res.existingWorkspaces);
+      setWorkspaces(res.existingWorkspaces.reverse());
     } catch (err) {
       console.log(err);
     }
   };
 
-  /*const findImage = (templateName) => {
-    if (templateName === "pumpkin") {
-      return pumpkin;
-    } else if (templateName === "flower" || templateName === "flower1") {
-      return flower;
-    } else return brasil;
-  };*/
-
   // Return the page which includes a sidebar and a grid of all workspaces a user can join.
   // Each component of the grid will have a thumbnail image of the coloring book (snapshot of last edited state) and owner information
   return (
-    <AppShell navbar={<Sidebar activePage="HOME" />}>
-      <SimpleGrid cols={3} m="lg">
+    <AppShell navbar={<Sidebar activePage='HOME' />}>
+      <SimpleGrid cols={3} m='lg'>
         {workspaces.map((workspace, index) => (
-          <Card key={index} shadow="sm" p="lg" radius="md" withBorder>
+          <Card key={index} shadow='sm' p='lg' radius='md' withBorder>
             <div style={{ display: "flex", justifyContent: "center" }}>
               <SVGThumbnail paths={workspace.paths} width={100} height={110} />
             </div>
-            {/*  <Card.Section>
-              <Image
-                mt="lg"
-                src={findImage(workspace.workspaceName)}
-                height={160}
-                alt="Stock Image"
-                fit="contain"
-              />
-            </Card.Section>*/}
-            <Text mt="sm" weight={500}>
-              {workspace.workspaceName}
-            </Text>
-            <Text mb="sm" size="sm" color="dimmed">
-              Owner: {workspace.workspaceOwner}
-            </Text>
-            {/* {canvas.participants < canvas.capacity && (
-              <Text mb='sm' size='sm' color='dimmed'>
-                {canvas.participants}/{canvas.capacity} artists joined
+            <Group>
+              <Text mt='sm' weight={500}>
+                {workspace.workspaceName}
               </Text>
-            )}
-            {canvas.participants >= canvas.capacity && (
-              <Badge mb='xs' radius='sm' color='orange' variant='filled'>
-                Canvas Full
+              <Badge mt='sm' color='br-green' variant='filled'>
+                Public
               </Badge>
-            )} */}
+            </Group>
+            <Text mb='sm' size='sm' color='dimmed'>
+              Creator: {workspace.workspaceOwner}
+            </Text>
             <Button
-              shadow="sm"
+              shadow='sm'
               fullWidth
               disabled={false}
               onClick={() => {
