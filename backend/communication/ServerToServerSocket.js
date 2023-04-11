@@ -1,12 +1,16 @@
 import http from "http";
 import Workspace from "../models/workspaceModel.js";
+import User from "../models/userModel.js";
 import mongoose from "mongoose";
 import { WebSocketServer, WebSocket } from "ws";
 import { processServerUpdateMessage } from "../communication/WorkspaceSocketTOB.js";
 import {
   setServerCanvasUpdates,
-  deleteServerCanvasUpdates,
+  setServerHttpUpdates,
   getServerCanvasUpdates,
+  getServerHttpUpdates,
+  deleteServerCanvasUpdates,
+  deleteServerHttpUpdates,
   getTS,
   setTS,
 } from "./WorkspaceSocketTOB.js";
@@ -76,13 +80,17 @@ const connectToOtherServers = async (isDelay) => {
 
         if (downedServers.has(String(id))) {
           let serverCanvasUpdate = getServerCanvasUpdates(id);
+          let serverHttpUpdate = getServerHttpUpdates(id);
 
           deleteServerCanvasUpdates(id);
+          deleteServerHttpUpdates(id);
 
           let message = {
-            updates: serverCanvasUpdate,
+            canvasUpdates: serverCanvasUpdate,
+            httpUpdates: serverHttpUpdate,
             TS: getTS(),
-            canvasUpdates: getServerCanvasUpdates(-1),
+            otherCanvasUpdates: getServerCanvasUpdates(-1),
+            otherHttpUpdates: getServerHttpUpdates(-1),
           };
 
           setTimeout(() => {
@@ -98,6 +106,8 @@ const connectToOtherServers = async (isDelay) => {
         delete serverConnections[id];
 
         setServerCanvasUpdates([], id);
+
+        setServerHttpUpdates([], id);
 
         console.log("---------------------> server is down", downedServers);
       });
@@ -134,6 +144,83 @@ async function broadcastUpdate(
   }
 }
 
+async function updateWorkspacePathDB(update) {
+  console.log("Color: ", update["color"]);
+  await Workspace.updateOne(
+    {
+      workspaceCode: update["workSpaceCode"],
+    },
+    { $set: { "paths.$[element].svgFill": update["color"] } },
+    {
+      arrayFilters: [
+        { "element._id": mongoose.Types.ObjectId(update["path_id"]) },
+      ],
+    }
+  );
+}
+
+async function createWorkspace(workspaceInfo) {
+  delete workspaceInfo["type"];
+
+  try {
+    const newWorkspace = await Workspace.create(workspaceInfo);
+  } catch (err) {
+    console.log(
+      "An error has occured while creating a workspace, after a server has recorvered with the following error ",
+      err
+    );
+  }
+}
+
+async function createUser(userInfo) {
+  delete userInfo["type"];
+
+  try {
+    const newUser = await Workspace.create(userInfo);
+  } catch (err) {
+    console.log(
+      "An error has occured while creating a user, after a server has recorvered with the following error ",
+      err
+    );
+  }
+}
+
+async function deleteUser(userInfo) {
+  delete userInfo["type"];
+
+  try {
+    const existingUser = await User.findOne(userInfo);
+
+    if (existingUser) {
+      await existingUser.remove();
+    }
+  } catch (err) {
+    console.log(
+      "An error has occured while deleting a user, after a server has recorvered with the following error ",
+      err
+    );
+  }
+}
+
+async function updateUser(userInfo) {
+  delete userInfo["type"];
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      userInfo["user_id"],
+      userInfo["request"],
+      {
+        new: true,
+      }
+    );
+  } catch (err) {
+    console.log(
+      "An error has occured while updating a user, after a server has recorvered with the following error ",
+      err
+    );
+  }
+}
+
 async function processIncomingMessage(socket, message) {
   try {
     const jsonMsg = JSON.parse(message);
@@ -154,33 +241,37 @@ async function processIncomingMessage(socket, message) {
         jsonMsg["timeStamp"],
         jsonMsg["isAck"]
       );
-    } else if (jsonMsg.hasOwnProperty("updates")) {
+    } else if (
+      jsonMsg.hasOwnProperty("canvasUpdates") ||
+      jsonMsg.hasOwnProperty("httpUpdates")
+    ) {
       //Manually apply these updates
-      let updates = jsonMsg["updates"];
+
+      let canvasUpdates = jsonMsg["canvasUpdates"];
+      let httpUpdates = jsonMsg["httpUpdates"];
+
       setTS(jsonMsg["TS"]);
-      setServerCanvasUpdates(jsonMsg["canvasUpdates"], -1);
-      for (let i = 0; i < updates.length; i++) {
-        console.log("Updating color: " + updates[i]["color"]);
-        try {
-          await Workspace.findOneAndUpdate(
-            {
-              workspaceCode: updates[i]["workSpaceCode"],
-            },
-            { $set: { "paths.$[element].svgFill": updates[i]["color"] } },
-            {
-              arrayFilters: [
-                {
-                  "element._id": mongoose.Types.ObjectId(updates[i]["path_id"]),
-                },
-              ],
-            }
-          );
-        } catch (err) {
-          console.log(
-            "An error occurred with the following update: " + updates[i]
-          );
-          console.log(err);
+      setServerCanvasUpdates(jsonMsg["otherCanvasUpdates"], -1);
+
+      setServerHttpUpdates(jsonMsg["otherHttpUpdates"], -1);
+
+      //We first want to apply all the HTTP updates then apply socket updates
+
+      for (let i = 0; i < httpUpdates.length; i++) {
+        if (httpUpdates[i]["type"] === "createWorkspace") {
+          createWorkspace(httpUpdates[i]);
+        } else if (httpUpdates[i]["type"] === "createUser") {
+          createUser(httpUpdates[i]);
+        } else if (httpUpdates[i]["type"] === "deleteUser") {
+          deleteUser(httpUpdates[i]);
+        } else if (httpUpdates[i]["type"] === "updateUser") {
+          updateUser(httpUpdates[i]);
         }
+      }
+
+      //Apply socket updates
+      for (let i = 0; i < canvasUpdates.length; i++) {
+        updateWorkspacePathDB(canvasUpdates[i]);
       }
     } else if (jsonMsg.hasOwnProperty("serverId")) {
       // This is a server on the client side of the connection telling us what server they are
