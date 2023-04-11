@@ -56,6 +56,21 @@ const getAllWorkspaces = asyncHandler(async (req, res) => {
   }
 });
 
+// Controller function to get all workspaces that exist in the database
+const getOneWorkspace = asyncHandler(async (req, res) => {
+  try {
+    // Get all existing workspaces and return them to the requestor with a success status
+    const existingWorkspace = await Workspace.findOne({
+      workspaceCode: req.params.workspaceCode,
+    });
+    res.status(200).json({ existingWorkspace });
+  } catch (error) {
+    // Return any errors that occur.
+    const errMessage = error.message;
+    res.status(400).json(errMessage);
+  }
+});
+
 // NOT USED
 const deleteWorkspace = asyncHandler(async (req, res) => {
   try {
@@ -72,9 +87,9 @@ const deleteWorkspace = asyncHandler(async (req, res) => {
       res.status(400);
       throw new Error(
         "User " +
-        req.params.userName +
-        " is not the owner of the Workspace: " +
-        existingWorkspace.workspaceName
+          req.params.userName +
+          " is not the owner of the Workspace: " +
+          existingWorkspace.workspaceName
       );
     }
     const workspaceName = existingWorkspace.workspaceName;
@@ -107,4 +122,5 @@ export {
   getAllWorkspaces,
   deleteWorkspace,
   createWorkspace,
+  getOneWorkspace,
 };

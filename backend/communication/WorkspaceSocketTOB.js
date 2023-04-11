@@ -1,10 +1,7 @@
 import Workspace from "../models/workspaceModel.js";
 import { UpdateQueue } from "../util/updateQueue.js";
 import { updateClients } from "../communication/ToFrontendSocket.js";
-import {
-  broadcastUpdate,
-  getDownedServers,
-} from "../communication/ServerToServerSocket.js";
+import { broadcastUpdate, getDownedServers } from "../communication/ServerToServerSocket.js";
 import mongoose from "mongoose";
 
 const localId = process.env.SERVER_ID;
@@ -102,7 +99,8 @@ async function processServerUpdateMessage(
 function checkServerTimeStamps(updateTimeStamp) {
   for (let i = 0; i < otherIds.length; i++) {
     let downedServers = getDownedServers();
-    if (downedServers.has(otherIds[i])) continue;
+    if (downedServers.has(otherIds[i]))
+      continue;
     if (updateTimeStamp > TS[parseInt(otherIds[i])]) return false;
   }
   return true;

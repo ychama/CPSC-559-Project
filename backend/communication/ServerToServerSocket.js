@@ -23,15 +23,13 @@ const downedServers = new Set();
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
-export const getDownedServers = () => {
-  return downedServers;
-};
+export const getDownedServers = () => { return downedServers; };
 
 const listenForServers = async () => {
   const server = http.createServer();
 
   // overwrite this port when we create the web socket server
-  server.listen(localId, "0.0.0.0", function () {});
+  server.listen(localId, "0.0.0.0", function () { });
 
   // Set up server
   const webSocketServer = new WebSocketServer({
@@ -53,7 +51,8 @@ const listenForServers = async () => {
 
 const connectToOtherServers = async (isDelay) => {
   // Wait for other servers to start
-  if (isDelay) await delay(10000);
+  if (isDelay)
+    await delay(10000);
 
   otherIds.forEach((id) => {
     if (!(id in serverConnections)) {
@@ -132,7 +131,7 @@ async function broadcastUpdate(
   console.log("end broadcastUpdate");
 }
 
-const broadcastMissedMessages = () => {};
+const broadcastMissedMessages = () => { };
 
 function processIncomingMessage(socket, message) {
   try {

@@ -1,6 +1,14 @@
-import { React, useState, useEffect } from "react";
-import { Center, ColorPicker, Stack, TextInput, Title } from "@mantine/core";
+import { React, useState, useEffect, useDebugValue } from "react";
+import {
+  Center,
+  ColorPicker,
+  JsonInput,
+  Stack,
+  TextInput,
+  Title,
+} from "@mantine/core";
 import { getBackendUrl } from "../backendhelpers/proxyHelper.js";
+import { getWorkspace } from "../backendhelpers/workspaceHelper.js";
 
 let websocketUrl = localStorage.getItem("websocketURL");
 
@@ -26,6 +34,18 @@ const SVG = () => {
       setViewBox(newViewBox);
     }
   }, [SVGPaths]);
+
+  useEffect(() => {
+    if (localStorage.getItem("workspaceCode")) {
+      //console.log("sending request with workspace code: " + localStorage.getItem("workspaceCode"));
+      const svg = getWorkspace(localStorage.getItem("workspaceCode"));
+      //console.log("Received paths: " + JSON.stringify(svg.paths));
+      if (svg.paths) {
+        setSVGPaths(svg.paths);
+        localStorage.setItem("paths", JSON.stringify(svg.paths));
+      }
+    }
+  }, []);
 
   // Update the color of the SVG canvas, responds to user clicks and the color selected on the color picker
   const updateColor = (pathId) => {
