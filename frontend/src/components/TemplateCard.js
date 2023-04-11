@@ -56,21 +56,21 @@ const TemplateCard = ({ _id, templateName, paths, groupTransform }) => {
   // Return the Template Card component made up of Mantine components
   return (
     <>
-      <Card shadow="sm" p="lg" radius="md" withBorder>
+      <Card shadow='sm' p='lg' radius='md' withBorder>
         <Card.Section>
           <Image
-            mt="lg"
+            mt='lg'
             src={findImage()}
             height={160}
-            alt="Stock Image"
-            fit="contain"
+            alt='Stock Image'
+            fit='contain'
           />
         </Card.Section>
-        <Text mt="sm" mb="sm" weight={500}>
-          Template Name: {templateName}
+        <Text mt='sm' mb='sm' weight={500}>
+          Template: {templateName}
         </Text>
         <Button
-          shadow="sm"
+          shadow='sm'
           fullWidth
           disabled={false}
           onClick={() => {
@@ -83,7 +83,7 @@ const TemplateCard = ({ _id, templateName, paths, groupTransform }) => {
       <Modal
         opened={opened}
         onClose={() => setOpened(false)}
-        title="Create a Workspace"
+        title='Create a Workspace'
         centered
         overlayColor={
           theme.colorScheme === "dark"
@@ -96,14 +96,14 @@ const TemplateCard = ({ _id, templateName, paths, groupTransform }) => {
         <Image
           src={findImage()}
           height={200}
-          alt="Stock Image"
-          radius="md"
-          fit="contain"
+          alt='Stock Image'
+          radius='md'
+          fit='contain'
         />
         <TextInput
-          mt="xl"
-          placeholder="Workspace #1"
-          label="Workspace Name"
+          mt='xl'
+          placeholder='Workspace #1'
+          label='Workspace Name'
           withAsterisk
           value={workspaceName}
           onChange={(e) => {
@@ -111,7 +111,7 @@ const TemplateCard = ({ _id, templateName, paths, groupTransform }) => {
           }}
           error={error}
         />
-        <Center mt="xl">
+        <Center mt='xl'>
           <Button onClick={onNewWorkspace}>Create Workspace</Button>
         </Center>
       </Modal>
