@@ -56,12 +56,15 @@ const listenForServers = async () => {
   });
 };
 
-const connectToOtherServers = async (isDelay) => {
+const connectToOtherServers = async (isDelay, reconnectID = "") => {
   // Wait for other servers to start
   if (isDelay) await delay(10000);
 
   otherIds.forEach((id) => {
-    if (!(id in serverConnections)) {
+    if (
+      (reconnectID === "" || id === reconnectID) &&
+      !(id in serverConnections)
+    ) {
       // Connect to other servers with a greater Id then this one
       const serverAddress = SERVER_CLIENT_WEBSOCKET_URL.replace(/{}/g, id);
 
@@ -76,7 +79,8 @@ const connectToOtherServers = async (isDelay) => {
         serverConnections[id] = inferiorSocket;
 
         // send local id
-        inferiorSocket.send(`{ "serverId": ${localId} }`);
+        if (reconnectID === "")
+          inferiorSocket.send(`{ "serverId": ${localId} }`);
 
         if (downedServers.has(String(id))) {
           let serverCanvasUpdate = getServerCanvasUpdates(id);
@@ -142,21 +146,6 @@ async function broadcastUpdate(
   for (let id in serverConnections) {
     serverConnections[id].send(jsonUpdate);
   }
-}
-
-async function updateWorkspacePathDB(update) {
-  console.log("Color: ", update["color"]);
-  await Workspace.updateOne(
-    {
-      workspaceCode: update["workSpaceCode"],
-    },
-    { $set: { "paths.$[element].svgFill": update["color"] } },
-    {
-      arrayFilters: [
-        { "element._id": mongoose.Types.ObjectId(update["path_id"]) },
-      ],
-    }
-  );
 }
 
 async function createWorkspace(workspaceInfo) {
@@ -271,12 +260,25 @@ async function processIncomingMessage(socket, message) {
 
       //Apply socket updates
       for (let i = 0; i < canvasUpdates.length; i++) {
-        updateWorkspacePathDB(canvasUpdates[i]);
+        await Workspace.updateOne(
+          {
+            workspaceCode: canvasUpdates[i]["workSpaceCode"],
+          },
+          { $set: { "paths.$[element].svgFill": canvasUpdates[i]["color"] } },
+          {
+            arrayFilters: [
+              {
+                "element._id": mongoose.Types.ObjectId(
+                  canvasUpdates[i]["path_id"]
+                ),
+              },
+            ],
+          }
+        );
       }
     } else if (jsonMsg.hasOwnProperty("serverId")) {
       // This is a server on the client side of the connection telling us what server they are
-      console.log(`Connected to server ${jsonMsg.serverId}`);
-      connectToOtherServers(false);
+      connectToOtherServers(false, String(jsonMsg.serverId));
     } else {
       throw new Error("Unrecognized message received from another server");
     }
