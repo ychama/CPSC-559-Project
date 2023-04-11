@@ -12,6 +12,7 @@ const otherIds = process.env.OTHER_SERVERS.split(",");
 
 // Dictionary that keeps track of all the updates a server has missed
 let serverCanvasUpdates = {};
+let serverHttpUpdates = {};
 
 // logical timestamps for this object
 var TS = Array(otherIds.length + 2).fill(0);
@@ -33,8 +34,26 @@ const getServerCanvasUpdates = (id = -1) => {
   else return serverCanvasUpdates[id];
 };
 
+const setServerHttpUpdates = (newUpdates, id = -1) => {
+  if (id == -1) {
+    serverHttpUpdates = newUpdates;
+    for (const [key, value] of Object.entries(serverHttpUpdates)) {
+      console.log(key, value);
+    }
+  } else serverHttpUpdates[id] = newUpdates;
+};
+
+const getServerHttpUpdates = (id = -1) => {
+  if (id == -1) return serverHttpUpdates;
+  else return serverHttpUpdates[id];
+};
+
 const deleteServerCanvasUpdates = (id) => {
   delete serverCanvasUpdates[id];
+};
+
+const deleteServerHttpUpdates = (id) => {
+  delete serverHttpUpdates[id];
 };
 
 const getTS = () => {
@@ -164,8 +183,11 @@ export {
   processClientUpdateMessage,
   processServerUpdateMessage,
   setServerCanvasUpdates,
+  setServerHttpUpdates,
   getServerCanvasUpdates,
+  getServerHttpUpdates,
   deleteServerCanvasUpdates,
+  deleteServerHttpUpdates,
   getTS,
   setTS,
 };

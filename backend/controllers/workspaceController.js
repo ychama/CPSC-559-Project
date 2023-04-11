@@ -2,6 +2,10 @@ import asyncHandler from "express-async-handler";
 import Workspace from "../models/workspaceModel.js";
 import { v4 as uuidv4 } from "uuid";
 import { postBroadCast } from "../middleware/httpBroadcast.js";
+import {
+  getServerHttpUpdates,
+  setServerHttpUpdates,
+} from "../communication/WorkspaceSocketTOB.js";
 
 // Controller function to create a new workspace
 const createWorkspace = asyncHandler(async (req, res) => {
@@ -24,6 +28,30 @@ const createWorkspace = asyncHandler(async (req, res) => {
       paths: req.body.paths,
       groupTransform: req.body.groupTransform,
     });
+
+    //Store the changes for downed servers
+
+    let update = {
+      workspaceCode: workspaceCode,
+      workspaceName: req.body.workspaceName,
+      workspaceOwner: req.user,
+      paths: req.body.paths,
+      groupTransform: req.body.groupTransform,
+      type: "createWorkspace",
+    };
+
+    let serverHttpUpdates = getServerHttpUpdates();
+
+    for (const [key, value] of Object.entries(serverHttpUpdates)) {
+      let tempUpdates = [...value];
+
+      tempUpdates.push(update);
+
+      serverHttpUpdates[key] = tempUpdates;
+    }
+
+    setServerHttpUpdates(serverHttpUpdates);
+
     // Send the created workspace with a success status to the requestor
     res.status(200).json(newWorkspace);
     req.body.workspaceCode = workspaceCode;
