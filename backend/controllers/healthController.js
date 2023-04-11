@@ -17,7 +17,12 @@ const getHealth = asyncHandler(async (req, res) => {
   } catch (err) {
     // If there is an error, respond to the load balancer specifying that the MongoDB instance is down
     res.status(500).json({ message: "MongoDB failure." }); // internal server error
-    console.log("Error checking MongoDB status:", err);
+    console.log("Error checking MongoDB status: ", err);
+
+    if (process.env.DB_CONNECTED) {
+      console.log("Exiting server...");
+      process.exit(5);
+    }
   }
 });
 

@@ -5,6 +5,7 @@ import {
   createWorkspace,
   getAllWorkspaces,
   getWorkspace,
+  getOneWorkspace,
 } from "../controllers/workspaceController.js";
 
 // Creating an express route for the workspace endpoints using the controller functions and logged in middleware
@@ -14,7 +15,7 @@ const workspaceRoute = express.Router();
 workspaceRoute.get("/", loggedIn, getAllWorkspaces);
 workspaceRoute.post("/", loggedIn, createWorkspace);
 // These two functions require workspaceCode as a parameter as well.
-workspaceRoute.get("/:workspaceCode", loggedIn, getWorkspace);
+workspaceRoute.get("/:workspaceCode", loggedIn, getOneWorkspace);
 // NOT USED
 workspaceRoute.delete("/:workspaceCode", loggedIn, deleteWorkspace);
 

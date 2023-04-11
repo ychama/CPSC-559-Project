@@ -103,28 +103,28 @@ const AccountPage = () => {
   };
   // Return the page components, including the sidebar and user information components
   return (
-    <AppShell navbar={<Sidebar activePage="HOME" />}>
+    <AppShell navbar={<Sidebar activePage='ACCOUNT' />}>
       <Container>
-        <Title order={1} color="br-turq" m="md" align="center">
+        <Title order={1} color='br-turq' m='md' align='center'>
           Hello, {user.userFirstName}!
         </Title>
-        <AspectRatio ratio={1080 / 1080} sx={{ maxWidth: "200px" }} mx="auto">
-          <Image src={logo} alt="logo" />
+        <AspectRatio ratio={1080 / 1080} sx={{ maxWidth: "200px" }} mx='auto'>
+          <Image src={logo} alt='logo' />
         </AspectRatio>
-        <Title order={5} color="black" align="center">
+        <Title order={5} color='black' align='center'>
           Thank you for providing us with your creativity and art! Feel free to
           edit any account information below.
         </Title>
-        <Paper padding="lg" shadow="xs" m="md">
-          <Text align="center" size="xl" weight={700} m="md" pt="md">
+        <Paper padding='lg' shadow='xs' m='md'>
+          <Text align='center' size='xl' weight={700} m='md' pt='md'>
             Account Information
           </Text>
           {edit ? (
             <>
               <TextInput
-                label="First Name"
+                label='First Name'
                 withAsterisk
-                m="md"
+                m='md'
                 value={updates.userFirstName}
                 onChange={(event) => {
                   setUpdates({
@@ -134,9 +134,9 @@ const AccountPage = () => {
                 }}
               />
               <TextInput
-                label="Last Name"
+                label='Last Name'
                 withAsterisk
-                m="md"
+                m='md'
                 value={updates.userLastName}
                 onChange={(event) => {
                   setUpdates({
@@ -146,10 +146,10 @@ const AccountPage = () => {
                 }}
               />
               <TextInput
-                label="Email"
+                label='Email'
                 error={emailError ? "Invalid Email" : ""}
                 withAsterisk
-                m="md"
+                m='md'
                 value={updates.userEmail}
                 onChange={(event) => {
                   //console.log(event.currentTarget.value);
@@ -161,9 +161,9 @@ const AccountPage = () => {
                 }}
               />
               <PasswordInput
-                label="Password"
-                m="md"
-                placeholder="Please enter your new password here."
+                label='Password'
+                m='md'
+                placeholder='Please enter your new password here.'
                 onChange={(event) => {
                   setUpdates({
                     ...updates,
@@ -175,8 +175,8 @@ const AccountPage = () => {
           ) : (
             <>
               <Center>
-                <Table m="md">
-                  <tbody align="center">
+                <Table m='md'>
+                  <tbody align='center'>
                     <tr>
                       <td>
                         <b>Username:</b>
@@ -214,8 +214,8 @@ const AccountPage = () => {
           )}
           <Center>
             <Button
-              m="md"
-              mr="sm"
+              m='md'
+              mr='sm'
               onClick={() => {
                 if (edit) {
                   if (
@@ -250,29 +250,29 @@ const AccountPage = () => {
               {edit ? "Save" : "Edit Information"}
             </Button>
             {edit ? (
-              <Button ml="sm" m="md" color="red" onClick={() => setEdit(!edit)}>
+              <Button ml='sm' m='md' color='red' onClick={() => setEdit(!edit)}>
                 Cancel
               </Button>
             ) : (
               <>
-                <Modal opened={opened} onClose={close} size="lg">
-                  <Title align="center" order={2}>
+                <Modal opened={opened} onClose={close} size='lg'>
+                  <Title align='center' order={2}>
                     Are you sure you want to delete your account?
                   </Title>
-                  <Title align="center" order={4} m="md">
+                  <Title align='center' order={4} m='md'>
                     {
                       //Workspaces that you own will also be removed.
                     }
                     You may not be able to access your art in the future.
                   </Title>
                   <Center>
-                    <Button ml="sm" m="md" color="br-turq" onClick={close}>
+                    <Button ml='sm' m='md' color='br-turq' onClick={close}>
                       Cancel
                     </Button>
                     <Button
-                      ml="sm"
-                      m="md"
-                      color="red"
+                      ml='sm'
+                      m='md'
+                      color='red'
                       onClick={() => {
                         close();
                         deleteUser(user.userName);
@@ -283,7 +283,7 @@ const AccountPage = () => {
                     </Button>
                   </Center>
                 </Modal>
-                <Button ml="sm" m="md" color="red" onClick={open}>
+                <Button ml='sm' m='md' color='red' onClick={open}>
                   Delete Account
                 </Button>
               </>

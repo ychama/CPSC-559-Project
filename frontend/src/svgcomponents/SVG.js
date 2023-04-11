@@ -1,6 +1,15 @@
-import { React, useState, useEffect } from "react";
-import { Center, ColorPicker, Stack, TextInput, Title } from "@mantine/core";
+import { React, useState, useEffect, useDebugValue } from "react";
+import {
+  Card,
+  Center,
+  ColorPicker,
+  JsonInput,
+  Stack,
+  TextInput,
+  Title,
+} from "@mantine/core";
 import { getBackendUrl } from "../backendhelpers/proxyHelper.js";
+import { getWorkspace } from "../backendhelpers/workspaceHelper.js";
 
 let websocketUrl = localStorage.getItem("websocketURL");
 
@@ -26,6 +35,18 @@ const SVG = () => {
       setViewBox(newViewBox);
     }
   }, [SVGPaths]);
+
+  useEffect(() => {
+    if (localStorage.getItem("workspaceCode")) {
+      //console.log("sending request with workspace code: " + localStorage.getItem("workspaceCode"));
+      const svg = getWorkspace(localStorage.getItem("workspaceCode"));
+      //console.log("Received paths: " + JSON.stringify(svg.paths));
+      if (svg.paths) {
+        setSVGPaths(svg.paths);
+        localStorage.setItem("paths", JSON.stringify(svg.paths));
+      }
+    }
+  }, []);
 
   // Update the color of the SVG canvas, responds to user clicks and the color selected on the color picker
   const updateColor = (pathId) => {
@@ -135,25 +156,25 @@ const SVG = () => {
   return (
     // Return the SVG component generated dynamically from the SVG paths in the selected canvas
     <>
-      <Stack direction="column" spacing="md">
+      <Stack direction='column' spacing='md'>
         <Center>
-          <Title order={1} color="br-turq">
+          <Title order={1} color='br-turq'>
             {SVGTitleName}
           </Title>
         </Center>
         <svg
-          width="500.70076"
-          height="550.7067066666666"
-          xmlns="http://www.w3.org/2000/svg"
+          width='500.70076'
+          height='550.7067066666666'
+          xmlns='http://www.w3.org/2000/svg'
           viewBox={viewBox}
         >
           <g
-            id="layer1"
-            inkscapelabel="Calque 1"
-            inkscapegroupmode="layer"
+            id='layer1'
+            inkscapelabel='Calque 1'
+            inkscapegroupmode='layer'
             //transform={groupTransform}
           >
-            <g id="g3020">
+            <g id='g3020'>
               {SVGPaths.map((path, index) => {
                 return (
                   // Map each SVG path to an SVG Path element in the virtual DOM for react to render
@@ -162,7 +183,7 @@ const SVG = () => {
                     strokeWidth={path.svgStrokeWidth}
                     strokeMiterlimit={path.svgStrokeMiterLimit}
                     d={path.svgD}
-                    stroke="#000000"
+                    stroke='#000000'
                     transform={path.svgTransform}
                     onClick={() => {
                       updateColor(path._id);
@@ -174,18 +195,19 @@ const SVG = () => {
             </g>
           </g>
         </svg>
+
         <Center>
           <ColorPicker
-            format="hex"
+            format='hex'
             value={currentColor}
             onChange={setCurrentColor}
           />
         </Center>
-        <Center mt="sm">
+        <Center mt='sm'>
           <TextInput
-            placeholder="#FFFFFF"
+            placeholder='#FFFFFF'
             value={currentColor}
-            label="Current color"
+            label='Current color'
             onChange={(e) => setCurrentColor(e.target.value)}
           ></TextInput>
         </Center>

@@ -25,12 +25,15 @@ export const getAllWorkspaces = async () => {
 export const getWorkspace = async (code) => {
   // Create HTTP GET Request using the workspace code in the request URL, use the user authentication token stored in local storage to authorize the request
   // Also use the current backend URL stored in local storage to send a request to the currently connected server.
+
+  //console.log("sent request with code: " + code);
   let httpRequest = async () => {
     const response = await instance.get(
       localStorage.getItem("backendURL") + "/workspaces/" + code,
       { headers: { Authorization: "Bearer " + localStorage.getItem("token") } }
     );
-    return response.data;
+    //console.log("Received response: " + JSON.stringify(response));
+    return response.data.existingWorkspace;
   };
   // Use the retry function to run the request several times, using a different backend URL each time (in case of failure)
   return retry(httpRequest);

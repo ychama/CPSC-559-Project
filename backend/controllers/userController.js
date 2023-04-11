@@ -10,6 +10,11 @@ import {
   deleteBroadCast,
 } from "../middleware/httpBroadcast.js";
 
+import {
+  getServerHttpUpdates,
+  setServerHttpUpdates,
+} from "../communication/WorkspaceSocketTOB.js";
+
 const { SECRET = "secret" } = process.env;
 
 // USER CONTROLLER
@@ -43,6 +48,28 @@ const createUser = asyncHandler(async (req, res) => {
         userFirstName: req.body.userFirstName,
         userLastName: req.body.userLastName,
       });
+
+      let update = {
+        userName: req.body.userName,
+        userEmail: req.body.userEmail,
+        userPassword: hashedPassword,
+        userFirstName: req.body.userFirstName,
+        userLastName: req.body.userLastName,
+        type: "createUser",
+      };
+
+      let serverHttpUpdates = getServerHttpUpdates();
+
+      for (const [key, value] of Object.entries(serverHttpUpdates)) {
+        let tempUpdates = [...value];
+
+        tempUpdates.push(update);
+
+        serverHttpUpdates[key] = tempUpdates;
+      }
+
+      setServerHttpUpdates(serverHttpUpdates);
+
       // After successful creation of the user document, get a JSON Web Token for the created user for authentication
       const token = jwt.sign({ userName: newUser.userName }, SECRET);
       // Persistent cookie settings
@@ -80,6 +107,24 @@ const deleteUser = asyncHandler(async (req, res) => {
     }
     // If it exists, remove it and return a success message
     await existingUser.remove();
+
+    let update = {
+      userName: req.params.userName,
+      type: "deleteUser",
+    };
+
+    let serverHttpUpdates = getServerHttpUpdates();
+
+    for (const [key, value] of Object.entries(serverHttpUpdates)) {
+      let tempUpdates = [...value];
+
+      tempUpdates.push(update);
+
+      serverHttpUpdates[key] = tempUpdates;
+    }
+
+    setServerHttpUpdates(serverHttpUpdates);
+
     res.status(200).json({
       message: "Removed user account with username: " + req.params.userName,
     });
@@ -89,6 +134,7 @@ const deleteUser = asyncHandler(async (req, res) => {
         "\n\nHERE IS THE REQ HEADERS: " +
           JSON.stringify(req.headers.authorization)
       );
+
       deleteBroadCast(
         `/users/${req.params.userName}/`,
         {},
@@ -198,6 +244,24 @@ const updateUser = asyncHandler(async (req, res) => {
       const updatedUser = await User.findByIdAndUpdate(user._id, request, {
         new: true,
       });
+
+      let update = {
+        user_id: user._id,
+        request: request,
+        type: "updateUser",
+      };
+
+      let serverHttpUpdates = getServerHttpUpdates();
+
+      for (const [key, value] of Object.entries(serverHttpUpdates)) {
+        let tempUpdates = [...value];
+
+        tempUpdates.push(update);
+
+        serverHttpUpdates[key] = tempUpdates;
+      }
+
+      setServerHttpUpdates(serverHttpUpdates);
       //      const response = Workspace.updateMany(
       //        { workspaceOwner: userName },
       //        { $set: { workspaceOwner: updatedUser.userName } }

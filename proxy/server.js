@@ -10,6 +10,8 @@ import axios from "axios";
 
 // This process is replicated as can be seen in the docker-compose.yml for the project.
 
+setTimeout(() => {}, 3000);
+
 // keep constant URL strings for checking health and directing users to available servers (using both HTTP and web socket "connections").
 const SERVER_CLIENT_BASE_URL = "http://localhost:500{}/api";
 const SERVER_CLIENT_WEBSOCKET_URL = "ws://localhost:700{}";
@@ -66,6 +68,13 @@ const healthCheck = async () => {
       .catch((err) => {
         // If there is an error (timeout, connection refused, etc...), remove the server from the set of available servers and add it to the set of offline servers (users will not be directed to it)
         console.log("Server " + serverID + " is down");
+        if (currentServer === serverID) {
+          // If it is not available, change the current primary server
+          // always picking the lowest available server id for new HTTP primary server
+          let TEMP_AVAILABLE_SERVERS = [...AVAILABLE_SERVERS];
+          TEMP_AVAILABLE_SERVERS.sort();
+          currentServer = TEMP_AVAILABLE_SERVERS[0];
+        }
         AVAILABLE_SERVERS.delete(serverID);
         OFFLINE_SERVERS.add(serverID);
       });
@@ -73,6 +82,7 @@ const healthCheck = async () => {
   // Log available/offline servers
   console.log("AVAILABLE_SERVERS", AVAILABLE_SERVERS);
   console.log("OFFLINE_SERVERS", OFFLINE_SERVERS);
+  console.log("CURRENT HTTP PRIMARY: ", currentServer);
 };
 
 const port = 4000;
@@ -118,6 +128,5 @@ app.route("/api/server").get((req, res) => {
 // Start server and listen for requests
 app.listen(port, () => {
   console.log("Server started on port " + port);
-
   setInterval(healthCheck, 5000);
 });

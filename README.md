@@ -1,156 +1,34 @@
 # CPSC-559-Project
 
+## Application Description
+
+![System Architecture](images/architecture.png)
+
+- [Frontend](frontend/README-FRONTEND.md)
+- [Proxy](proxy/README-PROXY.md)
+- [Backend](backend/README-SERVER.md)
+
 ## How To Run
 
 1. Install Docker Desktop and docker-compose
 1. Clone this repo
 1. go to `docker-compose.yml` and modify the values as needed (environments variables, ports, etc.)
 1. Run `docker-compose up --build -d`
-   - The backend is started and exposed on port `5000`
-   - The frontend is started and exposed on port `3000`
-   - A MongoDB container (`database` service) is started that is exposed on port `27017`. Data is stored on the `mongo-data` volume (on your machine's filesystem)
-   - A Mongo Express container is started that is exposed on port `8081`
+   - The backends start and are exposed on ports `5001`-`5004`
+   - The frontend is started and exposed on port `3001`
+   - MongoDB containers (`database` services) start and are exposed on port `27017`. Data is stored on the `mongo-data` volume (on your machine's filesystem)
+   - Mongo Express containers start and are exposed on port `8081`-`8084`
    - Run `docker-compose down` to bring down all the containers
-1. Go to the mongo-express service (`localhost:8081`) to manage the MongoDB database and add SVGs using their JSON representation (sunflower/ironma/spiderman) as well as workspaces.
+1. Go to the mongo-express services (`localhost:8081`-`localhost:8084`) to manage the MongoDB databases and add SVGs using their JSON representation (sunflower/ironma/spiderman) as well as workspaces. The templates below have to be inserted through the mongo-express services to be accessed by all servers in the system (copy the templates into each template test collection). For a sample workspace, paste the sample sunflower workspace in the workspace test collection.
 
 ### Deployment
 
-In order to test the system in a realistic environment ngrok is used to expose the ports of each of the backend instances that ngrok communicates with. Because the Ngrok Urls are tied to one device a separate Ngrok branch exists to expose the ports. When live, the develop branch is designed to be only be accessed by local clients
+In order to test the system in a realistic environment ngrok is used to expose the ports of each of the backend instances that ngrok communicates with. Because the Ngrok Urls are tied to one device a separate Ngrok branch exists to expose the ports. When live, the develop branch is designed to be only be accessed by local clients. The ngrok functionality requires authentication details, so we recommend testing the system locally with Docker and viewing the functionality of different processes in the container.
 
-## Sample SVG Template 
+### Application Screenshot
 
-```
-sunflower SVG
+![Screenshot](images/home.png)
 
-{
-   "_id": ObjectID(),
-   "templateName":"flower1",
-   "paths":[
-      {
-         "svgStrokeWidth":"0.39355",
-         "svgStrokeMiterLimit":"2",
-         "svgD":"m393.15 488.97c0 14.938-8.8643 27.047-19.799 27.047s-19.799-12.109-19.799-27.047 8.8643-27.047 19.799-27.047 19.799 12.109 19.799 27.047z",
-         "svgTransform":"matrix(4.171,0,0,4.171,-1189.9,-1622.6)",
-         "svgFill":"#4612c9",
-         "_id": ObjectID()
-      },
-      {
-         "svgStrokeWidth":"0.39355",
-         "svgStrokeMiterLimit":"2",
-         "svgD":"m393.15 488.97c0 14.938-8.8643 27.047-19.799 27.047s-19.799-12.109-19.799-27.047 8.8643-27.047 19.799-27.047 19.799 12.109 19.799 27.047z",
-         "svgTransform":"matrix(1.9267,-3.6993,3.6993,1.9267,-2300.4,940)",
-         "svgFill":"#4612c9",
-         "_id": ObjectID()
-      },
-      {
-         "svgStrokeWidth":"0.39355",
-         "svgStrokeMiterLimit":"2",
-         "svgD":"m393.15 488.97c0 14.938-8.8643 27.047-19.799 27.047s-19.799-12.109-19.799-27.047 8.8643-27.047 19.799-27.047 19.799 12.109 19.799 27.047z",
-         "svgTransform":"matrix(-2.2819,-3.4915,3.4915,-2.2819,-619.15,3078.5)",
-         "svgFill":"#4612c9",
-         "_id": ObjectID()
-      },
-      {
-         "svgStrokeWidth":"0.39355",
-         "svgStrokeMiterLimit":"2",
-         "svgD":"m393.15 488.97c0 14.938-8.8643 27.047-19.799 27.047s-19.799-12.109-19.799-27.047 8.8643-27.047 19.799-27.047 19.799 12.109 19.799 27.047z",
-         "svgTransform":"matrix(-4.168 .15789 -.15789 -4.168 2006.7 2709.8)",
-         "svgFill":"#4612c9",
-         "_id": ObjectID()
-      },
-      {
-         "svgStrokeWidth":"0.39355",
-         "svgStrokeMiterLimit":"2",
-         "svgD":"m393.15 488.97c0 14.938-8.8643 27.047-19.799 27.047s-19.799-12.109-19.799-27.047 8.8643-27.047 19.799-27.047 19.799 12.109 19.799 27.047z",
-         "svgTransform":"matrix(1.8201,3.7529,-3.7529,1.8201,1664.3,-1785.7)",
-         "svgFill":"#4612c9",
-         "_id": ObjectID()
-      },
-      {
-         "svgStrokeWidth":"0.39355",
-         "svgStrokeMiterLimit":"2",
-         "svgD":"m393.15 488.97c0 14.938-8.8643 27.047-19.799 27.047s-19.799-12.109-19.799-27.047 8.8643-27.047 19.799-27.047 19.799 12.109 19.799 27.047z",
-         "svgTransform":"matrix(-2.1332,3.5842,-3.5842,-2.1332,3051.5,358.96)",
-         "svgFill":"#4612c9",
-         "_id": ObjectID()
-      },
-      {
-         "svgStrokeWidth":"0.39355",
-         "svgStrokeMiterLimit":"2",
-         "svgD":"m388.2 491.45c0 7.7128-6.2525 13.965-13.965 13.965-7.7129 0-13.965-6.2525-13.965-13.965 0-7.7129 6.2525-13.965 13.965-13.965 7.7128 0 13.965 6.2525 13.965 13.965z",
-         "svgTransform":"matrix(7.6546,0,0,7.6546,-2501.9,-3188.1)",
-         "svgFill":"#c21111",
-         "_id": ObjectID()
-      }
-   ],
-   "groupTransform":"translate(-119.87 -303.28)"
-}
+## Sample SVG Templates
 
-default workspace
-
-{
-    _id: ObjectId(),
-    workspaceCode: '1',
-    workspaceName: 'Default Workspace',
-    workspaceOwner: 'default',
-    groupTransform: 'translate(-119.87 -303.28)',
-    paths: [
-        {
-            svgStrokeWidth: '0.39355',
-            svgStrokeMiterLimit: '2',
-            svgD: 'm393.15 488.97c0 14.938-8.8643 27.047-19.799 27.047s-19.799-12.109-19.799-27.047 8.8643-27.047 19.799-27.047 19.799 12.109 19.799 27.047z',
-            svgTransform: 'matrix(4.171,0,0,4.171,-1189.9,-1622.6)',
-            svgFill: '#130dd1',
-            _id: ObjectId('64077ad771da60f184244b1a')
-        },
-        {
-            svgStrokeWidth: '0.39355',
-            svgStrokeMiterLimit: '2',
-            svgD: 'm393.15 488.97c0 14.938-8.8643 27.047-19.799 27.047s-19.799-12.109-19.799-27.047 8.8643-27.047 19.799-27.047 19.799 12.109 19.799 27.047z',
-            svgTransform: 'matrix(1.9267,-3.6993,3.6993,1.9267,-2300.4,940)',
-            svgFill: '#130dd1',
-            _id: ObjectId('64077ad771da60f184244b1b')
-        },
-        {
-            svgStrokeWidth: '0.39355',
-            svgStrokeMiterLimit: '2',
-            svgD: 'm393.15 488.97c0 14.938-8.8643 27.047-19.799 27.047s-19.799-12.109-19.799-27.047 8.8643-27.047 19.799-27.047 19.799 12.109 19.799 27.047z',
-            svgTransform: 'matrix(-2.2819,-3.4915,3.4915,-2.2819,-619.15,3078.5)',
-            svgFill: '#130dd1',
-            _id: ObjectId('64077ad771da60f184244b1c')
-        },
-        {
-            svgStrokeWidth: '0.39355',
-            svgStrokeMiterLimit: '2',
-            svgD: 'm393.15 488.97c0 14.938-8.8643 27.047-19.799 27.047s-19.799-12.109-19.799-27.047 8.8643-27.047 19.799-27.047 19.799 12.109 19.799 27.047z',
-            svgTransform: 'matrix(-4.168 .15789 -.15789 -4.168 2006.7 2709.8)',
-            svgFill: '#130dd1',
-            _id: ObjectId('64077ad771da60f184244b1d')
-        },
-        {
-            svgStrokeWidth: '0.39355',
-            svgStrokeMiterLimit: '2',
-            svgD: 'm393.15 488.97c0 14.938-8.8643 27.047-19.799 27.047s-19.799-12.109-19.799-27.047 8.8643-27.047 19.799-27.047 19.799 12.109 19.799 27.047z',
-            svgTransform: 'matrix(1.8201,3.7529,-3.7529,1.8201,1664.3,-1785.7)',
-            svgFill: '#130dd1',
-            _id: ObjectId('64077ad771da60f184244b1e')
-        },
-        {
-            svgStrokeWidth: '0.39355',
-            svgStrokeMiterLimit: '2',
-            svgD: 'm393.15 488.97c0 14.938-8.8643 27.047-19.799 27.047s-19.799-12.109-19.799-27.047 8.8643-27.047 19.799-27.047 19.799 12.109 19.799 27.047z',
-            svgTransform: 'matrix(-2.1332,3.5842,-3.5842,-2.1332,3051.5,358.96)',
-            svgFill: '#130dd1',
-            _id: ObjectId('64077ad771da60f184244b1f')
-        },
-        {
-            svgStrokeWidth: '0.39355',
-            svgStrokeMiterLimit: '2',
-            svgD: 'm388.2 491.45c0 7.7128-6.2525 13.965-13.965 13.965-7.7129 0-13.965-6.2525-13.965-13.965 0-7.7129 6.2525-13.965 13.965-13.965 7.7128 0 13.965 6.2525 13.965 13.965z',
-            svgTransform: 'matrix(7.6546,0,0,7.6546,-2501.9,-3188.1)',
-            svgFill: '#d1d10d',
-            _id: ObjectId('64077ad771da60f184244b20')
-        }
-    ]
-}
-```
+Sample Templates can be seen in the `templates` directory. These documents can be manually added into the MongoDB databases. It is expected that a system administrator would do this as part of the setup of this application.

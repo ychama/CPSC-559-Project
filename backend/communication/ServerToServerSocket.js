@@ -1,7 +1,19 @@
 import http from "http";
+import Workspace from "../models/workspaceModel.js";
+import User from "../models/userModel.js";
+import mongoose from "mongoose";
 import { WebSocketServer, WebSocket } from "ws";
 import { processServerUpdateMessage } from "../communication/WorkspaceSocketTOB.js";
-
+import {
+  setServerCanvasUpdates,
+  setServerHttpUpdates,
+  getServerCanvasUpdates,
+  getServerHttpUpdates,
+  deleteServerCanvasUpdates,
+  deleteServerHttpUpdates,
+  getTS,
+  setTS,
+} from "./WorkspaceSocketTOB.js";
 const SERVER_CLIENT_WEBSOCKET_URL = "ws://backend{}:600{}";
 const PORT_TEMPLATE = "600{}";
 
@@ -15,13 +27,16 @@ const downedServers = new Set();
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
-export const getDownedServers = () => { return downedServers; };
+// Get list of servers that have crashed.
+export const getDownedServers = () => {
+  return downedServers;
+};
 
 const listenForServers = async () => {
   const server = http.createServer();
 
   // overwrite this port when we create the web socket server
-  server.listen(localId, "0.0.0.0", function () { });
+  server.listen(localId, "0.0.0.0", function () {});
 
   // Set up server
   const webSocketServer = new WebSocketServer({
@@ -43,8 +58,7 @@ const listenForServers = async () => {
 
 const connectToOtherServers = async (isDelay) => {
   // Wait for other servers to start
-  if (isDelay)
-    await delay(10000);
+  if (isDelay) await delay(10000);
 
   otherIds.forEach((id) => {
     if (!(id in serverConnections)) {
@@ -58,13 +72,32 @@ const connectToOtherServers = async (isDelay) => {
       inferiorSocket.addEventListener("open", function (event) {
         console.log(`Connected to server ${id}`);
 
+        // store connection
+        serverConnections[id] = inferiorSocket;
+
         // send local id
         inferiorSocket.send(`{ "serverId": ${localId} }`);
 
-        downedServers.delete(id);
+        if (downedServers.has(String(id))) {
+          let serverCanvasUpdate = getServerCanvasUpdates(id);
+          let serverHttpUpdate = getServerHttpUpdates(id);
 
-        // store connection
-        serverConnections[id] = inferiorSocket;
+          deleteServerCanvasUpdates(id);
+          deleteServerHttpUpdates(id);
+
+          let message = {
+            canvasUpdates: serverCanvasUpdate,
+            httpUpdates: serverHttpUpdate,
+            TS: getTS(),
+            otherCanvasUpdates: getServerCanvasUpdates(-1),
+            otherHttpUpdates: getServerHttpUpdates(-1),
+          };
+
+          setTimeout(() => {
+            serverConnections[String(id)].send(JSON.stringify(message));
+          }, 1000);
+        }
+        downedServers.delete(id);
       });
 
       inferiorSocket.addEventListener("close", function (event) {
@@ -72,10 +105,11 @@ const connectToOtherServers = async (isDelay) => {
 
         delete serverConnections[id];
 
-        console.log(
-          "---------------------> server is down",
-          downedServers
-        );
+        setServerCanvasUpdates([], id);
+
+        setServerHttpUpdates([], id);
+
+        console.log("---------------------> server is down", downedServers);
       });
 
       // receive message
@@ -86,6 +120,8 @@ const connectToOtherServers = async (isDelay) => {
   });
 };
 
+// Broadcasting update to all other servers in the system, this is done to adhere to the push protocol
+
 async function broadcastUpdate(
   timeStamp,
   workspaceCode,
@@ -93,7 +129,6 @@ async function broadcastUpdate(
   color,
   isAck
 ) {
-  console.log("start broadcastUpdate");
   const update = {
     serverId: parseInt(localId),
     timeStamp: timeStamp,
@@ -107,10 +142,86 @@ async function broadcastUpdate(
   for (let id in serverConnections) {
     serverConnections[id].send(jsonUpdate);
   }
-  console.log("end broadcastUpdate");
 }
 
-function processIncomingMessage(socket, message) {
+async function updateWorkspacePathDB(update) {
+  console.log("Color: ", update["color"]);
+  await Workspace.updateOne(
+    {
+      workspaceCode: update["workSpaceCode"],
+    },
+    { $set: { "paths.$[element].svgFill": update["color"] } },
+    {
+      arrayFilters: [
+        { "element._id": mongoose.Types.ObjectId(update["path_id"]) },
+      ],
+    }
+  );
+}
+
+async function createWorkspace(workspaceInfo) {
+  delete workspaceInfo["type"];
+
+  try {
+    const newWorkspace = await Workspace.create(workspaceInfo);
+  } catch (err) {
+    console.log(
+      "An error has occured while creating a workspace, after a server has recorvered with the following error ",
+      err
+    );
+  }
+}
+
+async function createUser(userInfo) {
+  delete userInfo["type"];
+
+  try {
+    const newUser = await Workspace.create(userInfo);
+  } catch (err) {
+    console.log(
+      "An error has occured while creating a user, after a server has recorvered with the following error ",
+      err
+    );
+  }
+}
+
+async function deleteUser(userInfo) {
+  delete userInfo["type"];
+
+  try {
+    const existingUser = await User.findOne(userInfo);
+
+    if (existingUser) {
+      await existingUser.remove();
+    }
+  } catch (err) {
+    console.log(
+      "An error has occured while deleting a user, after a server has recorvered with the following error ",
+      err
+    );
+  }
+}
+
+async function updateUser(userInfo) {
+  delete userInfo["type"];
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      userInfo["user_id"],
+      userInfo["request"],
+      {
+        new: true,
+      }
+    );
+  } catch (err) {
+    console.log(
+      "An error has occured while updating a user, after a server has recorvered with the following error ",
+      err
+    );
+  }
+}
+
+async function processIncomingMessage(socket, message) {
   try {
     const jsonMsg = JSON.parse(message);
 
@@ -130,6 +241,38 @@ function processIncomingMessage(socket, message) {
         jsonMsg["timeStamp"],
         jsonMsg["isAck"]
       );
+    } else if (
+      jsonMsg.hasOwnProperty("canvasUpdates") ||
+      jsonMsg.hasOwnProperty("httpUpdates")
+    ) {
+      //Manually apply these updates
+
+      let canvasUpdates = jsonMsg["canvasUpdates"];
+      let httpUpdates = jsonMsg["httpUpdates"];
+
+      setTS(jsonMsg["TS"]);
+      setServerCanvasUpdates(jsonMsg["otherCanvasUpdates"], -1);
+
+      setServerHttpUpdates(jsonMsg["otherHttpUpdates"], -1);
+
+      //We first want to apply all the HTTP updates then apply socket updates
+
+      for (let i = 0; i < httpUpdates.length; i++) {
+        if (httpUpdates[i]["type"] === "createWorkspace") {
+          createWorkspace(httpUpdates[i]);
+        } else if (httpUpdates[i]["type"] === "createUser") {
+          createUser(httpUpdates[i]);
+        } else if (httpUpdates[i]["type"] === "deleteUser") {
+          deleteUser(httpUpdates[i]);
+        } else if (httpUpdates[i]["type"] === "updateUser") {
+          updateUser(httpUpdates[i]);
+        }
+      }
+
+      //Apply socket updates
+      for (let i = 0; i < canvasUpdates.length; i++) {
+        updateWorkspacePathDB(canvasUpdates[i]);
+      }
     } else if (jsonMsg.hasOwnProperty("serverId")) {
       // This is a server on the client side of the connection telling us what server they are
       console.log(`Connected to server ${jsonMsg.serverId}`);
