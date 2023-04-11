@@ -136,7 +136,7 @@ async function broadcastUpdate(
 
 async function updateWorkspacePathDB(update) {
   try {
-    await Workspace.updateOne(
+    await Workspace.findOneAndUpdate(
       {
         workspaceCode: update["workSpaceCode"],
       },
