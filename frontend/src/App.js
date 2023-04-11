@@ -40,6 +40,16 @@ function App() {
               },
             },
           }),
+          components: {
+            Navbar: {
+              styles: (theme) => ({
+                root: {
+                  backgroundColor: theme.colors["br-green"][6],
+                  borderColor: theme.colors["br-green"][6],
+                },
+              }),
+            },
+          },
           colors: {
             "br-black": [
               "#FFFFFF",
@@ -108,13 +118,13 @@ function App() {
       >
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<LoginPage />} />
-            <Route path="signup" element={<SignUpPage />} />
-            <Route path="home" element={<HomePage />} />
-            <Route path="canvas" element={<CanvasPage />} />
-            <Route path="gallery" element={<GalleryPage />} />
-            <Route path="create" element={<CreatePage />} />
-            <Route path="account" element={<AccountPage />} />
+            <Route path='/' element={<LoginPage />} />
+            <Route path='signup' element={<SignUpPage />} />
+            <Route path='home' element={<HomePage />} />
+            <Route path='canvas' element={<CanvasPage />} />
+            <Route path='gallery' element={<GalleryPage />} />
+            <Route path='create' element={<CreatePage />} />
+            <Route path='account' element={<AccountPage />} />
           </Routes>
         </BrowserRouter>
       </MantineProvider>

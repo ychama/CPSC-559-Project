@@ -15,6 +15,8 @@ import {
   Drawer,
   Burger,
   Center,
+  AspectRatio,
+  Image,
 } from "@mantine/core";
 import {
   IconHome2,
@@ -24,6 +26,7 @@ import {
   IconPhotoSearch,
 } from "@tabler/icons";
 import "../styles/Sidebar.css";
+import logo from "../images/logo.png";
 
 /**
  * Sidebar for the application, Component is reused in several pages when the user is logged in.
@@ -65,7 +68,7 @@ const Sidebar = (props) => {
   return (
     <>
       <Burger
-        className="burger"
+        className='burger'
         color={theme.colors["br-black"][7]}
         opened={drawerOpened}
         onClick={() => setDrawerOpened((open) => !open)}
@@ -75,63 +78,62 @@ const Sidebar = (props) => {
         withCloseButton={false}
         onClose={() => setDrawerOpened((o) => !o)}
       >
-        <Navbar p="xs" className="sidebar">
+        <Navbar p='xs'>
           <Navbar.Section>
             <Burger onClick={() => setDrawerOpened((o) => !o)} />
-            <Space h="lg" />
-            <Center>
-              <Title color="white">Bob Ross Together</Title>
-            </Center>
+            <Space h='lg' />
           </Navbar.Section>
-          <Navbar.Section grow mt="md">
+          <Navbar.Section>
+            <AspectRatio
+              ratio={1080 / 1080}
+              sx={{ maxWidth: "150px" }}
+              mx='auto'
+            >
+              <Image src={logo} alt='logo' />
+            </AspectRatio>
+            <Center>
+              <Title color='white' order={2}>
+                Bob Ross
+              </Title>
+            </Center>
+            <Center>
+              <Title color='white' order={1}>
+                Together
+              </Title>
+            </Center>
+            <Space h='lg' />
+          </Navbar.Section>
+          <Navbar.Section grow mt='md'>
             {!user.isAdmin ? ( // only render the button if user.isAdmin is false
               <Button
-                variant="subtle"
+                variant='subtle'
                 leftIcon={<IconHome2 size={50} />}
-                size="xl"
+                size='xl'
                 color={activePage === "HOME" ? "br-black" : "br-white"}
                 onClick={() => {
                   navigate("/home");
                 }}
                 fullWidth
-                className="button"
+                className='button'
               >
                 HOME
               </Button>
             ) : null}
             {!user.isAdmin ? (
               <>
-                <Space h="xl" />
+                <Space h='xl' />
                 <Button
-                  variant="subtle"
+                  variant='subtle'
                   leftIcon={<IconPhotoSearch size={50} />}
-                  size="xl"
+                  size='xl'
                   color={activePage === "CREATE" ? "br-black" : "br-white"}
                   onClick={() => {
                     navigate("/create");
                   }}
                   fullWidth
-                  className="button"
+                  className='button'
                 >
                   CREATE
-                </Button>
-              </>
-            ) : null}
-            {!user.isAdmin ? (
-              <>
-                <Space h="xl" />
-                <Button
-                  variant="subtle"
-                  leftIcon={<IconBrush size={50} />}
-                  size="xl"
-                  color={activePage === "GALLERY" ? "br-black" : "br-white"}
-                  onClick={() => {
-                    navigate("/gallery");
-                  }}
-                  fullWidth
-                  className="button"
-                >
-                  GALLERY
                 </Button>
               </>
             ) : null}
@@ -164,14 +166,12 @@ const Sidebar = (props) => {
                   }}
                 >
                   <Group>
-                    <Avatar radius="xl" />
+                    <Avatar radius='xl' />
                     <Box sx={{ flex: 1 }}>
-                      <Text size="sm" weight={500}>
-                        {/* {"@" + user.username} */}
+                      <Text size='sm' weight={500}>
                         {"@" + user.userName}
                       </Text>
-                      <Text color="white" size="xs">
-                        {/* {user.firstName + " " + user.lastName} */}
+                      <Text color='white' size='xs'>
                         {user.userFirstName + " " + user.userLastName}
                       </Text>
                     </Box>
@@ -184,7 +184,7 @@ const Sidebar = (props) => {
                   </Group>
                 </UnstyledButton>
               ) : null}
-              <Space h="sm" />
+              <Space h='sm' />
               <Center>
                 <Button
                   sx={{
@@ -200,7 +200,7 @@ const Sidebar = (props) => {
                     localStorage.removeItem("userName");
                     localStorage.removeItem("paths");
                   }}
-                  className="button-red"
+                  className='button-red'
                 >
                   Logout
                 </Button>

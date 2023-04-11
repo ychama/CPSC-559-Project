@@ -221,7 +221,7 @@ async function updateUser(userInfo) {
   }
 }
 
-function processIncomingMessage(socket, message) {
+async function processIncomingMessage(socket, message) {
   try {
     const jsonMsg = JSON.parse(message);
 

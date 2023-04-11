@@ -89,51 +89,51 @@ const LoginPage = () => {
     <>
       <Header
         height={70}
-        p="md"
-        className="header"
+        p='md'
+        className='header'
         sx={{ backgroundColor: theme.colors["br-turq"][6] }}
       >
-        <Title order={1} color="br-white" ta="left">
+        <Title order={1} color='br-white' ta='left'>
           Bob Ross Together
         </Title>
       </Header>
-      <Space h="lg" />
-      <AspectRatio ratio={1080 / 1080} sx={{ maxWidth: "200px" }} mx="auto">
-        <Image src={logo} alt="logo" />
+      <Space h='lg' />
+      <AspectRatio ratio={1080 / 1080} sx={{ maxWidth: "200px" }} mx='auto'>
+        <Image src={logo} alt='logo' />
       </AspectRatio>
       <Center>
-        <Title order={1} color="br-turq">
+        <Title order={1} color='br-turq'>
           Bob Ross Together
         </Title>
       </Center>
-      <Space h="xl" />
+      <Space h='xl' />
       <MediaQuery
-        query="(max-width: 500px) and (min-width: 200px)"
+        query='(max-width: 500px) and (min-width: 200px)'
         styles={{ paddingLeft: "30px", paddingRight: "30px", height: "100vh" }}
       >
-        <Box sx={{ maxWidth: 400 }} mx="auto">
+        <Box sx={{ maxWidth: 400 }} mx='auto'>
           <form onSubmit={loginForm.onSubmit((values) => handleSignIn(values))}>
             <TextInput
               withAsterisk
-              label="Username"
-              placeholder="johnsmith"
+              label='Username'
+              placeholder='johnsmith'
               {...loginForm.getInputProps("username")}
             />
-            <Space h="lg" />
+            <Space h='lg' />
             <PasswordInput
               withAsterisk
-              label="Password"
-              placeholder="Password"
+              label='Password'
+              placeholder='Password'
               {...loginForm.getInputProps("password")}
             />
-            <Space h="xl" />
-            <Space h="xl" />
-            <Stack spacing="xl">
-              <Button type="submit">LOGIN</Button>
+            <Space h='xl' />
+            <Space h='xl' />
+            <Stack spacing='xl'>
+              <Button type='submit'>LOGIN</Button>
             </Stack>
           </form>
-          <Space h="sm" />
-          <Stack spacing="xl">
+          <Space h='sm' />
+          <Stack spacing='xl'>
             <Button onClick={() => navigate("/signup")}>SIGN UP</Button>
           </Stack>
         </Box>
