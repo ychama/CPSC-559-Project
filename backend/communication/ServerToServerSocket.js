@@ -6,10 +6,10 @@ import { processServerUpdateMessage } from "../communication/WorkspaceSocketTOB.
 import {
   setServerCanvasUpdates,
   deleteServerCanvasUpdates,
+  getServerCanvasUpdates,
   getTS,
   setTS,
 } from "./WorkspaceSocketTOB.js";
-import { getServerCanvasUpdates } from "./WorkspaceSocketTOB.js";
 const SERVER_CLIENT_WEBSOCKET_URL = "ws://backend{}:600{}";
 const PORT_TEMPLATE = "600{}";
 
@@ -75,16 +75,17 @@ const connectToOtherServers = async (isDelay) => {
         if (downedServers.has(String(id))) {
           let serverCanvasUpdate = getServerCanvasUpdates(id);
 
-          let canvasUpdates = {
+          deleteServerCanvasUpdates(id);
+
+          let message = {
             updates: serverCanvasUpdate,
-            ts: getTS(),
+            TS: getTS(),
+            canvasUpdates: getServerCanvasUpdates(-1)
           };
 
           setTimeout(() => {
-            serverConnections[String(id)].send(JSON.stringify(canvasUpdates));
+            serverConnections[String(id)].send(JSON.stringify(message));
           }, 1000);
-
-          deleteServerCanvasUpdates(id);
         }
         downedServers.delete(id);
       });
@@ -94,7 +95,7 @@ const connectToOtherServers = async (isDelay) => {
 
         delete serverConnections[id];
 
-        setServerCanvasUpdates(id);
+        setServerCanvasUpdates([], id);
 
         console.log("---------------------> server is down", downedServers);
       });
@@ -114,7 +115,6 @@ async function broadcastUpdate(
   color,
   isAck
 ) {
-  console.log("start broadcastUpdate");
   const update = {
     serverId: parseInt(localId),
     timeStamp: timeStamp,
@@ -128,10 +128,21 @@ async function broadcastUpdate(
   for (let id in serverConnections) {
     serverConnections[id].send(jsonUpdate);
   }
-  console.log("end broadcastUpdate");
 }
 
-const broadcastMissedMessages = () => { };
+async function updateWorkspacePathDB(update) {
+  console.log("Color: ", update["color"]);
+  await Workspace.updateOne(
+    {
+      workspaceCode: update["workSpaceCode"],
+    },
+    { $set: { "paths.$[element].svgFill": update["color"] } },
+    {
+      arrayFilters: [
+        { "element._id": mongoose.Types.ObjectId(update["path_id"]) },
+      ],
+    });
+}
 
 function processIncomingMessage(socket, message) {
   try {
@@ -155,27 +166,11 @@ function processIncomingMessage(socket, message) {
       );
     } else if (jsonMsg.hasOwnProperty("updates")) {
       //Manually apply these updates
-
       let updates = jsonMsg["updates"];
       setTS(jsonMsg["TS"]);
+      setServerCanvasUpdates(jsonMsg["canvasUpdates"], -1);
       for (let i = 0; i < updates.length; i++) {
-        Workspace.updateOne(
-          {
-            workspaceCode: updates[i]["workSpaceCode"],
-          },
-          { $set: { "paths.$[element].svgFill": updates[i]["color"] } },
-          {
-            arrayFilters: [
-              { "element._id": mongoose.Types.ObjectId(updates[i]["path_id"]) },
-            ],
-          },
-          (err, doc) => {
-            if (err) {
-              console.log(err);
-              console.log("Error updating Workspace Paths in DB");
-            }
-          }
-        );
+        updateWorkspacePathDB(updates[i]);
       }
     } else if (jsonMsg.hasOwnProperty("serverId")) {
       // This is a server on the client side of the connection telling us what server they are

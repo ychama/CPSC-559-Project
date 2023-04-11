@@ -16,12 +16,22 @@ var TS = Array(otherIds.length + 2).fill(0);
 // queue for processing messages
 const queue = new UpdateQueue();
 
-const setServerCanvasUpdates = (id) => {
-  serverCanvasUpdates[id] = [];
+const setServerCanvasUpdates = (newUpdates, id = -1) => {
+  if (id == -1) {
+    serverCanvasUpdates = newUpdates;
+    for (const [key, value] of Object.entries(serverCanvasUpdates)) {
+      console.log(key, value);
+    }
+  }
+  else
+    serverCanvasUpdates[id] = newUpdates;
 };
 
-const getServerCanvasUpdates = (id) => {
-  return serverCanvasUpdates[id];
+const getServerCanvasUpdates = (id = -1) => {
+  if (id == -1)
+    return serverCanvasUpdates;
+  else
+    return serverCanvasUpdates[id];
 };
 
 const deleteServerCanvasUpdates = (id) => {
@@ -37,9 +47,6 @@ const setTS = (newTS) => {
 };
 
 async function processClientUpdateMessage(targetWorkspaceCode, path_id, color) {
-  console.log("start processClientUpdateMessage");
-
-  console.log("TS", TS);
   TS[parseInt(localId)] += 1; // increment local timestamp
 
   const payload = {
@@ -57,8 +64,6 @@ async function processClientUpdateMessage(targetWorkspaceCode, path_id, color) {
     color,
     false
   );
-
-  console.log("end processClientUpdateMessage");
 }
 
 async function processServerUpdateMessage(
@@ -69,8 +74,6 @@ async function processServerUpdateMessage(
   updateTimeStamp,
   isAck
 ) {
-  console.log("start processServerUpdateMessage");
-
   TS[serverId] = updateTimeStamp;
 
   const payload = {
@@ -92,8 +95,6 @@ async function processServerUpdateMessage(
       true
     );
   }
-
-  console.log("end processServerUpdateMessage");
 }
 
 function checkServerTimeStamps(updateTimeStamp) {
