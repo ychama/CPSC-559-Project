@@ -13,13 +13,16 @@
 1. Install Docker Desktop and docker-compose
 1. Clone this repo
 1. go to `docker-compose.yml` and modify the values as needed (environments variables, ports, etc.)
-1. Run `docker-compose up --build -d`
+1. **Run `docker-compose up --build -d` to bring up the services**
    - The backends start and are exposed on ports `5001`-`5004`
    - The frontend is started and exposed on port `3001`
    - MongoDB containers (`database` services) start and are exposed on port `27017`. Data is stored on the `mongo-data` volume (on your machine's filesystem)
    - Mongo Express containers start and are exposed on port `8081`-`8084`
    - Run `docker-compose down` to bring down all the containers
-1. Go to the mongo-express services (`localhost:8081`-`localhost:8084`) to manage the MongoDB databases and add SVGs using their JSON representation (sunflower/ironma/spiderman) as well as workspaces. The templates below have to be inserted through the mongo-express services to be accessed by all servers in the system (copy the templates into each template test collection). For a sample workspace, paste the sample sunflower workspace in the workspace test collection.
+   - Containers can be viewed in the Docker Desktop UI
+1. Go to the mongo-express services (`localhost:8081`-`localhost:8084`) to manage the MongoDB databases and add SVGs using their JSON representation (sunflower/pumpkin/brazil in the `templates` dir). The templates have to be inserted through the mongo-express services to be accessed by all servers in the system (copy the templates into each template test collection).
+1. This submission already has a pre-populated database with 1 User, 3 Templates, and 3 Workspaces (canvases)
+   - The sample user's username is `test` and their password is `123`.
 
 ### Deployment
 
