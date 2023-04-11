@@ -51,7 +51,7 @@ app.get(
 
 // Web socket communication
 listenForServers();
-connectToOtherServers();
+connectToOtherServers(true);
 startFrontendSocket();
 
 // Start the server and listen for requests.

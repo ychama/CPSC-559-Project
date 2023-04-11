@@ -11,6 +11,11 @@ const otherIds = process.env.OTHER_SERVERS.split(",");
 const localPort = PORT_TEMPLATE.replace(/{}/g, localId);
 
 const serverConnections = {};
+const downedServers = new Set();
+
+const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+
+export const getDownedServers = () => { return downedServers; };
 
 const listenForServers = async () => {
   const server = http.createServer();
@@ -23,26 +28,32 @@ const listenForServers = async () => {
     port: localPort,
     httpServer: server,
   });
+
   console.log(`Websocket Server open to other servers on port ${localPort}`);
 
   // Connection from another server
-  webSocketServer.on("connection", function connection(superSocket) {
+  webSocketServer.on("connection", function connection(superSocket, req) {
+    console.log(" --------> A connection HAS been established");
+
     superSocket.on("message", function incoming(message) {
       processIncomingMessage(superSocket, message);
     });
   });
 };
 
-const connectToOtherServers = async () => {
+const connectToOtherServers = async (isDelay) => {
   // Wait for other servers to start
-  await delay(10000);
+  if (isDelay)
+    await delay(10000);
 
   otherIds.forEach((id) => {
-    // Connect to other servers with a greater Id then this one
-    if (localId < id) {
+    if (!(id in serverConnections)) {
+      // Connect to other servers with a greater Id then this one
       const serverAddress = SERVER_CLIENT_WEBSOCKET_URL.replace(/{}/g, id);
 
       const inferiorSocket = new WebSocket(serverAddress);
+
+      inferiorSocket.addEventListener("error", console.error);
 
       inferiorSocket.addEventListener("open", function (event) {
         console.log(`Connected to server ${id}`);
@@ -50,8 +61,21 @@ const connectToOtherServers = async () => {
         // send local id
         inferiorSocket.send(`{ "serverId": ${localId} }`);
 
+        downedServers.delete(id);
+
         // store connection
         serverConnections[id] = inferiorSocket;
+      });
+
+      inferiorSocket.addEventListener("close", function (event) {
+        downedServers.add(id);
+
+        delete serverConnections[id];
+
+        console.log(
+          "---------------------> server is down",
+          downedServers
+        );
       });
 
       // receive message
@@ -62,27 +86,31 @@ const connectToOtherServers = async () => {
   });
 };
 
-const delay = (ms) => new Promise((res) => setTimeout(res, ms));
-
-async function broadcastUpdate(timeStamp, workspaceCode, path_id, color, isAck) {
-  console.log("start broadcastUpdate")
+async function broadcastUpdate(
+  timeStamp,
+  workspaceCode,
+  path_id,
+  color,
+  isAck
+) {
+  console.log("start broadcastUpdate");
   const update = {
     serverId: parseInt(localId),
     timeStamp: timeStamp,
     workspaceCode: workspaceCode,
     path_id: path_id,
     color: color,
-    isAck: isAck
+    isAck: isAck,
   };
   const jsonUpdate = JSON.stringify(update);
 
   for (let id in serverConnections) {
     serverConnections[id].send(jsonUpdate);
   }
-  console.log("end broadcastUpdate")
+  console.log("end broadcastUpdate");
 }
 
-async function processIncomingMessage(socket, message) {
+function processIncomingMessage(socket, message) {
   try {
     const jsonMsg = JSON.parse(message);
 
@@ -105,9 +133,7 @@ async function processIncomingMessage(socket, message) {
     } else if (jsonMsg.hasOwnProperty("serverId")) {
       // This is a server on the client side of the connection telling us what server they are
       console.log(`Connected to server ${jsonMsg.serverId}`);
-
-      // Save connection with id
-      serverConnections[jsonMsg["serverId"]] = socket;
+      connectToOtherServers(false);
     } else {
       throw new Error("Unrecognized message received from another server");
     }
