@@ -1,7 +1,10 @@
 import Workspace from "../models/workspaceModel.js";
 import { UpdateQueue } from "../util/updateQueue.js";
 import { updateClients } from "../communication/ToFrontendSocket.js";
-import { broadcastUpdate, getDownedServers } from "../communication/ServerToServerSocket.js";
+import {
+  broadcastUpdate,
+  getDownedServers,
+} from "../communication/ServerToServerSocket.js";
 import mongoose from "mongoose";
 
 const localId = process.env.SERVER_ID;
@@ -16,13 +19,30 @@ var TS = Array(otherIds.length + 2).fill(0);
 // queue for processing messages
 const queue = new UpdateQueue();
 
-const updateOtherIds = (newOtherIds) => {
-  otherIds = newOtherIds;
+const setServerCanvasUpdates = (id) => {
+  serverCanvasUpdates[id] = [];
+};
+
+const getServerCanvasUpdates = (id) => {
+  return serverCanvasUpdates[id];
+};
+
+const deleteServerCanvasUpdates = (id) => {
+  delete serverCanvasUpdates[id];
+};
+
+const getTS = () => {
+  return TS;
+};
+
+const setTS = (newTS) => {
+  TS = newTS;
 };
 
 async function processClientUpdateMessage(targetWorkspaceCode, path_id, color) {
   console.log("start processClientUpdateMessage");
 
+  console.log("TS", TS);
   TS[parseInt(localId)] += 1; // increment local timestamp
 
   const payload = {
@@ -82,8 +102,7 @@ async function processServerUpdateMessage(
 function checkServerTimeStamps(updateTimeStamp) {
   for (let i = 0; i < otherIds.length; i++) {
     let downedServers = getDownedServers();
-    if (downedServers.has(otherIds[i]))
-      continue;
+    if (downedServers.has(otherIds[i])) continue;
     if (updateTimeStamp > TS[parseInt(otherIds[i])]) return false;
   }
   return true;
@@ -121,13 +140,21 @@ function processEnqueuedUpdate() {
 
       updateClients(update.payload.workspaceCode, data);
 
+      let payload = {
+        path_id: path_id,
+        color: color,
+        workSpaceCode: update.payload.workspaceCode,
+      };
+
       for (const [key, value] of Object.entries(serverCanvasUpdates)) {
         let tempUpdates = [...value];
 
-        tempUpdates.push(jsonMsg);
+        tempUpdates.push(payload);
 
         serverCanvasUpdates[key] = tempUpdates;
       }
+
+      console.log("---------->", serverCanvasUpdates);
     }
   }
 }
@@ -135,5 +162,9 @@ function processEnqueuedUpdate() {
 export {
   processClientUpdateMessage,
   processServerUpdateMessage,
-  updateOtherIds,
+  setServerCanvasUpdates,
+  getServerCanvasUpdates,
+  deleteServerCanvasUpdates,
+  getTS,
+  setTS,
 };

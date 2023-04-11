@@ -1,7 +1,15 @@
 import http from "http";
+import Workspace from "../models/workspaceModel.js";
+import mongoose from "mongoose";
 import { WebSocketServer, WebSocket } from "ws";
 import { processServerUpdateMessage } from "../communication/WorkspaceSocketTOB.js";
-
+import {
+  setServerCanvasUpdates,
+  deleteServerCanvasUpdates,
+  getTS,
+  setTS,
+} from "./WorkspaceSocketTOB.js";
+import { getServerCanvasUpdates } from "./WorkspaceSocketTOB.js";
 const SERVER_CLIENT_WEBSOCKET_URL = "ws://backend{}:600{}";
 const PORT_TEMPLATE = "600{}";
 
@@ -15,13 +23,15 @@ const downedServers = new Set();
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
-export const getDownedServers = () => { return downedServers; };
+export const getDownedServers = () => {
+  return downedServers;
+};
 
 const listenForServers = async () => {
   const server = http.createServer();
 
   // overwrite this port when we create the web socket server
-  server.listen(localId, "0.0.0.0", function () { });
+  server.listen(localId, "0.0.0.0", function () {});
 
   // Set up server
   const webSocketServer = new WebSocketServer({
@@ -43,8 +53,7 @@ const listenForServers = async () => {
 
 const connectToOtherServers = async (isDelay) => {
   // Wait for other servers to start
-  if (isDelay)
-    await delay(10000);
+  if (isDelay) await delay(10000);
 
   otherIds.forEach((id) => {
     if (!(id in serverConnections)) {
@@ -58,13 +67,27 @@ const connectToOtherServers = async (isDelay) => {
       inferiorSocket.addEventListener("open", function (event) {
         console.log(`Connected to server ${id}`);
 
+        // store connection
+        serverConnections[id] = inferiorSocket;
+
         // send local id
         inferiorSocket.send(`{ "serverId": ${localId} }`);
 
-        downedServers.delete(id);
+        if (downedServers.has(String(id))) {
+          let serverCanvasUpdate = getServerCanvasUpdates(id);
 
-        // store connection
-        serverConnections[id] = inferiorSocket;
+          let canvasUpdates = {
+            updates: serverCanvasUpdate,
+            ts: getTS(),
+          };
+
+          setTimeout(() => {
+            serverConnections[String(id)].send(JSON.stringify(canvasUpdates));
+          }, 1000);
+
+          deleteServerCanvasUpdates(id);
+        }
+        downedServers.delete(id);
       });
 
       inferiorSocket.addEventListener("close", function (event) {
@@ -72,10 +95,9 @@ const connectToOtherServers = async (isDelay) => {
 
         delete serverConnections[id];
 
-        console.log(
-          "---------------------> server is down",
-          downedServers
-        );
+        setServerCanvasUpdates(id);
+
+        console.log("---------------------> server is down", downedServers);
       });
 
       // receive message
@@ -110,6 +132,8 @@ async function broadcastUpdate(
   console.log("end broadcastUpdate");
 }
 
+const broadcastMissedMessages = () => {};
+
 function processIncomingMessage(socket, message) {
   try {
     const jsonMsg = JSON.parse(message);
@@ -130,6 +154,30 @@ function processIncomingMessage(socket, message) {
         jsonMsg["timeStamp"],
         jsonMsg["isAck"]
       );
+    } else if (jsonMsg.hasOwnProperty("updates")) {
+      //Manually apply these updates
+
+      let updates = jsonMsg["updates"];
+      setTS(jsonMsg["TS"]);
+      for (let i = 0; i < updates.length; i++) {
+        Workspace.updateOne(
+          {
+            workspaceCode: updates[i]["workSpaceCode"],
+          },
+          { $set: { "paths.$[element].svgFill": updates[i]["color"] } },
+          {
+            arrayFilters: [
+              { "element._id": mongoose.Types.ObjectId(updates[i]["path_id"]) },
+            ],
+          },
+          (err, doc) => {
+            if (err) {
+              console.log(err);
+              console.log("Error updating Workspace Paths in DB");
+            }
+          }
+        );
+      }
     } else if (jsonMsg.hasOwnProperty("serverId")) {
       // This is a server on the client side of the connection telling us what server they are
       console.log(`Connected to server ${jsonMsg.serverId}`);
