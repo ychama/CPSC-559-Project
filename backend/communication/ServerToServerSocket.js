@@ -14,14 +14,16 @@ const serverConnections = {};
 const downedServers = new Set();
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
-
-export const getDownedServers = () => { return downedServers; };
+// Get list of servers that have crashed.
+export const getDownedServers = () => {
+  return downedServers;
+};
 
 const listenForServers = async () => {
   const server = http.createServer();
 
   // overwrite this port when we create the web socket server
-  server.listen(localId, "0.0.0.0", function () { });
+  server.listen(localId, "0.0.0.0", function () {});
 
   // Set up server
   const webSocketServer = new WebSocketServer({
@@ -43,8 +45,7 @@ const listenForServers = async () => {
 
 const connectToOtherServers = async (isDelay) => {
   // Wait for other servers to start
-  if (isDelay)
-    await delay(10000);
+  if (isDelay) await delay(10000);
 
   otherIds.forEach((id) => {
     if (!(id in serverConnections)) {
@@ -72,10 +73,7 @@ const connectToOtherServers = async (isDelay) => {
 
         delete serverConnections[id];
 
-        console.log(
-          "---------------------> server is down",
-          downedServers
-        );
+        console.log("---------------------> server is down", downedServers);
       });
 
       // receive message
@@ -85,6 +83,8 @@ const connectToOtherServers = async (isDelay) => {
     }
   });
 };
+
+// Broadcasting update to all other servers in the system, this is done to adhere to the push protocol
 
 async function broadcastUpdate(
   timeStamp,
