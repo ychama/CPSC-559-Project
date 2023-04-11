@@ -112,8 +112,8 @@ const AccountPage = () => {
           <Image src={logo} alt='logo' />
         </AspectRatio>
         <Title order={5} color='black' align='center'>
-          Thank you for providing us with your creativity and art! Feel free to
-          edit any account information below.
+          Thank you for providing us with your creativity and art! View your
+          information below.
         </Title>
         <Paper padding='lg' shadow='xs' m='md'>
           <Text align='center' size='xl' weight={700} m='md' pt='md'>
@@ -213,7 +213,8 @@ const AccountPage = () => {
             </>
           )}
           <Center>
-            <Button
+            {/** edit and delete functionality removed */}
+            {/* <Button
               m='md'
               mr='sm'
               onClick={() => {
@@ -248,8 +249,8 @@ const AccountPage = () => {
               }}
             >
               {edit ? "Save" : "Edit Information"}
-            </Button>
-            {edit ? (
+            </Button> */}
+            {/* {edit ? (
               <Button ml='sm' m='md' color='red' onClick={() => setEdit(!edit)}>
                 Cancel
               </Button>
@@ -287,7 +288,7 @@ const AccountPage = () => {
                   Delete Account
                 </Button>
               </>
-            )}
+            )} */}
           </Center>
         </Paper>
       </Container>
