@@ -79,7 +79,7 @@ services:
 
   backend1:
     build: ./backend
-    restart: unless-stopped
+    restart: on-failure:5
     ports:
       - 5001:5000
       - 7001:7000
@@ -90,7 +90,7 @@ services:
 
   backend2:
     build: ./backend
-    restart: unless-stopped
+    restart: on-failure:5
     ports:
       - 5002:5000
       - 7002:7000
@@ -101,7 +101,7 @@ services:
 
   backend3:
     build: ./backend
-    restart: unless-stopped
+    restart: on-failure:5
     ports:
       - 5003:5000
       - 7003:7000
@@ -112,7 +112,7 @@ services:
 
   backend4:
     build: ./backend
-    restart: unless-stopped
+    restart: on-failure:5
     ports:
       - 5004:5000
       - 7004:7000

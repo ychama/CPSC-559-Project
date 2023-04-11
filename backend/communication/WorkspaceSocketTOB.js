@@ -45,6 +45,7 @@ const setTS = (newTS) => {
   TS = newTS;
 };
 
+// Function to process an incoming client canvas update
 async function processClientUpdateMessage(targetWorkspaceCode, path_id, color) {
   TS[parseInt(localId)] += 1; // increment local timestamp
 
@@ -53,7 +54,7 @@ async function processClientUpdateMessage(targetWorkspaceCode, path_id, color) {
     path_id: path_id,
     color: color,
   };
-
+  // Enque the update
   queue.enqueue(parseInt(localId), TS[parseInt(localId)], payload);
   processEnqueuedUpdate();
   await broadcastUpdate(
@@ -65,6 +66,7 @@ async function processClientUpdateMessage(targetWorkspaceCode, path_id, color) {
   );
 }
 
+// Function to process an incoming server canvas update
 async function processServerUpdateMessage(
   targetWorkspaceCode,
   path_id,
@@ -80,10 +82,11 @@ async function processServerUpdateMessage(
     path_id: path_id,
     color: color,
   };
-
+  // Enque the update if it is not an acknowledgment
   if (!isAck) queue.enqueue(serverId, updateTimeStamp, payload);
   processEnqueuedUpdate();
 
+  // Check timestamps and ack, broadcast if necessary
   if (!isAck && updateTimeStamp > TS[parseInt(localId)]) {
     TS[parseInt(localId)] = updateTimeStamp;
     await broadcastUpdate(
@@ -95,7 +98,7 @@ async function processServerUpdateMessage(
     );
   }
 }
-
+// Function to check list of timestamps to guarantee consistency
 function checkServerTimeStamps(updateTimeStamp) {
   for (let i = 0; i < otherIds.length; i++) {
     let downedServers = getDownedServers();
@@ -105,6 +108,7 @@ function checkServerTimeStamps(updateTimeStamp) {
   return true;
 }
 
+// Function to update workspaces with enqueued updates (priority queue by timestamp)
 function processEnqueuedUpdate() {
   if (!queue.isEmpty()) {
     const update = queue.front();
@@ -134,7 +138,7 @@ function processEnqueuedUpdate() {
         path_id: path_id,
         color: color,
       };
-
+      // Update clients with the workspace code
       updateClients(update.payload.workspaceCode, data);
 
       let payload = {

@@ -10,6 +10,8 @@ import axios from "axios";
 
 // This process is replicated as can be seen in the docker-compose.yml for the project.
 
+setTimeout(() => {}, 3000);
+
 // keep constant URL strings for checking health and directing users to available servers (using both HTTP and web socket "connections").
 const SERVER_CLIENT_BASE_URL = "http://localhost:500{}/api";
 const SERVER_CLIENT_WEBSOCKET_URL = "ws://localhost:700{}";
@@ -98,6 +100,5 @@ app.route("/api/server").get((req, res) => {
 // Start server and listen for requests
 app.listen(port, () => {
   console.log("Server started on port " + port);
-
   setInterval(healthCheck, 5000);
 });

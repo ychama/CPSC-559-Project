@@ -37,7 +37,7 @@ const LoginPage = () => {
     if (localStorage.getItem("token")) {
       navigate("/home");
     }
-    setHTTPBackendURL;
+    setHTTPBackendURL();
   }, []);
 
   // Reset Backend HTTP URL every 8 minutes, to ensure the primary replica is being used

@@ -23,6 +23,7 @@ const downedServers = new Set();
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
+// Get list of servers that have crashed.
 export const getDownedServers = () => {
   return downedServers;
 };
@@ -108,6 +109,8 @@ const connectToOtherServers = async (isDelay) => {
     }
   });
 };
+
+// Broadcasting update to all other servers in the system, this is done to adhere to the push protocol
 
 async function broadcastUpdate(
   timeStamp,
