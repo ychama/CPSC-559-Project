@@ -189,7 +189,7 @@ async function deleteUser(userInfo) {
 
   try {
     console.log(userInfo);
-    const existingUser = await User.findOne(userInfo);
+    const existingUser = await User.findOne({ userName: userInfo["userName"] });
 
     if (existingUser) {
       await existingUser.remove();
@@ -205,7 +205,9 @@ async function deleteUser(userInfo) {
 async function updateUser(userInfo) {
   try {
     delete userInfo["type"];
-    const user = await User.findOne({ userName: userInfo["userName"] });
+    const user = await User.findOne({
+      userName: userInfo["userName"],
+    });
 
     if (user) {
       const updatedUser = await User.findByIdAndUpdate(
