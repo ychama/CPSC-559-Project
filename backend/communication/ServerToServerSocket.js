@@ -165,7 +165,7 @@ async function createUser(userInfo) {
   delete userInfo["type"];
 
   try {
-    const newUser = await Workspace.create(userInfo);
+    const newUser = await User.create(userInfo);
   } catch (err) {
     console.log(
       "An error has occured while creating a user, after a server has recorvered with the following error ",

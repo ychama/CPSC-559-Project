@@ -23,9 +23,6 @@ const queue = new UpdateQueue();
 const setServerCanvasUpdates = (newUpdates, id = -1) => {
   if (id == -1) {
     serverCanvasUpdates = newUpdates;
-    for (const [key, value] of Object.entries(serverCanvasUpdates)) {
-      console.log(key, value);
-    }
   } else serverCanvasUpdates[id] = newUpdates;
 };
 
@@ -37,9 +34,6 @@ const getServerCanvasUpdates = (id = -1) => {
 const setServerHttpUpdates = (newUpdates, id = -1) => {
   if (id == -1) {
     serverHttpUpdates = newUpdates;
-    for (const [key, value] of Object.entries(serverHttpUpdates)) {
-      console.log(key, value);
-    }
   } else serverHttpUpdates[id] = newUpdates;
 };
 
