@@ -1,7 +1,15 @@
 import http from "http";
+import Workspace from "../models/workspaceModel.js";
+import mongoose from "mongoose";
 import { WebSocketServer, WebSocket } from "ws";
 import { processServerUpdateMessage } from "../communication/WorkspaceSocketTOB.js";
-
+import {
+  setServerCanvasUpdates,
+  deleteServerCanvasUpdates,
+  getServerCanvasUpdates,
+  getTS,
+  setTS,
+} from "./WorkspaceSocketTOB.js";
 const SERVER_CLIENT_WEBSOCKET_URL = "ws://backend{}:600{}";
 const PORT_TEMPLATE = "600{}";
 
@@ -14,6 +22,7 @@ const serverConnections = {};
 const downedServers = new Set();
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+
 // Get list of servers that have crashed.
 export const getDownedServers = () => {
   return downedServers;
@@ -59,19 +68,36 @@ const connectToOtherServers = async (isDelay) => {
       inferiorSocket.addEventListener("open", function (event) {
         console.log(`Connected to server ${id}`);
 
+        // store connection
+        serverConnections[id] = inferiorSocket;
+
         // send local id
         inferiorSocket.send(`{ "serverId": ${localId} }`);
 
-        downedServers.delete(id);
+        if (downedServers.has(String(id))) {
+          let serverCanvasUpdate = getServerCanvasUpdates(id);
 
-        // store connection
-        serverConnections[id] = inferiorSocket;
+          deleteServerCanvasUpdates(id);
+
+          let message = {
+            updates: serverCanvasUpdate,
+            TS: getTS(),
+            canvasUpdates: getServerCanvasUpdates(-1),
+          };
+
+          setTimeout(() => {
+            serverConnections[String(id)].send(JSON.stringify(message));
+          }, 1000);
+        }
+        downedServers.delete(id);
       });
 
       inferiorSocket.addEventListener("close", function (event) {
         downedServers.add(id);
 
         delete serverConnections[id];
+
+        setServerCanvasUpdates([], id);
 
         console.log("---------------------> server is down", downedServers);
       });
@@ -93,7 +119,6 @@ async function broadcastUpdate(
   color,
   isAck
 ) {
-  console.log("start broadcastUpdate");
   const update = {
     serverId: parseInt(localId),
     timeStamp: timeStamp,
@@ -107,7 +132,24 @@ async function broadcastUpdate(
   for (let id in serverConnections) {
     serverConnections[id].send(jsonUpdate);
   }
-  console.log("end broadcastUpdate");
+}
+
+async function updateWorkspacePathDB(update) {
+  try {
+    await Workspace.findOneAndUpdate(
+      {
+        workspaceCode: update["workSpaceCode"],
+      },
+      { $set: { "paths.$[element].svgFill": update["color"] } },
+      {
+        arrayFilters: [
+          { "element._id": mongoose.Types.ObjectId(update["path_id"]) },
+        ],
+      }
+    );
+  } catch (err) {
+    console.log("error updating Path: ", err);
+  }
 }
 
 function processIncomingMessage(socket, message) {
@@ -130,6 +172,16 @@ function processIncomingMessage(socket, message) {
         jsonMsg["timeStamp"],
         jsonMsg["isAck"]
       );
+    } else if (jsonMsg.hasOwnProperty("updates")) {
+      //Manually apply these updates
+      let updates = jsonMsg["updates"];
+      setTS(jsonMsg["TS"]);
+      setServerCanvasUpdates(jsonMsg["canvasUpdates"], -1);
+      for (let i = 0; i < updates.length; i++) {
+        updateWorkspacePathDB(updates[i])
+          .then(() => console.log("Updated Path"))
+          .catch(() => console.log("Error Updating Path"));
+      }
     } else if (jsonMsg.hasOwnProperty("serverId")) {
       // This is a server on the client side of the connection telling us what server they are
       console.log(`Connected to server ${jsonMsg.serverId}`);

@@ -19,14 +19,34 @@ var TS = Array(otherIds.length + 2).fill(0);
 // queue for processing messages
 const queue = new UpdateQueue();
 
-const updateOtherIds = (newOtherIds) => {
-  otherIds = newOtherIds;
+const setServerCanvasUpdates = (newUpdates, id = -1) => {
+  if (id == -1) {
+    serverCanvasUpdates = newUpdates;
+    for (const [key, value] of Object.entries(serverCanvasUpdates)) {
+      console.log(key, value);
+    }
+  } else serverCanvasUpdates[id] = newUpdates;
+};
+
+const getServerCanvasUpdates = (id = -1) => {
+  if (id == -1) return serverCanvasUpdates;
+  else return serverCanvasUpdates[id];
+};
+
+const deleteServerCanvasUpdates = (id) => {
+  delete serverCanvasUpdates[id];
+};
+
+const getTS = () => {
+  return TS;
+};
+
+const setTS = (newTS) => {
+  TS = newTS;
 };
 
 // Function to process an incoming client canvas update
 async function processClientUpdateMessage(targetWorkspaceCode, path_id, color) {
-  console.log("start processClientUpdateMessage");
-
   TS[parseInt(localId)] += 1; // increment local timestamp
 
   const payload = {
@@ -44,8 +64,6 @@ async function processClientUpdateMessage(targetWorkspaceCode, path_id, color) {
     color,
     false
   );
-
-  console.log("end processClientUpdateMessage");
 }
 
 // Function to process an incoming server canvas update
@@ -57,8 +75,6 @@ async function processServerUpdateMessage(
   updateTimeStamp,
   isAck
 ) {
-  console.log("start processServerUpdateMessage");
-
   TS[serverId] = updateTimeStamp;
 
   const payload = {
@@ -81,8 +97,6 @@ async function processServerUpdateMessage(
       true
     );
   }
-
-  console.log("end processServerUpdateMessage");
 }
 // Function to check list of timestamps to guarantee consistency
 function checkServerTimeStamps(updateTimeStamp) {
@@ -127,13 +141,21 @@ function processEnqueuedUpdate() {
       // Update clients with the workspace code
       updateClients(update.payload.workspaceCode, data);
 
+      let payload = {
+        path_id: path_id,
+        color: color,
+        workSpaceCode: update.payload.workspaceCode,
+      };
+
       for (const [key, value] of Object.entries(serverCanvasUpdates)) {
         let tempUpdates = [...value];
 
-        tempUpdates.push(jsonMsg);
+        tempUpdates.push(payload);
 
         serverCanvasUpdates[key] = tempUpdates;
       }
+
+      console.log("---------->", serverCanvasUpdates);
     }
   }
 }
@@ -141,5 +163,9 @@ function processEnqueuedUpdate() {
 export {
   processClientUpdateMessage,
   processServerUpdateMessage,
-  updateOtherIds,
+  setServerCanvasUpdates,
+  getServerCanvasUpdates,
+  deleteServerCanvasUpdates,
+  getTS,
+  setTS,
 };
