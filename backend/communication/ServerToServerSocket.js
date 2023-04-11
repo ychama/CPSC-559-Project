@@ -134,25 +134,7 @@ async function broadcastUpdate(
   }
 }
 
-async function updateWorkspacePathDB(update) {
-  try {
-    await Workspace.findOneAndUpdate(
-      {
-        workspaceCode: update["workSpaceCode"],
-      },
-      { $set: { "paths.$[element].svgFill": update["color"] } },
-      {
-        arrayFilters: [
-          { "element._id": mongoose.Types.ObjectId(update["path_id"]) },
-        ],
-      }
-    );
-  } catch (err) {
-    console.log("error updating Path: ", err);
-  }
-}
-
-function processIncomingMessage(socket, message) {
+async function processIncomingMessage(socket, message) {
   try {
     const jsonMsg = JSON.parse(message);
 
@@ -178,9 +160,27 @@ function processIncomingMessage(socket, message) {
       setTS(jsonMsg["TS"]);
       setServerCanvasUpdates(jsonMsg["canvasUpdates"], -1);
       for (let i = 0; i < updates.length; i++) {
-        updateWorkspacePathDB(updates[i])
-          .then(() => console.log("Updated Path"))
-          .catch(() => console.log("Error Updating Path"));
+        console.log("Updating color: " + updates[i]["color"]);
+        try {
+          await Workspace.findOneAndUpdate(
+            {
+              workspaceCode: updates[i]["workSpaceCode"],
+            },
+            { $set: { "paths.$[element].svgFill": updates[i]["color"] } },
+            {
+              arrayFilters: [
+                {
+                  "element._id": mongoose.Types.ObjectId(updates[i]["path_id"]),
+                },
+              ],
+            }
+          );
+        } catch (err) {
+          console.log(
+            "An error occurred with the following update: " + updates[i]
+          );
+          console.log(err);
+        }
       }
     } else if (jsonMsg.hasOwnProperty("serverId")) {
       // This is a server on the client side of the connection telling us what server they are
