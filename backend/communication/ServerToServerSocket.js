@@ -23,13 +23,15 @@ const downedServers = new Set();
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
-export const getDownedServers = () => { return downedServers; };
+export const getDownedServers = () => {
+  return downedServers;
+};
 
 const listenForServers = async () => {
   const server = http.createServer();
 
   // overwrite this port when we create the web socket server
-  server.listen(localId, "0.0.0.0", function () { });
+  server.listen(localId, "0.0.0.0", function () {});
 
   // Set up server
   const webSocketServer = new WebSocketServer({
@@ -51,8 +53,7 @@ const listenForServers = async () => {
 
 const connectToOtherServers = async (isDelay) => {
   // Wait for other servers to start
-  if (isDelay)
-    await delay(10000);
+  if (isDelay) await delay(10000);
 
   otherIds.forEach((id) => {
     if (!(id in serverConnections)) {
@@ -80,7 +81,7 @@ const connectToOtherServers = async (isDelay) => {
           let message = {
             updates: serverCanvasUpdate,
             TS: getTS(),
-            canvasUpdates: getServerCanvasUpdates(-1)
+            canvasUpdates: getServerCanvasUpdates(-1),
           };
 
           setTimeout(() => {
@@ -131,17 +132,21 @@ async function broadcastUpdate(
 }
 
 async function updateWorkspacePathDB(update) {
-  console.log("Color: ", update["color"]);
-  await Workspace.updateOne(
-    {
-      workspaceCode: update["workSpaceCode"],
-    },
-    { $set: { "paths.$[element].svgFill": update["color"] } },
-    {
-      arrayFilters: [
-        { "element._id": mongoose.Types.ObjectId(update["path_id"]) },
-      ],
-    });
+  try {
+    await Workspace.updateOne(
+      {
+        workspaceCode: update["workSpaceCode"],
+      },
+      { $set: { "paths.$[element].svgFill": update["color"] } },
+      {
+        arrayFilters: [
+          { "element._id": mongoose.Types.ObjectId(update["path_id"]) },
+        ],
+      }
+    );
+  } catch (err) {
+    console.log("error updating Path: ", err);
+  }
 }
 
 function processIncomingMessage(socket, message) {
@@ -170,7 +175,9 @@ function processIncomingMessage(socket, message) {
       setTS(jsonMsg["TS"]);
       setServerCanvasUpdates(jsonMsg["canvasUpdates"], -1);
       for (let i = 0; i < updates.length; i++) {
-        updateWorkspacePathDB(updates[i]);
+        updateWorkspacePathDB(updates[i])
+          .then(() => console.log("Updated Path"))
+          .catch(() => console.log("Error Updating Path"));
       }
     } else if (jsonMsg.hasOwnProperty("serverId")) {
       // This is a server on the client side of the connection telling us what server they are

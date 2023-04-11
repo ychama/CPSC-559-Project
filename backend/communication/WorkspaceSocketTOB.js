@@ -1,7 +1,10 @@
 import Workspace from "../models/workspaceModel.js";
 import { UpdateQueue } from "../util/updateQueue.js";
 import { updateClients } from "../communication/ToFrontendSocket.js";
-import { broadcastUpdate, getDownedServers } from "../communication/ServerToServerSocket.js";
+import {
+  broadcastUpdate,
+  getDownedServers,
+} from "../communication/ServerToServerSocket.js";
 import mongoose from "mongoose";
 
 const localId = process.env.SERVER_ID;
@@ -22,16 +25,12 @@ const setServerCanvasUpdates = (newUpdates, id = -1) => {
     for (const [key, value] of Object.entries(serverCanvasUpdates)) {
       console.log(key, value);
     }
-  }
-  else
-    serverCanvasUpdates[id] = newUpdates;
+  } else serverCanvasUpdates[id] = newUpdates;
 };
 
 const getServerCanvasUpdates = (id = -1) => {
-  if (id == -1)
-    return serverCanvasUpdates;
-  else
-    return serverCanvasUpdates[id];
+  if (id == -1) return serverCanvasUpdates;
+  else return serverCanvasUpdates[id];
 };
 
 const deleteServerCanvasUpdates = (id) => {
@@ -100,8 +99,7 @@ async function processServerUpdateMessage(
 function checkServerTimeStamps(updateTimeStamp) {
   for (let i = 0; i < otherIds.length; i++) {
     let downedServers = getDownedServers();
-    if (downedServers.has(otherIds[i]))
-      continue;
+    if (downedServers.has(otherIds[i])) continue;
     if (updateTimeStamp > TS[parseInt(otherIds[i])]) return false;
   }
   return true;
