@@ -152,7 +152,12 @@ async function createWorkspace(workspaceInfo) {
   delete workspaceInfo["type"];
 
   try {
-    const newWorkspace = await Workspace.create(workspaceInfo);
+    const workspaceExists = await Workspace.exists({
+      workspaceName: workspaceInfo["workspaceName"],
+    });
+    if (!workspaceExists) {
+      const newWorkspace = await Workspace.create(workspaceInfo);
+    }
   } catch (err) {
     console.log(
       "An error has occured while creating a workspace, after a server has recorvered with the following error ",
@@ -189,7 +194,7 @@ async function deleteUser(userInfo) {
 
   try {
     console.log(userInfo);
-    const existingUser = await User.findOne(userInfo);
+    const existingUser = await User.findOne({ userName: userInfo["userName"] });
 
     if (existingUser) {
       await existingUser.remove();
@@ -205,7 +210,9 @@ async function deleteUser(userInfo) {
 async function updateUser(userInfo) {
   try {
     delete userInfo["type"];
-    const user = await User.findOne({ userName: userInfo["userName"] });
+    const user = await User.findOne({
+      userName: userInfo["userName"],
+    });
 
     if (user) {
       const updatedUser = await User.findByIdAndUpdate(
@@ -263,13 +270,13 @@ async function processIncomingMessage(socket, message) {
 
       for (let i = 0; i < httpUpdates.length; i++) {
         if (httpUpdates[i]["type"] === "createWorkspace") {
-          createWorkspace(httpUpdates[i]);
+          await createWorkspace(httpUpdates[i]);
         } else if (httpUpdates[i]["type"] === "createUser") {
-          createUser(httpUpdates[i]);
+          await createUser(httpUpdates[i]);
         } else if (httpUpdates[i]["type"] === "deleteUser") {
-          deleteUser(httpUpdates[i]);
+          await deleteUser(httpUpdates[i]);
         } else if (httpUpdates[i]["type"] === "updateUser") {
-          updateUser(httpUpdates[i]);
+          await updateUser(httpUpdates[i]);
         }
       }
 

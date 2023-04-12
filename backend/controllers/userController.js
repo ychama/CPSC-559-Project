@@ -245,8 +245,11 @@ const updateUser = asyncHandler(async (req, res) => {
         new: true,
       });
 
+      delete request["isBroadcast"];
+
       let update = {
         user_id: user._id,
+        userName: req.params.userName,
         request: request,
         type: "updateUser",
       };
