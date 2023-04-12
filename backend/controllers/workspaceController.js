@@ -19,6 +19,14 @@ const createWorkspace = asyncHandler(async (req, res) => {
       workspaceCode = req.body.workspaceCode;
     }
 
+    // Can't have duplicate workspace names
+    const workspaceExists = await Workspace.exists({
+      workspaceName: req.body.workspaceName,
+    });
+    if (workspaceExists) {
+      throw new Error("Workspace with this name already exists");
+    }
+
     // Create the new workspace document in the MongoDB instance using the Workspace model and request body attributes
     // Mongoose handles creating the document in the MongoDB instance
     const newWorkspace = await Workspace.create({
