@@ -148,6 +148,7 @@ async function broadcastUpdate(
   }
 }
 
+// Function to create a workspace for recovery
 async function createWorkspace(workspaceInfo) {
   delete workspaceInfo["type"];
 
@@ -165,10 +166,11 @@ async function createWorkspace(workspaceInfo) {
     );
   }
 }
-
+// Function to create a user for recovery
 async function createUser(userInfo) {
   try {
     delete userInfo["type"];
+    console.log("Received user info: ", userInfo);
 
     // Check if the username or email exist in the database
     const userNameExists = await User.exists({
@@ -177,18 +179,23 @@ async function createUser(userInfo) {
     const userEmailExists = await User.exists({
       userEmail: userInfo["userEmail"],
     });
-
-    if (!userEmailExists && !userNameExist) {
+    console.log(
+      "UserNameExists and UserEmailExists: " +
+        userNameExists +
+        " " +
+        userEmailExists
+    );
+    if (!userEmailExists && !userNameExists) {
       const newUser = await User.create(userInfo);
     }
   } catch (err) {
     console.log(
-      "An error has occured while creating a user, after a server has recorvered with the following error ",
+      "An error has occured while creating a user, after a server has recovered with the following error ",
       err
     );
   }
 }
-
+// Function to delete a user for recovery
 async function deleteUser(userInfo) {
   delete userInfo["type"];
 
@@ -201,12 +208,12 @@ async function deleteUser(userInfo) {
     }
   } catch (err) {
     console.log(
-      "An error has occured while deleting a user, after a server has recorvered with the following error ",
+      "An error has occured while deleting a user, after a server has recovered with the following error ",
       err
     );
   }
 }
-
+// Function to update a user for recovery
 async function updateUser(userInfo) {
   try {
     delete userInfo["type"];
@@ -226,16 +233,17 @@ async function updateUser(userInfo) {
     console.log(userInfo);
   } catch (err) {
     console.log(
-      "An error has occured while updating a user, after a server has recorvered with the following error ",
+      "An error has occured while updating a user, after a server has recovered with the following error ",
       err
     );
   }
 }
 
+// Function to process an incoming server message
 async function processIncomingMessage(socket, message) {
   try {
     const jsonMsg = JSON.parse(message);
-
+    // Check the type of message based on JSON properties
     if (
       jsonMsg.hasOwnProperty("serverId") &&
       jsonMsg.hasOwnProperty("timeStamp") &&
