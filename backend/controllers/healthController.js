@@ -21,7 +21,7 @@ const getHealth = asyncHandler(async (req, res) => {
 
     if (process.env.DB_CONNECTED) {
       console.log("Exiting server...");
-      process.exit(5);
+      process.exit(0);
     }
   }
 });
