@@ -178,7 +178,7 @@ async function createUser(userInfo) {
       userEmail: userInfo["userEmail"],
     });
 
-    if (!userEmailExists && !userNameExist) {
+    if (!userEmailExists && !userNameExists) {
       const newUser = await User.create(userInfo);
     }
   } catch (err) {
