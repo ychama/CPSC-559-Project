@@ -28,7 +28,7 @@ const TemplateCard = ({ _id, templateName, paths, groupTransform }) => {
   const findImage = () => {
     if (templateName === "pumpkin") {
       return pumpkin;
-    } else if (templateName === "flower1") {
+    } else if (templateName === "flower1" || templateName === "Flower") {
       return flower;
     } else return brasil;
   };
